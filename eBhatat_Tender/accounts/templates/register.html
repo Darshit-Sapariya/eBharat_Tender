@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-5 text-center">
+         <div class="row justify-content-center" style="margin-left: 115px;">
+          <!-- Centered Logo -->
+            <div class="col-md-7 text-center">
+              <img src="{% static 'images/Logo/gov-logo.png' %}"
+                  class="img-fluid "
+                  alt="Government Logo"
+                  style="max-width: 150px;">
+            </div>
+          </div>   
+          <!-- Heading -->
+          <h2 class="fw-normal mb-3" style="letter-spacing: 1px;">
+            Create Your Account
+          </h2>
+
+          <p class="text-muted mb-4">
+            Register to access the eBharat Government Tender Portal
+          </p>
+
+          <!-- Registration Form -->
+          <form method="POST">
+            {% csrf_token %}
+
+            <!-- Full Name -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="full_name"
+                     class="form-control form-control-lg"
+                     placeholder="Enter your full name" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Email Address</label>
+              <input type="email" name="email"
+                     class="form-control form-control-lg"
+                     placeholder="Enter your email address" required>
+            </div>
+
+            <!-- Mobile -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Mobile Number</label>
+              <input type="tel" name="mobile"
+                     class="form-control form-control-lg"
+                     placeholder="Enter your mobile number" required>
+            </div>
+
+            <!-- Username -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Username</label>
+              <input type="text" name="username"
+                     class="form-control form-control-lg"
+                     placeholder="Choose username" required>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Password</label>
+              <input type="password" name="password"
+                     class="form-control form-control-lg"
+                     placeholder="Enter password" required>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-3 text-start">
+              <label class="form-label">Confirm Password</label>
+              <input type="password" name="confirm_password"
+                     class="form-control form-control-lg"
+                     placeholder="Confirm password" required>
+            </div>
+
+            <!-- Declaration -->
+            <div class="form-check mb-4 text-start">
+              <input class="form-check-input" type="checkbox" required>
+              <label class="form-check-label">
+                I declare that the information provided is true and correct.
+              </label>
+            </div>
+
+            <!-- Register Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                Register
+              </button>
+            </div>
+
+            <!-- Login Link -->
+            <p class="mt-3 mb-0">
+              Already have an account?
+              <a href="{% url 'accounts:login' %}" class="text-decoration-none">
+                Login here
+              </a>
+            </p>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+  /* Header slight zoom */
+    .tender-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        transition: transform 0.3s ease;
+    }
+    .tender-title:hover {
+        transform: scale(1.03);
+    }
+
+    /* Section headings */
+    .section-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        border-left: 4px solid #0d6efd;
+        padding-left: 10px;
+    }
+
+    /* Highlight boxes */
+    .highlight-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+
+    .important-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #198754;
+    }
+
+    .date-highlight {
+        font-weight: 600;
+        color: #dc3545;
+    }

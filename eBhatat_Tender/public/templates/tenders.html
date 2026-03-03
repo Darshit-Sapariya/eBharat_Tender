@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Open Tenders Section -->
+ <!-- Open Tenders Section -->
+    <section id="tenders" class="py-16 lg:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins">Open Tenders</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Explore current opportunities and find the perfect match for your business
+                </p>
+            </div>
+            
+            <!-- Search and Filter -->
+          <form method="GET" class="mb-8 flex flex-col md:flex-row gap-4">
+
+    <div class="flex-1 relative">
+        <input
+            type="text"
+            name="search"
+            value="{{ search_query }}"
+            placeholder="Search tenders..."
+            class="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-lg"
+        />
+    </div>
+
+    <div class="flex gap-2">
+        <select name="category" class="px-4 py-3 border border-gray-200 rounded-lg">
+    <option value="all">All Categories</option>
+
+    <option value="Infrastructure"
+        {% if selected_category == "Infrastructure" %}selected{% endif %}>
+        Infrastructure
+    </option>
+
+    <option value="Construction"
+        {% if selected_category == "Construction" %}selected{% endif %}>
+        Construction
+    </option>
+
+    <option value="Road & Highway"
+        {% if selected_category == "Road & Highway" %}selected{% endif %}>
+        Road & Highway
+    </option>
+
+    <option value="Water Supply"
+        {% if selected_category == "Water Supply" %}selected{% endif %}>
+        Water Supply
+    </option>
+
+    <option value="IT & Software"
+        {% if selected_category == "IT & Software" %}selected{% endif %}>
+        IT & Software
+    </option>
+
+    <option value="Healthcare"
+        {% if selected_category == "Healthcare" %}selected{% endif %}>
+        Healthcare
+    </option>
+
+    <option value="Education"
+        {% if selected_category == "Education" %}selected{% endif %}>
+        Education
+    </option>
+
+    <option value="Energy & Power"
+        {% if selected_category == "Energy & Power" %}selected{% endif %}>
+        Energy & Power
+    </option>
+</select>
+        <button type="submit"
+            class="bg-primary text-white px-6 py-3 rounded-lg">
+            Filter
+        </button>
+    </div>
+
+</form>
+            
+            <!-- Tender Cards -->
+           <div class="container my-5">
+  <div id="tender-cards" class="row g-4">
+
+    <!-- Card 1 -->
+    <!-- From Uiverse.io by SachinKumar666 --> 
+<section class="py-5 bg-light">
+  <div class="container">
+
+
+    <div class="row g-4">
+    {% for tender in tenders %}
+<div class="col-12 col-md-6 col-lg-4">
+  <div class="card h-100 shadow-sm border-0 rounded-4">
+    <div class="card-body d-flex flex-column">
+
+      <!-- Title + Status -->
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <h5 class="fw-semibold mb-0">{{ tender.title }}</h5>
+
+        <span class="badge rounded-pill px-3
+        {% if tender.status == 'open' %}
+            bg-success
+        {% elif tender.status == 'draft' %}
+            bg-warning text-dark
+        {% elif tender.status == 'closed' %}
+            bg-danger
+        {% else %}
+            bg-secondary
+        {% endif %}
+        ">
+            {{ tender.status|upper }}
+        </span>
+      </div>
+
+      <!-- Department -->
+      <p class="text-muted mb-1">
+        <strong>Department:</strong> {{ tender.department }}
+      </p>
+
+      <!-- Description -->
+      <p class="text-secondary small flex-grow-1">
+        {{ tender.description|truncatewords:15 }}
+      </p>
+
+      <!-- Value + Closing Date -->
+      <div class="row mb-3">
+        <div class="col">
+          <small class="text-muted">Estimated Value</small>
+          <div class="fw-semibold text-success">
+            ₹{{ tender.estimated_value }}
+          </div>
+        </div>
+        <div class="col text-end">
+          <small class="text-muted">Closing Date</small>
+          <div class="fw-semibold">
+            {{ tender.closing_date }}
+          </div>
+        </div>
+      </div>
+
+      <!-- View Button -->
+      <a href="{% url 'public:tenderDetails' tender.id %}"
+         class="btn btn-primary w-100 rounded-3">
+         View Details
+      </a>
+       <small class="text-muted mt-2">
+            Created by: {{ tender.created_by.username }} || {{ tender.created_at|date:"M d, Y" }}
+        </small>
+
+    </div>
+  </div>
+</div>
+
+{% empty %}
+<div class="col-12 text-center py-5">
+    <h5 class="text-muted">No tenders available.</h5>
+</div>
+{% endfor %}
+
+
+  </div>
+</section>
+
+            <!-- No Results Message -->
+            <div id="no-results" class="text-center py-12 hidden">
+                <i data-lucide="file-text" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No tenders found</h3>
+                <p class="text-gray-600">Try adjusting your search criteria</p>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

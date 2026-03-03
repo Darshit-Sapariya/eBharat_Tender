@@ -1,0 +1,18 @@
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileBtn = document.getElementById('mobileMenuBtn');
+const closeBtn = document.getElementById('closeMobileMenu');
+const overlay = document.getElementById('mobileOverlay');
+
+function openMenu() {
+    mobileMenu.classList.remove('translate-x-full');
+    overlay.classList.remove('hidden');
+}
+
+function closeMenu() {
+    mobileMenu.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+}
+
+mobileBtn.addEventListener('click', openMenu);
+closeBtn.addEventListener('click', closeMenu);
+overlay.addEventListener('click', closeMenu);

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+
+            <h3 class="mb-4 text-center fw-bold">My Profile</h3>
+
+            <!-- STATUS ALERT -->
+            {% if profile.status == "pending" %}
+                <div class="alert alert-warning text-center">
+                    Your profile verification is Pending.
+                </div>
+            {% elif profile.status == "approved" %}
+                <div class="alert alert-success text-center">
+                    Your profile is Approved.
+                </div>
+            {% elif profile.status == "rejected" %}
+                <div class="alert alert-danger text-center">
+                    Your profile was Rejected. Please update details.
+                </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row">
+                   <!-- User  -->
+                    
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">User Name</label>
+                        <input type="text" name="user" class="form-control" value="{{ request.user }}" readonly disabled>
+                    </div>
+                     <!-- Full   -->
+
+                      
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ profile.full_name }}">
+                    </div>
+                   
+                    <!-- Profile Picture -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Profile Picture</label>
+                        <input type="file" name="profile_pic" class="form-control">
+                    </div>
+
+                    <!-- Mobile -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" name="mobile" class="form-control" value="{{ profile.mobile }}">
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" class="form-control">{{ profile.address }}</textarea>
+                    </div>
+
+                    <!-- Government ID Type -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Government ID Type</label>
+                        <select name="gov_id_type" class="form-select">
+                            <option>Aadhaar</option>
+                            <option>PAN</option>
+                            <option>Passport</option>
+                            <option>Driving License</option>
+                        </select>
+                    </div>
+
+                    <!-- Government ID Number -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Government ID Number</label>
+                        <input type="text" name="gov_id_number" class="form-control" value="{{ profile.gov_id_number }}">
+                    </div>
+
+                    <!-- Government ID Upload -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Upload Government ID Proof</label>
+                        <input type="file" name="gov_id_upload" class="form-control">
+                    </div>
+
+                    <!-- Role -->
+                    <div class="col-md-12 mb-3">
+    <label class="form-label">Role</label>
+
+    {% if profile.role %}
+        <input type="text" class="form-control" value="{{ profile.get_role_display }}" readonly>
+    {% else %}
+        <select name="role" class="form-select" required>
+            <option value="">Select Role</option>
+            <option value="creator">Tender Creator / Department</option>
+            <option value="bidder">Bidder / Vendor</option>
+        </select>
+    {% endif %}
+</div>
+
+
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-5">Submit Profile</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

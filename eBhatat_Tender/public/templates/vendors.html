@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-5 bg-light">
+  <div class="container">
+
+    <!-- Heading -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Vendors & Contractors</h2>
+      <p class="text-muted">
+        Registered vendors participating in government tenders
+      </p>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body p-4">
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Company Name</th>
+                <th>Category</th>
+                <th>Registered Date</th>
+                <th>Status</th>
+                <th>Profile</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+                <td>1</td>
+                <td>ABC Infrastructure Pvt Ltd</td>
+                <td>Construction</td>
+                <td>15 Jan 2026</td>
+                <td><span class="badge bg-success">Active</span></td>
+                <td>
+                  <a href="#" class="btn btn-sm btn-outline-primary">
+                    View
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td>2</td>
+                <td>HealthTech Supplies</td>
+                <td>Medical Equipment</td>
+                <td>02 Feb 2026</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>
+                  <a href="#" class="btn btn-sm btn-outline-primary">
+                    View
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td>3</td>
+                <td>Smart Solutions IT</td>
+                <td>IT & Software</td>
+                <td>28 Jan 2026</td>
+                <td><span class="badge bg-danger">Suspended</span></td>
+                <td>
+                  <a href="#" class="btn btn-sm btn-outline-primary">
+                    View
+                  </a>
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

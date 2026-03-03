@@ -1,0 +1,12 @@
+.bg-light-blue {
+  background-color: #e7f1ff;
+}
+
+.grant-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grant-card:hover {
+  transform: scale(1.04);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+}

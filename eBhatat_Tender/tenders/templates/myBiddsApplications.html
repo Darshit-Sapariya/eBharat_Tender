@@ -1,0 +1,154 @@
+{% extends "base1.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- ================= PAGE HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">All Bid Applications</h3>
+            <p class="text-muted mb-0">
+                Review and manage all submitted bids across tenders
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= SUMMARY CARDS ================= -->
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Bids</h6>
+                    <h4 class="fw-bold">{{ total_bids }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-warning">Pending</h6>
+                    <h4 class="fw-bold">
+                        {{ pending_count }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-success">Approved</h6>
+                    <h4 class="fw-bold">
+                        {{ approved_count }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-danger">Rejected</h6>
+                    <h4 class="fw-bold">
+                        {{ rejected_count }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= BID TABLE ================= -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Vendor UID</th>
+                            <th>Tender</th>
+                            <th>Company</th>
+                            <th>Bid Amount</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for bid in bids %}
+                        <tr>
+
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <small class="text-muted">
+                                   @ {{ bid.applicant.username }}
+                                </small><br>
+                            </td>
+                            <td>
+                                <strong>{{ bid.tender.title }}</strong><br>
+                                <small class="text-muted">
+                                    {{ bid.tender.department }}
+                                </small>
+                            </td>
+                            
+                            <td>
+                                <strong>{{ bid.company_name }}</strong><br>
+                                <small class="text-muted">
+                                    {{ bid.applicant.email }}
+                                </small>
+                            </td>
+
+                            <td class="fw-bold text-success">
+                                ₹ {{ bid.bid_amount }}
+                            </td>
+
+                            <td>
+                                {{ bid.applied_at|date:"d M Y H:i" }}
+                            </td>
+
+                            <td>
+                                {% if bid.status == "pending" %}
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                {% elif bid.status == "approved" %}
+                                    <span class="badge bg-success">
+                                        Approved
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                          
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                No bid applications found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

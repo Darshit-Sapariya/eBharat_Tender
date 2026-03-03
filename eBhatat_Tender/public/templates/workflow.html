@@ -1,0 +1,170 @@
+{% extends "base.html" %} 
+{% load static %}
+ {% block content %}
+
+ <section id="how-it-works" class="py-16 lg:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins">How It Works</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Simple steps to participate in the tendering process
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-round-icon lucide-circle-user-round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2 font-poppins">1. Register</h3>
+                    <p class="text-gray-600">Create your vendor account and complete verification</p>
+                </div>
+                
+                <div class="text-center group">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe-icon lucide-globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2 font-poppins">2. Browse</h3>
+                    <p class="text-gray-600">Search and filter tenders matching your expertise</p>
+                </div>
+                
+                <div class="text-center group">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal-icon lucide-send-horizontal"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2 font-poppins">3. Submit</h3>
+                    <p class="text-gray-600">Prepare and submit your comprehensive bid</p>
+                </div>
+                
+                <div class="text-center group">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trophy-icon lucide-trophy"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2 font-poppins">4. Win</h3>
+                    <p class="text-gray-600">Get awarded and start your project</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="container my-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-5">
+
+      <h2 class="fw-bold text-primary mb-4">
+        How eBharat Tender Works
+      </h2>
+
+      <p class="text-muted mb-4">
+        The eBharat Tender system is a structured electronic procurement platform 
+        designed to ensure transparency, fairness, accountability, and efficiency 
+        in government purchasing and contract allocation.
+      </p>
+
+      <!-- Step 1 -->
+      <h5 class="fw-bold mt-4">1. Vendor Registration</h5>
+      <p>
+        Every supplier, contractor, or service provider must first create an account 
+        on the portal. During registration, the vendor provides legally valid business 
+        details including company registration certificate, GST number, PAN number, 
+        contact information, and bank details. Supporting documents are uploaded 
+        digitally for authentication.
+      </p>
+      <p>
+        This step ensures that only genuine and legally recognized businesses 
+        participate in the procurement process.
+      </p>
+
+      <!-- Step 2 -->
+      <h5 class="fw-bold mt-4">2. Document Verification and Approval</h5>
+      <p>
+        After submission, the concerned authority carefully verifies all uploaded 
+        documents. The verification process checks business authenticity, tax compliance, 
+        and required certifications. If all documents meet the requirements, 
+        the vendor account is approved.
+      </p>
+      <p>
+        If discrepancies are found, the vendor is notified to correct and resubmit 
+        the documents. This maintains transparency and system integrity.
+      </p>
+
+      <!-- Step 3 -->
+      <h5 class="fw-bold mt-4">3. Tender Publication by Government Departments</h5>
+      <p>
+        Government departments publish tenders on the portal with complete details 
+        such as scope of work, eligibility criteria, estimated project cost, 
+        Earnest Money Deposit (EMD), technical specifications, and submission deadlines.
+      </p>
+      <p>
+        Each tender is assigned a unique reference number for tracking and record-keeping.
+      </p>
+
+      <!-- Step 4 -->
+      <h5 class="fw-bold mt-4">4. Tender Document Download</h5>
+      <p>
+        Registered vendors can download tender documents to review project 
+        requirements carefully. The documents provide detailed instructions, 
+        contract terms, evaluation criteria, and compliance conditions.
+      </p>
+      <p>
+        Vendors must ensure they meet all eligibility conditions before proceeding.
+      </p>
+
+      <!-- Step 5 -->
+      <h5 class="fw-bold mt-4">5. Online Bid Submission</h5>
+      <p>
+        Vendors prepare and submit their bids electronically before the deadline. 
+        The bid typically includes two parts:
+      </p>
+      <ul>
+        <li><strong>Technical Proposal</strong> – Documents proving capability and compliance.</li>
+        <li><strong>Financial Proposal</strong> – Price quotation and cost breakdown.</li>
+      </ul>
+      <p>
+        The system encrypts submitted bids to ensure confidentiality until the 
+        official opening date.
+      </p>
+
+      <!-- Step 6 -->
+      <h5 class="fw-bold mt-4">6. Bid Opening and Evaluation</h5>
+      <p>
+        On the scheduled date, bids are opened electronically in the presence 
+        of authorized officials. Technical proposals are evaluated first to ensure 
+        compliance with requirements.
+      </p>
+      <p>
+        Only technically qualified bidders proceed to financial evaluation. 
+        The evaluation process follows predefined criteria to maintain fairness.
+      </p>
+
+      <!-- Step 7 -->
+      <h5 class="fw-bold mt-4">7. Award of Contract</h5>
+      <p>
+        After evaluation, the contract is awarded to the most suitable bidder 
+        based on technical merit and competitive pricing. The selected vendor 
+        receives an official notification.
+      </p>
+      <p>
+        Award details are published on the portal for public transparency.
+      </p>
+
+      <!-- Step 8 -->
+      <h5 class="fw-bold mt-4">8. Contract Execution and Monitoring</h5>
+      <p>
+        Once awarded, the vendor executes the contract as per agreed terms. 
+        The department monitors progress to ensure quality and timely completion.
+      </p>
+      <p>
+        Payment is processed according to contract milestones and performance verification.
+      </p>
+
+      <div class="alert alert-primary mt-4">
+        <strong>Conclusion:</strong>  
+        The eBharat Tender platform ensures a transparent, structured, 
+        and accountable procurement process, reducing manual errors 
+        and promoting equal opportunity for all registered vendors.
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

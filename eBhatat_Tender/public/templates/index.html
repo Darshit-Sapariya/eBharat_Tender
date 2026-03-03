@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- ===== Hero section ===== -->
+<section class="hero-section position-relative text-white">
+  <!-- Overlay -->
+  <div class="hero-overlay"></div>
+  <!-- Hero Content -->
+  <div class="container hero-content">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-10">
+        <h1 class="hero-title">
+          Transparent Procurement
+          <span class="hero-subtitle">Made Simple</span>
+        </h1>
+        <p class="hero-description">
+          Discover opportunities, submit bids, and grow your business with our modern tendering platform
+        </p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+          <a href="/tenders/" class="btn btn-light btn-lg fw-semibold">
+            View Live Tenders
+          </a>
+          <a href="#" class="btn btn-outline-light btn-lg fw-semibold">
+            Submit a Bid
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="hero-stats">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-6 col-md-3 mb-3 mb-md-0">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Active Tenders</div>
+        </div>
+        <div class="col-6 col-md-3 mb-3 mb-md-0">
+          <div class="stat-number">1200+</div>
+          <div class="stat-label">Registered Vendors</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-number">₹50 Cr+</div>
+          <div class="stat-label">Total Value</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-number">98%</div>
+          <div class="stat-label">Success Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+{% endblock %}
