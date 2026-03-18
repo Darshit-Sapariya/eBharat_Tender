@@ -506,9 +506,14 @@
             <div class="flex items-center justify-between pt-3 border-t border-slate-100
                         font-dmSans text-[0.63rem] text-slate-400 font-semibold uppercase tracking-widest">
               <span class="flex items-center gap-1"><i class="fas fa-hashtag text-[0.56rem]"></i> {{ tender.tender_id }}</span>
-              <span class="flex items-center gap-1 cursor-pointer hover:text-[#1a56db] transition-colors">
-                <i class="fas fa-share-alt text-[0.58rem]"></i> Share
-              </span>
+              <div class="flex items-center gap-3">
+                <a href="{% url 'bids:toggle_watchlist' tender.id %}" class="flex items-center gap-1 cursor-pointer hover:text-[#1a56db] transition-colors no-underline text-slate-400">
+                  <i class="fas fa-star text-[0.58rem]"></i> Save
+                </a>
+                <span class="flex items-center gap-1 cursor-pointer hover:text-[#1a56db] transition-colors">
+                  <i class="fas fa-share-alt text-[0.58rem]"></i> Share
+                </span>
+              </div>
             </div>
 
           </div>

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'tenders',
     'bids',
     'public',
+    'coreadmin',
 ]
 
 MIDDLEWARE = [

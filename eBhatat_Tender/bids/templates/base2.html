@@ -475,6 +475,11 @@
       <i class="fas fa-clipboard-list"></i> My Bids
     </a>
 
+    <a href="{% url 'bids:my_watchlist' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'my_watchlist' %}active{% endif %}">
+      <i class="fas fa-star"></i> Watchlist
+    </a>
+
     <div class="nav-divider"></div>
     <div class="sidebar-label">Account</div>
 

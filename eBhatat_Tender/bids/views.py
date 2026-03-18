@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import TenderApplication
 from tenders.models import Tenderss
-from accounts.models import Notification
+from accounts.models import Notification, Watchlist
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
@@ -33,7 +33,7 @@ def bids_dashboard(request):
     # User's applied tenders
     applied_tenders = TenderApplication.objects.filter(
         applicant=request.user
-    )
+    ).order_by('-applied_at')
 
     # Pending bids
     pending_tenders = applied_tenders.filter(status='pending')
@@ -43,19 +43,36 @@ def bids_dashboard(request):
     # Rejected bids
     rejected_tenders = applied_tenders.filter(status='rejected')
 
+    # Recent Open Tenders (Latest 5)
+    recent_tenders = Tenderss.objects.filter(status='open').order_by('-created_at')[:5]
+
+    # Recent Notifications (Latest 5)
+    recent_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:5]
+
+    # Watchlist Count
+    watchlist_count = Watchlist.objects.filter(user=request.user).count()
+
+    # User Profile for status
+    profile = getattr(request.user, 'userprofile', None)
+
     context = {
         "open_tenders": open_tenders,
         "applied_tenders": applied_tenders,
         "pending_tenders": pending_tenders,
         "approved_tenders": approved_tenders,
         "rejected_tenders": rejected_tenders,
+        "recent_tenders": recent_tenders,
+        "recent_notifications": recent_notifications,
+        "profile": profile,
 
         # Counts
         "open_count": open_tenders.count(),
         "applied_count": applied_tenders.count(),
+        "pending_count": pending_count if (pending_count := pending_tenders.count()) else 0, # usingWalrus for fun, wait no, let's keep it simple
         "pending_count": pending_tenders.count(),
         "approved_count": approved_tenders.count(),
         "rejected_count": rejected_tenders.count(),
+        "watchlist_count": watchlist_count,
     }
 
     return render(request, 'bids_dashboard.html', context)
@@ -178,6 +195,44 @@ def mybids(request):
 def bid_detail(request, bid_id):
     bid = get_object_or_404(TenderApplication,id=bid_id,applicant=request.user)
     return render(request, "bid_detail.html", {"bid": bid}) 
+
+@login_required
+def withdraw_bid(request, bid_id):
+    """Allow bidder to withdraw a pending bid."""
+    bid = get_object_or_404(TenderApplication, id=bid_id, applicant=request.user)
+    
+    if bid.status != 'pending':
+        messages.error(request, "You can only withdraw bids that are still pending.")
+        return redirect("bids:bid_detail", bid_id=bid.id)
+        
+    if bid.tender.closing_date < timezone.now().date():
+        messages.error(request, "Closing date has passed. You cannot withdraw this bid.")
+        return redirect("bids:bid_detail", bid_id=bid.id)
+
+    bid.delete()
+    messages.success(request, "Bid withdrawn successfully.")
+    return redirect("bids:mybids")
+
+@login_required
+def toggle_watchlist(request, tender_id):
+    """Add or remove a tender from user's watchlist."""
+    tender = get_object_or_404(Tenderss, id=tender_id)
+    watchlist_item = Watchlist.objects.filter(user=request.user, tender=tender)
+
+    if watchlist_item.exists():
+        watchlist_item.delete()
+        messages.info(request, f"Removed {tender.title} from watchlist.")
+    else:
+        Watchlist.objects.create(user=request.user, tender=tender)
+        messages.success(request, f"Added {tender.title} to watchlist.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'public:home'))
+
+@login_required
+def my_watchlist(request):
+    """View saved tenders."""
+    items = Watchlist.objects.filter(user=request.user).select_related('tender').order_by('-created_at')
+    return render(request, 'watchlist.html', {'watchlist': items})
 
 
 

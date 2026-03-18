@@ -308,11 +308,19 @@
         <div class="stat-val">{{ pending_count }}</div>
       </div>
     </a>
+
+    <a href="{% url 'bids:my_watchlist' %}" class="stat-card">
+      <div class="stat-icon primary" style="background: #fffbeb; color: #f59e0b;"><i class="fas fa-star"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Watchlist</div>
+        <div class="stat-val">{{ watchlist_count }}</div>
+      </div>
+    </a>
   </div>
 
   <!-- ══════ CONTENT PANELS ══════ -->
   <div class="row g-4 m-0">
-    
+
     <!-- Left: Recent Tenders -->
     <div class="col-lg-8 p-0 pe-lg-3">
       <div class="panel h-100">
@@ -346,33 +354,27 @@
       </div>
     </div>
 
-    <!-- Right: Performance & Links -->
+    <!-- Right: Notifications & Links -->
     <div class="col-lg-4 p-0">
       
-      <!-- Performance Panel -->
+      <!-- Notifications Panel -->
       <div class="panel mb-4">
         <div class="panel-header">
-          <h2 class="panel-title"><i class="fas fa-chart-line text-muted"></i> Performance</h2>
+          <h2 class="panel-title"><i class="fas fa-bell text-muted"></i> Latest Notifications</h2>
+          <a href="{% url 'accounts:view_all_notifications' %}" class="btn btn-sm text-primary p-0" style="font-size: 0.75rem; font-weight: 600;">View All</a>
         </div>
         <div class="panel-body">
-          <div class="perf-item">
-            <div class="perf-label">
-              <span>Approval Rate</span>
-              <span>{% widthratio approved_count applied_count 100 %}%</span>
+          <div class="activity-list">
+            {% for note in recent_notifications %}
+            <div class="activity-item p-2" style="background: transparent; border-color: rgba(0,0,0,0.05);">
+              <div style="font-size: 0.85rem;">
+                <div class="fw-bold text-navy">{{ note.message }}</div>
+                <div class="text-muted small">{{ note.created_at|timesince }} ago</div>
+              </div>
             </div>
-            <div class="progress">
-              <div class="progress-success" style="width: {% widthratio approved_count applied_count 100 %}%"></div>
-            </div>
-          </div>
-          
-          <div class="perf-item">
-            <div class="perf-label">
-              <span>Pending Rate</span>
-              <span>{% widthratio pending_count applied_count 100 %}%</span>
-            </div>
-            <div class="progress">
-              <div class="progress-warning" style="width: {% widthratio pending_count applied_count 100 %}%"></div>
-            </div>
+            {% empty %}
+            <div class="text-center py-3 text-muted small">No new notifications.</div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -396,6 +398,37 @@
 
     </div>
 
+  </div>
+
+  <!-- ══════ ACTIVE BIDS ══════ -->
+  <div class="panel mt-4">
+    <div class="panel-header">
+      <h2 class="panel-title"><i class="fas fa-paper-plane text-muted"></i> Recently Applied Bids</h2>
+      <a href="{% url 'bids:mybids' %}" class="btn btn-sm text-primary p-0" style="font-size: 0.75rem; font-weight: 600;">Manage Bids</a>
+    </div>
+    <div class="panel-body">
+      <div class="row g-3">
+        {% for bid in applied_tenders|slice:":3" %}
+        <div class="col-md-4">
+          <div class="activity-item h-100 flex-column align-items-start gap-2">
+            <div class="activity-title text-truncate w-100">{{ bid.tender.title }}</div>
+            <div class="d-flex justify-content-between w-100 align-items-center">
+              <span class="activity-badge {% if bid.status == 'approved' %}open{% elif bid.status == 'rejected' %}closed{% else %}warning{% endif %}" 
+                    style="{% if bid.status == 'pending' %}background:#fffbeb; color:#92400e;{% endif %}">
+                {{ bid.status|capfirst }}
+              </span>
+              <span class="fw-bold text-navy small">₹ {{ bid.bid_amount }}</span>
+            </div>
+            <a href="{% url 'bids:bid_detail' bid.id %}" class="btn btn-sm btn-outline-primary w-100 mt-2" style="font-size: 0.75rem; border-radius: 8px;">View Details</a>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-4 text-muted">
+          <p>You haven't applied for any tenders yet.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 
 </div>

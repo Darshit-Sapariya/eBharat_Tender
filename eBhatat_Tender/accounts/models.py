@@ -91,4 +91,15 @@ class AdminRequest(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and not instance.is_superuser:
-        UserProfile.objects.create(user=instance)    
+        UserProfile.objects.create(user=instance)
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist')
+    tender = models.ForeignKey('tenders.Tenderss', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'tender')
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.tender.title}"

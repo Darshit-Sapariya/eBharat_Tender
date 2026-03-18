@@ -9,6 +9,7 @@ urlpatterns = [
     path('mybids', views.mybids, name='mybids'),
     path("bid/<int:bid_id>/", views.bid_detail, name="bid_detail"),
     path("download-bid/<int:bid_id>/", views.download_bid_pdf, name="download_bid_pdf"),
-    
-    
+    path("bid/<int:bid_id>/withdraw/", views.withdraw_bid, name="withdraw_bid"),
+    path("tender/<int:tender_id>/watchlist/", views.toggle_watchlist, name="toggle_watchlist"),
+    path("watchlist/", views.my_watchlist, name="my_watchlist"),
 ]
