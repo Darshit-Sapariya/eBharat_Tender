@@ -2,173 +2,419 @@
 {% load static %}
 {% block content %}
 
-<!-- Open Tenders Section -->
- <!-- Open Tenders Section -->
-    <section id="tenders" class="py-16 lg:py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins">Open Tenders</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Explore current opportunities and find the perfect match for your business
-                </p>
-            </div>
-            
-            <!-- Search and Filter -->
-          <form method="GET" class="mb-8 flex flex-col md:flex-row gap-4">
+<style>
+  /* Pseudo-elements & animations Tailwind cannot replicate */
 
-    <div class="flex-1 relative">
-        <input
-            type="text"
-            name="search"
-            value="{{ search_query }}"
-            placeholder="Search tenders..."
-            class="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-lg"
-        />
+  /* Page header grid + radial glows */
+  .page-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 55% 80% at 85% 20%, rgba(26,86,219,0.28) 0%, transparent 65%),
+      radial-gradient(ellipse 30% 50% at 5% 90%, rgba(245,158,11,0.08) 0%, transparent 60%);
+  }
+
+  /* Pulsing live dot */
+  @keyframes pulse-dot {
+    0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(.8)}
+  }
+  .pulse-dot { animation: pulse-dot 2s infinite; }
+
+  /* Search input focus */
+  .search-input:focus {
+    border-color: #3b82f6; background: white;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none;
+  }
+  .search-input::placeholder { color: #94a3b8; }
+
+  /* Filter select focus */
+  .filter-select:focus {
+    border-color: #3b82f6; background: white;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none;
+  }
+
+  /* Tender card top bar */
+  .tender-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #0f2a5e, #1a56db);
+    transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+  }
+  .tender-card:hover::before { transform: scaleX(1); }
+
+  /* View toggle active state (JS-managed) */
+  .toggle-btn.active { background: white; color: #0f2a5e; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .toggle-btn:not(.active):hover { color: white; background: rgba(255,255,255,0.15); }
+</style>
+
+
+<!-- ══════ PAGE HEADER ══════ -->
+<div class="page-header relative overflow-hidden"
+     style="background: linear-gradient(135deg, #0b1e4a 0%, #0f2a5e 55%, #163472 100%);">
+
+  <!-- Header content -->
+  <div class="relative z-[1] max-w-[1280px] mx-auto px-6 pt-11 pb-8
+              flex flex-col md:flex-row gap-4 md:items-start md:justify-between">
+
+    <!-- Left: title + stats -->
+    <div>
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-[6px] bg-white/10 border border-white/15
+                  rounded-full px-[11px] py-[3px] mb-3 w-fit">
+        <span class="pulse-dot w-[6px] h-[6px] bg-green-400 rounded-full inline-block"></span>
+        <p class="text-[0.7rem] font-bold text-white/75 uppercase tracking-[0.06em] m-0">Live Tenders</p>
+      </div>
+
+      <h1 class="font-sora text-[clamp(1.75rem,4vw,2.4rem)] font-extrabold text-white
+                 leading-[1.15] mb-2">Tender Listings</h1>
+      <p class="text-[0.9rem] text-white/55 mb-5 leading-[1.6]">
+        Explore and bid on active government procurement opportunities.
+      </p>
+
+      <!-- Mini stats -->
+      <div class="flex flex-wrap gap-[0.6rem]">
+        <div class="flex items-center gap-[6px] bg-white/[0.08] border border-white/12 rounded-[9px] px-[14px] py-[6px]">
+          <span class="font-sora text-[1rem] font-extrabold text-white leading-none">{{ open_tenders }}+</span>
+          <span class="text-[0.72rem] text-white/45 font-medium">Active</span>
+        </div>
+        <div class="flex items-center gap-[6px] bg-white/[0.08] border border-white/12 rounded-[9px] px-[14px] py-[6px]">
+          <span class="font-sora text-[1rem] font-extrabold text-white leading-none">₹{{ total_value_cr|floatformat:1 }}Cr+</span>
+          <span class="text-[0.72rem] text-white/45 font-medium">Total Value</span>
+        </div>
+        <div class="flex items-center gap-[6px] bg-white/[0.08] border border-white/12 rounded-[9px] px-[14px] py-[6px]">
+          <span class="font-sora text-[1rem] font-extrabold text-white leading-none">{{ success_rate|floatformat:0 }}%</span>
+          <span class="text-[0.72rem] text-white/45 font-medium">Success Rate</span>
+        </div>
+      </div>
     </div>
 
-    <div class="flex gap-2">
-        <select name="category" class="px-4 py-3 border border-gray-200 rounded-lg">
-    <option value="all">All Categories</option>
-
-    <option value="Infrastructure"
-        {% if selected_category == "Infrastructure" %}selected{% endif %}>
-        Infrastructure
-    </option>
-
-    <option value="Construction"
-        {% if selected_category == "Construction" %}selected{% endif %}>
-        Construction
-    </option>
-
-    <option value="Road & Highway"
-        {% if selected_category == "Road & Highway" %}selected{% endif %}>
-        Road & Highway
-    </option>
-
-    <option value="Water Supply"
-        {% if selected_category == "Water Supply" %}selected{% endif %}>
-        Water Supply
-    </option>
-
-    <option value="IT & Software"
-        {% if selected_category == "IT & Software" %}selected{% endif %}>
-        IT & Software
-    </option>
-
-    <option value="Healthcare"
-        {% if selected_category == "Healthcare" %}selected{% endif %}>
-        Healthcare
-    </option>
-
-    <option value="Education"
-        {% if selected_category == "Education" %}selected{% endif %}>
-        Education
-    </option>
-
-    <option value="Energy & Power"
-        {% if selected_category == "Energy & Power" %}selected{% endif %}>
-        Energy & Power
-    </option>
-</select>
-        <button type="submit"
-            class="bg-primary text-white px-6 py-3 rounded-lg">
-            Filter
-        </button>
+    <!-- View toggle (desktop only) -->
+    <div class="hidden md:flex items-start gap-1 bg-white/[0.08] border border-white/15
+                rounded-[10px] p-1 flex-shrink-0 h-fit mt-1">
+      <button id="cardBtn" onclick="showCardView()" title="Card View"
+              class="toggle-btn active w-9 h-9 rounded-[7px] flex items-center justify-center
+                     cursor-pointer border-none transition-all duration-200">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/>
+        </svg>
+      </button>
+      <button id="tableBtn" onclick="showTableView()" title="Table View"
+              class="toggle-btn w-9 h-9 rounded-[7px] flex items-center justify-center
+                     cursor-pointer border-none text-white/45 transition-all duration-200">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M3 7h18M3 12h18M3 17h18"/>
+        </svg>
+      </button>
     </div>
 
-</form>
-            
-            <!-- Tender Cards -->
-           <div class="container my-5">
-  <div id="tender-cards" class="row g-4">
+  </div>
 
-    <!-- Card 1 -->
-    <!-- From Uiverse.io by SachinKumar666 --> 
-<section class="py-5 bg-light">
-  <div class="container">
+  <!-- Stats strip -->
+  <div class="relative z-[1] bg-black/25 border-t border-white/[0.08]">
+    <div class="max-w-[1280px] mx-auto px-6
+                grid grid-cols-2 sm:grid-cols-3">
 
-
-    <div class="row g-4">
-    {% for tender in tenders %}
-<div class="col-12 col-md-6 col-lg-4">
-  <div class="card h-100 shadow-sm border-0 rounded-4">
-    <div class="card-body d-flex flex-column">
-
-      <!-- Title + Status -->
-      <div class="d-flex justify-content-between align-items-start mb-2">
-        <h5 class="fw-semibold mb-0">{{ tender.title }}</h5>
-
-        <span class="badge rounded-pill px-3
-        {% if tender.status == 'open' %}
-            bg-success
-        {% elif tender.status == 'draft' %}
-            bg-warning text-dark
-        {% elif tender.status == 'closed' %}
-            bg-danger
-        {% else %}
-            bg-secondary
-        {% endif %}
-        ">
-            {{ tender.status|upper }}
+      <div class="flex items-center gap-[0.65rem] px-4 py-[0.85rem] border-r border-white/[0.07]">
+        <div class="w-[30px] h-[30px] rounded-[7px] bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+          <svg width="14" height="14" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <span class="text-[0.8rem] text-white/55">
+          Closing today: <strong class="text-white font-bold">{{ closing_today }}</strong>
         </span>
       </div>
 
-      <!-- Department -->
-      <p class="text-muted mb-1">
-        <strong>Department:</strong> {{ tender.department }}
-      </p>
-
-      <!-- Description -->
-      <p class="text-secondary small flex-grow-1">
-        {{ tender.description|truncatewords:15 }}
-      </p>
-
-      <!-- Value + Closing Date -->
-      <div class="row mb-3">
-        <div class="col">
-          <small class="text-muted">Estimated Value</small>
-          <div class="fw-semibold text-success">
-            ₹{{ tender.estimated_value }}
-          </div>
+      <div class="flex items-center gap-[0.65rem] px-4 py-[0.85rem] border-r border-white/[0.07]
+                  sm:border-r sm:[&:nth-child(2)]:border-r">
+        <div class="w-[30px] h-[30px] rounded-[7px] bg-green-500/15 flex items-center justify-center flex-shrink-0">
+          <svg width="14" height="14" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
         </div>
-        <div class="col text-end">
-          <small class="text-muted">Closing Date</small>
-          <div class="fw-semibold">
-            {{ tender.closing_date }}
-          </div>
-        </div>
+        <span class="text-[0.8rem] text-white/55">
+          Open tenders: <strong class="text-white font-bold">{{ open_tenders }}</strong>
+        </span>
       </div>
 
-      <!-- View Button -->
-      <a href="{% url 'public:tenderDetails' tender.id %}"
-         class="btn btn-primary w-100 rounded-3">
-         View Details
-      </a>
-       <small class="text-muted mt-2">
-            Created by: {{ tender.created_by.username }} || {{ tender.created_at|date:"M d, Y" }}
-        </small>
+      <div class="hidden sm:flex items-center gap-[0.65rem] px-4 py-[0.85rem]">
+        <div class="w-[30px] h-[30px] rounded-[7px] bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+          <svg width="14" height="14" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+          </svg>
+        </div>
+        <span class="text-[0.8rem] text-white/55">
+          Registered vendors: <strong class="text-white font-bold">{{ registered_vendors }}+</strong>
+        </span>
+      </div>
 
     </div>
   </div>
-</div>
+</div><!-- /page-header -->
 
-{% empty %}
-<div class="col-12 text-center py-5">
-    <h5 class="text-muted">No tenders available.</h5>
-</div>
-{% endfor %}
 
+<!-- ══════ CONTENT ══════ -->
+<div class="max-w-[1280px] mx-auto px-6 pt-8 pb-16">
+
+  <!-- Filter card -->
+  <div class="bg-white rounded-2xl px-[1.35rem] py-[1.1rem] border border-blue-100
+              shadow-[0_4px_24px_rgba(15,42,94,0.08)] mb-7">
+    <form method="GET"
+          class="flex flex-col lg:flex-row items-stretch lg:items-center gap-[0.85rem]">
+
+      <div class="flex flex-wrap gap-[0.65rem] flex-1">
+
+        <!-- Search -->
+        <div class="relative flex-1 min-w-[200px]">
+          <i class="fas fa-search absolute left-[0.85rem] top-1/2 -translate-y-1/2 text-slate-400 text-[0.82rem] pointer-events-none"></i>
+          <input type="text" name="search" value="{{ search_query }}"
+                 placeholder="Search tenders by title or keyword..."
+                 class="search-input w-full pl-[2.4rem] pr-4 py-[0.62rem]
+                        border-[1.5px] border-slate-200 rounded-[10px]
+                        text-[0.875rem] text-slate-800 bg-[#f8faff]
+                        font-dmSans transition-all duration-[0.18s]">
+        </div>
+
+        <!-- Category -->
+        <select name="category"
+                class="filter-select px-[0.85rem] py-[0.62rem] pr-8
+                       border-[1.5px] border-slate-200 rounded-[10px]
+                       text-[0.875rem] text-slate-800 bg-[#f8faff]
+                       font-dmSans cursor-pointer appearance-none
+                       transition-all duration-[0.18s]"
+                style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 0.7rem center; background-color: #f8faff;">
+          <option value="all">All Categories</option>
+          <option value="Infrastructure" {% if selected_category == "Infrastructure" %}selected{% endif %}>Infrastructure</option>
+          <option value="Construction"   {% if selected_category == "Construction"   %}selected{% endif %}>Construction</option>
+          <option value="Road & Highway" {% if selected_category == "Road & Highway" %}selected{% endif %}>Road &amp; Highway</option>
+          <option value="Water Supply"   {% if selected_category == "Water Supply"   %}selected{% endif %}>Water Supply</option>
+          <option value="IT & Software"  {% if selected_category == "IT & Software"  %}selected{% endif %}>IT &amp; Software</option>
+          <option value="Healthcare"     {% if selected_category == "Healthcare"     %}selected{% endif %}>Healthcare</option>
+          <option value="Education"      {% if selected_category == "Education"      %}selected{% endif %}>Education</option>
+          <option value="Energy & Power" {% if selected_category == "Energy & Power" %}selected{% endif %}>Energy &amp; Power</option>
+        </select>
+
+        <!-- Status -->
+        <select name="status"
+                class="filter-select px-[0.85rem] py-[0.62rem] pr-8
+                       border-[1.5px] border-slate-200 rounded-[10px]
+                       text-[0.875rem] text-slate-800 bg-[#f8faff]
+                       font-dmSans cursor-pointer appearance-none
+                       transition-all duration-[0.18s]"
+                style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 0.7rem center; background-color: #f8faff;">
+          <option value="">All Status</option>
+          <option value="open"   {% if selected_status == "open"   %}selected{% endif %}>Open</option>
+          <option value="closed" {% if selected_status == "closed" %}selected{% endif %}>Closed</option>
+          <option value="draft"  {% if selected_status == "draft"  %}selected{% endif %}>Draft</option>
+        </select>
+      </div>
+
+      <button type="submit"
+              class="inline-flex items-center gap-[0.4rem] bg-[#0f2a5e] text-white
+                     px-[1.4rem] py-[0.62rem] rounded-[10px] text-[0.875rem] font-semibold
+                     border-none cursor-pointer whitespace-nowrap font-dmSans
+                     transition-all duration-200
+                     hover:bg-[#163472] hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(15,42,94,0.25)]">
+        <i class="fas fa-sliders-h"></i> Apply Filter
+      </button>
+    </form>
+  </div>
+
+  <!-- Results meta -->
+  <div class="flex items-center justify-between mb-5 flex-wrap gap-2">
+    <p class="text-[0.85rem] text-slate-500">
+      Showing <strong class="text-[#0f2a5e] font-bold">{{ tenders|length }}</strong>
+      tender{{ tenders|length|pluralize }}
+      {% if search_query %} for "<strong class="text-[#0f2a5e]">{{ search_query }}</strong>"{% endif %}
+    </p>
+    <p class="text-[0.8rem] text-slate-400">
+      <i class="fas fa-clock mr-1"></i> Updated today
+    </p>
+  </div>
+
+
+  <!-- ═ CARD VIEW ═ -->
+  <div id="cardView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.15rem]">
+
+    {% for tender in tenders %}
+    <div class="tender-card relative bg-white rounded-2xl border border-blue-100 p-[1.4rem]
+                flex flex-col overflow-hidden
+                transition-all duration-[0.25s] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(15,42,94,0.1)] hover:border-[#c7d7f8]">
+
+      <!-- Top row -->
+      <div class="flex items-start justify-between gap-[0.65rem] mb-[0.85rem]">
+        <div class="w-[38px] h-[38px] rounded-[10px] bg-blue-50 flex items-center justify-center
+                    text-blue-600 text-[0.9rem] flex-shrink-0">
+          {% if tender.category == "IT & Software" %}<i class="fas fa-laptop-code"></i>
+          {% elif tender.category == "Infrastructure" or tender.category == "Road & Highway" %}<i class="fas fa-road"></i>
+          {% elif tender.category == "Construction" %}<i class="fas fa-hard-hat"></i>
+          {% elif tender.category == "Healthcare" %}<i class="fas fa-hospital"></i>
+          {% elif tender.category == "Education" %}<i class="fas fa-graduation-cap"></i>
+          {% elif tender.category == "Energy & Power" %}<i class="fas fa-bolt"></i>
+          {% elif tender.category == "Water Supply" %}<i class="fas fa-tint"></i>
+          {% else %}<i class="fas fa-file-contract"></i>{% endif %}
+        </div>
+
+        <span class="inline-flex items-center px-[9px] py-[3px] rounded-full
+                     text-[0.68rem] font-bold tracking-[0.04em] uppercase flex-shrink-0
+                     before:content-[''] before:w-[5px] before:h-[5px] before:rounded-full before:inline-block before:mr-1
+                     {% if tender.status == 'open' %}bg-green-50 text-green-700 before:bg-green-500
+                     {% elif tender.status == 'closed' %}bg-red-50 text-red-700 before:bg-red-500
+                     {% elif tender.status == 'awarded' %}bg-amber-50 text-amber-700 before:bg-amber-500
+                     {% elif tender.status == 'draft' %}bg-amber-50 text-amber-700 before:bg-amber-500
+                     {% else %}bg-slate-50 text-slate-500 before:bg-slate-400{% endif %}">
+          {% if tender.status == 'awarded' %}🏆 AWARDED{% else %}{{ tender.status|upper }}{% endif %}
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-1 mb-2">
+        <span class="inline-flex items-center text-[0.6rem] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit ring-1 ring-inset ring-blue-100">
+          {{ tender.tender_id }}
+        </span>
+        <h3 class="font-sora text-[0.92rem] font-bold text-slate-800 leading-[1.45]">
+          {{ tender.title }}
+        </h3>
+      </div>
+      <p class="inline-flex items-center gap-1 text-[0.77rem] text-slate-400 mb-[0.55rem]">
+        {% if tender.status == 'awarded' and tender.awarded_application %}
+          <i class="fas fa-trophy text-[0.7rem] text-amber-500"></i>
+          <span class="font-bold text-[#0f2a5e]">Awarded to: {{ tender.awarded_application.company_name }}</span>
+        {% else %}
+          <i class="fas fa-building text-[0.7rem]"></i> {{ tender.department }}
+        {% endif %}
+      </p>
+      <p class="flex-1 text-[0.8rem] text-slate-300 leading-[1.6] mb-[0.9rem]">
+        {{ tender.description|truncatewords:18 }}
+      </p>
+
+      <div class="h-px bg-slate-100 mb-[0.9rem]"></div>
+
+      <div class="flex justify-between mb-[0.9rem]">
+        <div>
+          <p class="text-[0.7rem] text-slate-400 font-medium mb-[2px]">Estimated Value</p>
+          <p class="font-sora text-[0.87rem] font-bold text-green-700">₹{{ tender.estimated_value }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[0.7rem] text-slate-400 font-medium mb-[2px]">Closing Date</p>
+          <p class="font-sora text-[0.87rem] font-bold text-slate-800">{{ tender.closing_date }}</p>
+        </div>
+      </div>
+
+      <a href="{% url 'public:tenderDetails' tender.id %}"
+         class="flex items-center justify-center gap-[5px]
+                bg-[#f8faff] text-[#0f2a5e] border-[1.5px] border-slate-200
+                px-4 py-[0.58rem] rounded-[10px] text-[0.83rem] font-semibold no-underline
+                font-dmSans transition-all duration-200
+                hover:bg-[#0f2a5e] hover:text-white hover:border-[#0f2a5e]">
+        View Details <i class="fas fa-arrow-right text-[0.72rem]"></i>
+      </a>
+    </div>
+
+    {% empty %}
+    <div class="col-span-full text-center py-16 px-8 bg-white rounded-2xl border border-blue-100">
+      <div class="w-[58px] h-[58px] bg-blue-50 rounded-full flex items-center justify-center
+                  mx-auto mb-4 text-[1.3rem] text-blue-300">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <h3 class="font-sora text-[1rem] font-bold text-slate-800 mb-[0.4rem]">No Tenders Found</h3>
+      <p class="text-[0.875rem] text-slate-400">Try adjusting your filters or check back later for new opportunities.</p>
+    </div>
+    {% endfor %}
 
   </div>
-</section>
 
-            <!-- No Results Message -->
-            <div id="no-results" class="text-center py-12 hidden">
-                <i data-lucide="file-text" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No tenders found</h3>
-                <p class="text-gray-600">Try adjusting your search criteria</p>
-            </div>
-        </div>
-    </section>
+
+  <!-- ═ TABLE VIEW ═ -->
+  <div id="tableView" class="hidden bg-white rounded-2xl border border-blue-100 overflow-hidden
+                              shadow-[0_4px_20px_rgba(15,42,94,0.05)] overflow-x-auto">
+    <table class="w-full border-collapse min-w-[680px]">
+      <thead>
+        <tr class="bg-gradient-to-r from-[#f0f5ff] to-[#e8f0fe] border-b border-blue-100">
+          <th class="px-5 py-[0.85rem] text-left text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">#</th>
+          <th class="px-5 py-[0.85rem] text-left text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">Title</th>
+          <th class="px-5 py-[0.85rem] text-left text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">Value</th>
+          <th class="px-5 py-[0.85rem] text-left text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">Closing Date</th>
+          <th class="px-5 py-[0.85rem] text-left text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">Status</th>
+          <th class="px-5 py-[0.85rem] text-center text-[0.7rem] font-bold uppercase tracking-[0.07em] text-[#0f2a5e] whitespace-nowrap">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tender in tenders %}
+        <tr class="border-b border-slate-50 last:border-b-0 transition-colors duration-150 hover:bg-[#f8faff]">
+          <td class="px-5 py-[0.95rem] text-slate-400 text-[0.76rem] font-semibold whitespace-nowrap align-middle">
+            {{ forloop.counter }}
+          </td>
+          <td class="px-5 py-[0.95rem] align-middle">
+            <span class="inline-flex items-center text-[0.6rem] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit ring-1 ring-inset ring-blue-100 mb-1">
+              {{ tender.tender_id }}
+            </span>
+            <p class="font-semibold text-[#0f2a5e] text-[0.875rem] max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+              {{ tender.title }}
+            </p>
+            <p class="text-[0.78rem] text-slate-400">{{ tender.department }}</p>
+          </td>
+          <td class="px-5 py-[0.95rem] font-sora font-bold text-green-700 text-[0.83rem] whitespace-nowrap align-middle">
+            ₹{{ tender.estimated_value }}
+          </td>
+          <td class="px-5 py-[0.95rem] text-slate-400 text-[0.83rem] whitespace-nowrap align-middle">
+            {{ tender.closing_date }}
+          </td>
+          <td class="px-5 py-[0.95rem] align-middle">
+            <span class="inline-flex items-center px-[9px] py-[3px] rounded-full
+                         text-[0.68rem] font-bold tracking-[0.04em] uppercase
+                         before:content-[''] before:w-[5px] before:h-[5px] before:rounded-full before:inline-block before:mr-1
+                         {% if tender.status == 'open' %}bg-green-50 text-green-700 before:bg-green-500
+                         {% elif tender.status == 'closed' %}bg-red-50 text-red-700 before:bg-red-500
+                         {% elif tender.status == 'awarded' %}bg-amber-50 text-amber-700 before:bg-amber-500
+                         {% elif tender.status == 'draft' %}bg-amber-50 text-amber-700 before:bg-amber-500
+                         {% else %}bg-slate-50 text-slate-500 before:bg-slate-400{% endif %}">
+              {% if tender.status == 'awarded' %}🏆 AWARDED{% else %}{{ tender.status|upper }}{% endif %}
+            </span>
+          </td>
+          <td class="px-5 py-[0.95rem] text-center align-middle">
+            <a href="{% url 'public:tenderDetails' tender.id %}"
+               class="inline-flex items-center gap-1 px-3 py-[5px]
+                      bg-[#0f2a5e] text-white rounded-lg text-[0.76rem] font-semibold no-underline
+                      transition-all duration-[0.18s] hover:bg-blue-600 hover:-translate-y-px">
+              <i class="fas fa-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center py-12 text-slate-400">
+            <i class="fas fa-folder-open block text-[1.4rem] mb-2 text-slate-300"></i>
+            No tenders found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /content-area -->
+
+
+<script>
+  function showCardView() {
+    document.getElementById('cardView').style.display = 'grid';
+    document.getElementById('tableView').classList.add('hidden');
+    document.getElementById('cardBtn').classList.add('active');
+    document.getElementById('tableBtn').classList.remove('active');
+  }
+  function showTableView() {
+    document.getElementById('tableView').classList.remove('hidden');
+    document.getElementById('cardView').style.display = 'none';
+    document.getElementById('tableBtn').classList.add('active');
+    document.getElementById('cardBtn').classList.remove('active');
+  }
+</script>
 
 {% endblock %}

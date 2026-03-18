@@ -4,6 +4,14 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # Create your models here.
+class Department(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    def __str__(self): return self.name
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    def __str__(self): return self.name
+
 class register(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
@@ -36,6 +44,8 @@ class UserProfile(models.Model):
     gov_id_number = models.CharField(max_length=50)
     gov_id_upload = models.FileField(upload_to='gov_id/')
 
+    designation = models.CharField(max_length=100, blank=True, null=True)
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True)
 
     status = models.CharField(
@@ -51,6 +61,31 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.CharField(max_length=255)
+    link = models.CharField(max_length=255, blank=True, null=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.message}"
+
+class AdminRequest(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    department_name = models.CharField(max_length=100)
+    category_name = models.CharField(max_length=100)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_remark = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.department_name} / {self.category_name}"
 
 # 🔹 AUTO CREATE PROFILE (except superuser)
 @receiver(post_save, sender=User)

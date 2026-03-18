@@ -3,270 +3,694 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Government Tender Portal</title>
+  <title>eBharat Tender Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="{% static 'css/style.css' %}" rel="stylesheet">
-  <link href="{% static 'css/tenderdetails.css' %}" rel="stylesheet">
-  <link href="{% static 'css/navbar.css' %}" rel="stylesheet">
-  <script src="{% static 'js/navbar.js' %}"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  
-</head>
-<body>
-<!-- ===== NAVBAR ===== -->
-<!-- ===== NAVBAR ===== -->
-<header class="bg-white shadow-sm sticky top-0 z-50 backdrop-blur-sm bg-white/95">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-      <!-- Logo -->
-      <div class="flex items-center">
-        <img src="{% static 'images/logo/logo-icon.png' %}" 
-             class="img-fluid mb-2 mt-2" 
-             style="max-width: 130px;">
-        <span class="ml-2 text-xl font-bold text-gray-900 font-poppins">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sora:   ['Sora', 'sans-serif'],
+            dmSans: ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy:      '#0f2a5e',
+            'navy-mid':'#163472',
+            'navy-dark':'#09193a',
+            blue:      '#1a56db',
+            'blue-light':'#3b82f6',
+            accent:    '#f59e0b',
+            surface:   '#f8faff',
+            'surface-2':'#f1f5f9',
+            muted:     '#64748b',
+            border:    '#e2e8f0',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ── Pseudo-elements & animations Tailwind cannot replicate ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { -webkit-font-smoothing: antialiased; }
+    h1,h2,h3,h4,h5,h6 { font-family: 'Sora', sans-serif; }
+
+    /* Nav Link Hover & Active Animations */
+    .nav-link {
+      position: relative;
+      transition: color 0.2s ease, background-color 0.2s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 80%;
+      height: 2.5px;
+      background: #1a56db;
+      border-radius: 2px;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+      transform-origin: center;
+    }
+    .nav-link:hover {
+      color: #0f2a5e;
+      background-color: rgba(15,42,94,0.04);
+    }
+    .nav-link:hover::after {
+      transform: translateX(-50%) scaleX(1);
+    }
+    .nav-link.active {
+      color: #1a56db;
+      font-weight: 700;
+      background-color: #eff6ff;
+    }
+    .nav-link.active::after {
+      transform: translateX(-50%) scaleX(1);
+      width: 16px;
+    }
+
+    /* Dropdown entrance animation */
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .dropdown-panel { animation: dropIn 0.16s cubic-bezier(0.16,1,0.3,1); }
+
+    /* Notification badge pop */
+    @keyframes badge-pop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+    .notif-badge { animation: badge-pop 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+
+    /* Custom scrollbars */
+    .notif-list::-webkit-scrollbar,
+    .drawer-body::-webkit-scrollbar { width: 4px; }
+    .notif-list::-webkit-scrollbar-track,
+    .drawer-body::-webkit-scrollbar-track { background: transparent; }
+    .notif-list::-webkit-scrollbar-thumb,
+    .drawer-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+    /* Footer link dot */
+    .footer-link::before {
+      content: '';
+      width: 4px; height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background 0.18s;
+    }
+    .footer-link:hover::before { background: #f59e0b; }
+
+    /* Profile chevron rotation */
+    .profile-btn[aria-expanded="true"] .profile-chevron { transform: rotate(180deg); }
+    .profile-chevron { transition: transform 0.2s; }
+
+    /* Drawer slide transition */
+    .mobile-drawer  { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .mobile-overlay { transition: opacity 0.3s; }
+
+    /* Drawer link hover indent */
+    .drawer-link:hover { color: #1a56db; padding-left: 0.85rem; }
+    .drawer-link:hover i { color: #1a56db; }
+    .drawer-link { transition: color 0.15s, padding-left 0.15s; }
+  </style>
+</head>
+
+<body class="font-dmSans bg-surface text-navy min-h-screen">
+
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+═══════════════════════════════════ -->
+<header class="sticky top-0 z-[100] bg-white/[0.98] backdrop-blur-[16px]
+               border-b border-[rgba(15,42,94,0.08)] shadow-[0_1px_0_rgba(15,42,94,0.08)]">
+  <div class="max-w-[1600px] w-full mx-auto px-6 lg:px-12 h-[66px] flex items-center justify-between">
+
+    <!-- Brand -->
+    <a href="/" class="flex flex-1 items-center gap-[0.65rem] no-underline flex-shrink-0">
+      <img src="{% static 'images/logo/logo-icon.png' %}"
+           class="h-[65px] w-auto block flex-shrink-0" alt="eBharat Tender Logo">
+      <div>
+        <span class="font-sora font-extrabold text-[1.1rem] text-navy leading-tight tracking-[-0.01em] block">
           eBharat Tender
         </span>
+        <span class="block text-[0.6rem] font-medium text-muted tracking-[0.07em] uppercase mt-px">
+          e-Procurement Portal
+        </span>
       </div>
+    </a>
 
-      <!-- Desktop Menu -->
-      <nav class="hidden md:flex items-center space-x-6">
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex flex-none items-center justify-center gap-[6px]">
+      <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %} px-[1.1rem] py-[0.45rem] rounded-[10px] text-[0.85rem] font-semibold text-muted no-underline tracking-[0.01em] whitespace-nowrap">
+        Home
+      </a>
+      <a href="/tenders/" class="nav-link {% if '/tenders/' in request.path %}active{% endif %} px-[1.1rem] py-[0.45rem] rounded-[10px] text-[0.85rem] font-semibold text-muted no-underline tracking-[0.01em] whitespace-nowrap">
+        Tenders
+      </a>
+      <a href="/funding/" class="nav-link {% if '/funding/' in request.path %}active{% endif %} px-[1.1rem] py-[0.45rem] rounded-[10px] text-[0.85rem] font-semibold text-muted no-underline tracking-[0.01em] whitespace-nowrap">
+        Funding
+      </a>
+      <a href="/noticeboard/" class="nav-link {% if '/noticeboard/' in request.path %}active{% endif %} px-[1.1rem] py-[0.45rem] rounded-[10px] text-[0.85rem] font-semibold text-muted no-underline tracking-[0.01em] whitespace-nowrap">
+        Noticeboard
+      </a>
+      <a href="/guidelines/" class="nav-link {% if '/guidelines/' in request.path %}active{% endif %} px-[1.1rem] py-[0.45rem] rounded-[10px] text-[0.85rem] font-semibold text-muted no-underline tracking-[0.01em] whitespace-nowrap">
+        Guidelines
+      </a>
+    </nav>
 
-        <a href="/" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
-        <a href="/tenders/" class="text-gray-700 hover:text-blue-600 font-medium">Tenders</a>
-        <a href="/funding/" class="text-gray-700 hover:text-blue-600 font-medium">Funding</a>
-        <a href="/workflow/" class="text-gray-700 hover:text-blue-600 font-medium">How It Works</a>
-        <a href="/guidelines/" class="text-gray-700 hover:text-blue-600 font-medium">Guidelines</a>
+    <!-- Right Actions -->
+    <div class="flex flex-1 items-center justify-end gap-[0.4rem]">
 
-        <div class="dropdown">
-          <a class="text-gray-700 hover:text-blue-600 font-medium dropdown-toggle"
-             href="#"
-             id="moreOptionsDropdown"
-             role="button"
-             data-bs-toggle="dropdown">
-            others
+      {% if user.is_authenticated %}
+
+      <!-- Profile dropdown -->
+      <div class="relative">
+        <button id="profileBtn" aria-expanded="false"
+                class="profile-btn flex items-center gap-[0.55rem] px-[0.7rem] py-[0.3rem] pl-[0.3rem]
+                       rounded-full border-[1.5px] border-border bg-white cursor-pointer
+                       transition-all duration-[0.18s]
+                       hover:border-blue-light hover:bg-surface hover:shadow-[0_2px_8px_rgba(59,130,246,0.12)]">
+          {% if user.userprofile.profile_pic %}
+            <img src="{{ user.userprofile.profile_pic.url }}"
+                 class="w-[30px] h-[30px] rounded-full object-cover border-[1.5px] border-border" alt="Profile">
+          {% else %}
+            <img src="{% static 'images/logo/default-profile.png' %}"
+                 class="w-[30px] h-[30px] rounded-full object-cover border-[1.5px] border-border" alt="Profile">
+          {% endif %}
+          <span class="hidden sm:block text-[0.83rem] font-semibold text-navy
+                       max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+            {{ user.username }}
+          </span>
+          <i class="fas fa-chevron-down profile-chevron text-[0.65rem] text-muted"></i>
+        </button>
+
+        <!-- Profile dropdown panel -->
+        <div id="profileDropdown"
+             class="dropdown-panel hidden absolute top-[calc(100%+12px)] right-0
+                    bg-white border border-border rounded-2xl w-[276px] z-[200] overflow-hidden
+                    shadow-[0_24px_64px_rgba(15,42,94,0.14),0_4px_16px_rgba(0,0,0,0.06)]">
+
+          <!-- Header -->
+          <div class="flex items-center gap-[0.85rem] px-5 py-5
+                      bg-gradient-to-br from-[#f0f5ff] to-[#e8f0fe] border-b border-blue-100">
+            {% if user.userprofile.profile_pic %}
+              <img src="{{ user.userprofile.profile_pic.url }}"
+                   class="w-[50px] h-[50px] rounded-full object-cover border-[2.5px] border-white
+                          shadow-[0_2px_10px_rgba(15,42,94,0.15)] flex-shrink-0">
+            {% else %}
+              <img src="{% static 'images/logo/default-profile.png' %}"
+                   class="w-[50px] h-[50px] rounded-full object-cover border-[2.5px] border-white
+                          shadow-[0_2px_10px_rgba(15,42,94,0.15)] flex-shrink-0">
+            {% endif %}
+            <div class="min-w-0">
+              <p class="text-[0.88rem] font-bold text-navy leading-[1.3]">{{ user.username }}</p>
+              <p class="text-[0.74rem] text-muted mt-[2px] overflow-hidden text-ellipsis whitespace-nowrap max-w-[160px]">
+                {{ user.email }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Menu items -->
+          <a href="{% url 'accounts:myprofile' %}"
+             class="flex items-center gap-[0.7rem] px-5 py-[0.72rem] no-underline
+                    text-navy text-[0.84rem] font-medium border-b border-surface-2
+                    transition-colors duration-[0.14s] hover:bg-surface hover:text-blue">
+            <i class="fas fa-user-circle w-[17px] text-center text-muted text-[0.82rem]"></i>
+            My Profile
+          </a>
+          <a href="#"
+             class="flex items-center gap-[0.7rem] px-5 py-[0.72rem] no-underline
+                    text-navy text-[0.84rem] font-medium border-b border-surface-2
+                    transition-colors duration-[0.14s] hover:bg-surface hover:text-blue">
+            <i class="fas fa-key w-[17px] text-center text-muted text-[0.82rem]"></i>
+            Change Password
           </a>
 
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/newTender/">All Bids</a></li>
-          </ul>
+
+          <!-- Logout -->
+          <a href="{% url 'accounts:logout' %}"
+             class="flex items-center gap-[0.7rem] px-5 py-[0.72rem] no-underline
+                    text-red-500 text-[0.84rem] font-semibold border-t border-surface-2
+                    transition-colors duration-[0.14s] hover:bg-red-50">
+            <i class="fas fa-sign-out-alt w-[17px] text-center text-[0.82rem]"></i>
+            Logout
+          </a>
         </div>
-      </nav>
-
-      <!-- Desktop Profile -->
-      <div class="hidden md:flex items-center">
-        {% if user.is_authenticated %}
-        <div class="relative">
-
-          <input type="checkbox" id="profileToggle" class="peer hidden">
-
-         <label for="profileToggle"
-       class="flex items-center space-x-2 cursor-pointer">
-
-    {% if user.userprofile.profile_pic %}
-        <img src="{{ user.userprofile.profile_pic.url }}"
-             class="w-10 h-10 rounded-full border"
-             alt="Profile">
-             
-    {% else %}
-        <img src="{% static 'images/Logo/default-profile.png' %}"
-             class="w-10 h-10 rounded-full border"
-             alt="Profile">
-    {% endif %}
-
-    <span class="text-gray-700 font-medium">
-        Hi, {{ user.username }}
-    </span>
-</label>
-
-          <div class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border
-                      hidden peer-checked:block z-50">
-
-              <div class="p-4 border-b flex items-start space-x-3">
-                  {% if user.userprofile.profile_pic %}
-                      <img src="{{ user.userprofile.profile_pic.url }}"
-                           class="w-12 h-12 rounded-full border"
-                           alt="Profile">
-                  {% else %}
-                      <img src="{% static 'images/Logo/default-profile.png' %}"
-                           class="w-12 h-12 rounded-full border"
-                           alt="Profile">
-                  {% endif %}
-
-                  <div class="flex-1 min-w-0">
-                      <h4 class="font-semibold">{{ user.username }}</h4>
-                      <p class="text-sm text-gray-500 break-words leading-tight">
-                          {{ user.email }}
-                      </p>
-                  </div>
-              </div>
-
-              <div class="py-2">
-                  <a href="{% url 'accounts:myprofile' %}" class="block px-4 py-2 hover:bg-gray-100">My Profile</a>
-                  <a href="#" class="block px-4 py-2 hover:bg-gray-100">Account Setting</a>
-              </div>
-
-              <div class="border-t">
-                  <a href="{% url 'accounts:logout' %}" 
-                     class="block px-4 py-2 text-red-600 hover:bg-gray-100">
-                     Logout
-                  </a>
-              </div>
-          </div>
-        </div>
-        {% else %}
-        <a href="{% url 'accounts:login' %}" 
-           class="text-gray-700 hover:text-blue-600 font-medium">
-           <i class="fa-solid fa-right-to-bracket me-1"></i> Login
-        </a>
-        {% endif %}
       </div>
 
-      <!-- Mobile Toggle -->
-      <button id="mobileMenuBtn" 
-              class="md:hidden text-gray-700 focus:outline-none">
-          <i class="fas fa-bars text-2xl"></i>
+      <!-- Divider -->
+      <span class="w-px h-[22px] bg-border flex-shrink-0 mx-[0.15rem]"></span>
+
+      <!-- Notification Bell -->
+      <div class="relative">
+        <button id="notificationBtn" aria-label="Notifications"
+                class="w-[38px] h-[38px] rounded-[10px] border-[1.5px] border-border bg-white
+                       flex items-center justify-center text-muted text-[0.88rem] cursor-pointer
+                       relative transition-all duration-[0.18s]
+                       hover:border-blue-light hover:text-blue hover:bg-blue-50
+                       hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(59,130,246,0.15)]">
+          <i class="fas fa-bell"></i>
+          {% if unread_count > 0 %}
+          <span id="notificationBadge"
+                class="notif-badge absolute -top-[5px] -right-[5px]
+                       bg-red-500 text-white text-[0.56rem] font-extrabold
+                       min-w-[17px] h-[17px] rounded-[9px] flex items-center justify-center
+                       px-[3px] border-2 border-white leading-none">
+            {{ unread_count }}
+          </span>
+          {% endif %}
+        </button>
+
+        <!-- Notification dropdown panel -->
+        <div id="notificationDropdown"
+             class="dropdown-panel hidden absolute top-[calc(100%+12px)] right-0
+                    bg-white border border-border rounded-2xl w-[344px] z-[200] overflow-hidden
+                    shadow-[0_24px_64px_rgba(15,42,94,0.14),0_4px_16px_rgba(0,0,0,0.06)]">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between px-5 py-4 border-b border-surface-2">
+            <h4 class="text-[0.88rem] font-bold text-navy">Notifications</h4>
+            {% if unread_count > 0 %}
+            <span class="text-[0.72rem] text-blue bg-blue-50 px-[9px] py-[2px]
+                         rounded-full font-bold border border-blue-200">
+              {{ unread_count }} new
+            </span>
+            {% endif %}
+          </div>
+
+          <!-- List -->
+          <div class="notif-list max-h-[280px] overflow-y-auto" id="notificationList">
+            {% for n in notifications %}
+            <a href="{% if n.link %}{{ n.link }}{% else %}#{% endif %}"
+               class="flex items-start gap-[0.7rem] px-5 py-[0.8rem] no-underline
+                      border-b border-surface-2 last:border-b-0
+                      transition-colors duration-150 hover:bg-surface">
+              <span class="w-2 h-2 rounded-full mt-[5px] flex-shrink-0
+                           {% if not n.is_read %}bg-blue shadow-[0_0_0_3px_rgba(26,86,219,0.12)]
+                           {% else %}bg-slate-300{% endif %}"></span>
+              <div>
+                <p class="text-[0.8rem] text-navy font-medium leading-[1.5]">{{ n.message }}</p>
+                <p class="text-[0.71rem] text-muted mt-[2px]">{{ n.created_at|timesince }} ago</p>
+              </div>
+            </a>
+            {% empty %}
+            <div class="text-center px-5 py-8">
+              <i class="fas fa-bell-slash text-slate-300 text-[1.4rem] block mb-2"></i>
+              <p class="text-[0.8rem] text-muted font-medium">No notifications yet</p>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Footer -->
+          <div class="flex justify-between items-center px-5 py-[0.7rem]
+                      border-t border-surface-2 bg-surface">
+            <a href="#" id="viewAllNotif"
+               class="flex items-center gap-1 text-[0.78rem] text-blue font-bold no-underline
+                      hover:underline">
+              View all <i class="fas fa-arrow-right text-[0.65rem]"></i>
+            </a>
+            <a href="{% url 'accounts:clear_notifications' %}"
+               class="flex items-center gap-1 text-[0.73rem] text-red-500 font-semibold no-underline
+                      px-[0.65rem] py-[0.28rem] rounded-[7px]
+                      bg-red-50 border border-red-200
+                      transition-all duration-150 hover:bg-red-100 hover:border-red-300">
+              <i class="fas fa-trash-alt"></i> Clear all
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+
+      <!-- Login button -->
+      <a href="{% url 'accounts:login' %}"
+         class="inline-flex items-center gap-[6px] px-5 py-[0.48rem]
+                bg-navy text-white rounded-[9px] text-[0.855rem] font-bold no-underline
+                tracking-[0.01em] whitespace-nowrap
+                transition-all duration-[0.18s]
+                hover:bg-navy-mid hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(15,42,94,0.28)]">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+
+      {% endif %}
+
+      <!-- Hamburger (mobile) -->
+      <button id="hamburgerBtn" aria-label="Menu"
+              class="flex md:hidden items-center justify-center w-[38px] h-[38px]
+                     rounded-[9px] border-[1.5px] border-border bg-white
+                     cursor-pointer text-navy text-[0.95rem] flex-shrink-0
+                     transition-all duration-[0.18s]
+                     hover:border-blue-light hover:text-blue hover:bg-surface">
+        <i class="fas fa-bars"></i>
       </button>
 
     </div>
   </div>
 </header>
 
-<!-- ===== MOBILE MENU ===== -->
-<div id="mobileMenu"
-     class="fixed top-0 right-0 w-72 h-full bg-white shadow-lg
-            transform translate-x-full transition-transform duration-300 z-50 md:hidden">
 
-  <div class="p-4 border-b flex justify-between items-center">
-      <h5 class="font-semibold">Menu</h5>
-      <button id="closeMobileMenu">
-          <i class="fas fa-times text-xl"></i>
-      </button>
-  </div>
-
-  <nav class="flex flex-col p-4 space-y-4">
-
-      {% if user.is_authenticated %}
-      <!-- Mobile Profile -->
-      <div class="border-b pb-4">
-          <div class="flex items-center space-x-3 mb-3">
-              {% if user.userprofile.profile_pic %}
-                  <img src="{{ user.userprofile.profile_pic.url }}"
-                       class="w-10 h-10 rounded-full border"
-                       alt="Profile">
-              {% else %}
-                  <img src="{% static 'images/Logo/default-profile.png' %}"
-                       class="w-10 h-10 rounded-full border"
-                       alt="Profile">
-              {% endif %}
-              <div>
-                  <h4 class="font-semibold">{{ user.username }}</h4>
-                  <p class="text-sm text-gray-500 break-words">
-                      {{ user.email }}
-                  </p>
-              </div>
-          </div>
-
-          <div class="mt-3 flex flex-col space-y-2">
-              <a href="#" class="text-gray-700 hover:text-blue-600">My Profile</a>
-              <a href="#" class="text-gray-700 hover:text-blue-600">Account Setting</a>
-          </div>
-      </div>
-      {% endif %}
-
-      <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
-      <a href="/tenders/" class="text-gray-700 hover:text-blue-600">Tenders</a>
-      <a href="/funding/" class="text-gray-700 hover:text-blue-600">Funding</a>
-      <a href="/workflow/" class="text-gray-700 hover:text-blue-600">How It Works</a>
-      <a href="/guidelines/" class="text-gray-700 hover:text-blue-600">Guidelines</a>
-
-      <hr>
-
-      <a href="/newTender/" class="text-gray-700 hover:text-blue-600">Create Tender</a>
-      <a href="/myapplications/" class="text-gray-700 hover:text-blue-600">My Applications</a>
-      <a href="/vendors/" class="text-gray-700 hover:text-blue-600">Vendors</a>
-      <a href="/departments/" class="text-gray-700 hover:text-blue-600">Departments</a>
-      <a href="/reports/" class="text-gray-700 hover:text-blue-600">Reports</a>
-      <a href="/settings/" class="text-gray-700 hover:text-blue-600">Settings</a>
-      <a href="/help/" class="text-gray-700 hover:text-blue-600">Help & Support</a>
-
-      <hr>
-
-      {% if user.is_authenticated %}
-          <a href="{% url 'accounts:logout' %}" class="text-red-600">Logout</a>
-      {% else %}
-          <a href="{% url 'accounts:login' %}" class="text-gray-700">Login</a>
-      {% endif %}
-
-  </nav>
-</div>
+<!-- ═══════════════════════════════════
+     MOBILE DRAWER
+═══════════════════════════════════ -->
 
 <!-- Overlay -->
 <div id="mobileOverlay"
-     class="fixed inset-0 bg-black bg-opacity-40 hidden z-40 md:hidden">
+     class="mobile-overlay fixed inset-0 bg-[rgba(9,25,58,0.55)] backdrop-blur-[4px] z-[299]
+            opacity-0 pointer-events-none">
 </div>
-<!-- ===== END NAVBAR ===== -->
 
-{% block content %}
-{% endblock %}
-<!-- ===== START FOOTER ===== -->
-<footer class="gov-footer">
-  <div class="container">
-    <div class="row">
+<!-- Drawer -->
+<div id="mobileDrawer"
+     class="mobile-drawer fixed top-0 right-0 w-[min(300px,88vw)] h-full bg-white z-[300]
+            translate-x-full flex flex-col shadow-[-8px_0_32px_rgba(15,42,94,0.18)]">
 
-      <!-- Column 1 -->
-      <div class="col-md-4 mb-3">
-        <h6>Government Tender Portal</h6>
-        <p>
-          Official e-Procurement platform for publishing government tenders,
-          managing bids, approvals, and vendor participation in a transparent manner.
+  <!-- Drawer Header -->
+  <div class="flex justify-between items-center px-[1.4rem] py-[1.15rem] border-b border-white/10"
+       style="background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%);">
+    <h5 class="font-sora text-[0.95rem] font-bold text-white">Menu</h5>
+    <button id="drawerClose"
+            class="w-8 h-8 rounded-lg border border-white/20 bg-white/10
+                   flex items-center justify-center cursor-pointer
+                   text-[0.85rem] text-white/80 transition-all duration-[0.18s]
+                   hover:bg-white/20 hover:text-white">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Drawer Body -->
+  <div class="drawer-body flex-1 overflow-y-auto px-[1.4rem] py-5">
+
+    {% if user.is_authenticated %}
+    <!-- User card -->
+    <div class="flex items-center gap-3 px-4 py-[0.9rem] mb-[1.1rem]
+                bg-gradient-to-br from-[#f0f5ff] to-[#e8f0fe]
+                rounded-xl border border-blue-100">
+      {% if user.userprofile.profile_pic %}
+        <img src="{{ user.userprofile.profile_pic.url }}"
+             class="w-[42px] h-[42px] rounded-full border-2 border-white object-cover
+                    shadow-[0_2px_8px_rgba(15,42,94,0.15)]">
+      {% else %}
+        <img src="{% static 'images/logo/default-profile.png' %}"
+             class="w-[42px] h-[42px] rounded-full border-2 border-white object-cover
+                    shadow-[0_2px_8px_rgba(15,42,94,0.15)]">
+      {% endif %}
+      <div class="min-w-0">
+        <p class="font-sora font-bold text-navy text-[0.88rem] whitespace-nowrap overflow-hidden text-ellipsis">
+          {{ user.username }}
+        </p>
+        <p class="text-[0.72rem] text-muted whitespace-nowrap overflow-hidden text-ellipsis">
+          {{ user.email }}
         </p>
       </div>
+    </div>
+    {% endif %}
 
-      <!-- Column 2 -->
-      <div class="col-md-4 mb-3">
-        <h6>Quick Links</h6>
-        <a href="/">Home</a>
-        <a href="/tenders/">Tenders</a>
-        <a href="/funding/">Funding</a>
-        <a href="/workflow/">How It Works</a>
+    <!-- Nav links -->
+    <a href="/" class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                       border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+      <i class="fas fa-home w-5 text-center text-muted text-[0.82rem]"></i> Home
+    </a>
+    <a href="/tenders/" class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                                border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+      <i class="fas fa-file-contract w-5 text-center text-muted text-[0.82rem]"></i> Tenders
+    </a>
+    <a href="/funding/" class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                                border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+      <i class="fas fa-coins w-5 text-center text-muted text-[0.82rem]"></i> Funding
+    </a>
+    <a href="/noticeboard/" class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                                    border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+      <i class="fas fa-clipboard-list w-5 text-center text-muted text-[0.82rem]"></i> Noticeboard
+    </a>
+    <a href="/guidelines/" class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                                   border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+      <i class="fas fa-book-open w-5 text-center text-muted text-[0.82rem]"></i> Guidelines
+    </a>
 
+    {% if user.is_authenticated %}
+      <a href="{% url 'accounts:myprofile' %}"
+         class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                border-b border-surface-2 no-underline text-navy text-[0.875rem] font-medium">
+        <i class="fas fa-user-circle w-5 text-center text-muted text-[0.82rem]"></i> My Profile
+      </a>
+      <a href="{% url 'accounts:logout' %}"
+         class="flex items-center gap-[0.7rem] px-4 py-[0.7rem] mt-4
+                bg-red-50 border border-red-200 rounded-[10px]
+                text-red-600 no-underline text-[0.855rem] font-bold
+                transition-all duration-[0.18s] hover:bg-red-100 hover:border-red-300">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    {% else %}
+      <a href="{% url 'accounts:login' %}"
+         class="drawer-link flex items-center gap-3 px-2 py-[0.7rem]
+                border-b border-surface-2 no-underline text-blue text-[0.875rem] font-bold">
+        <i class="fas fa-sign-in-alt w-5 text-center text-blue text-[0.82rem]"></i> Login
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════ -->
+<main class="min-h-[70vh]">
+  {% block content %}{% endblock %}
+</main>
+
+
+<!-- ═══════════════════════════════════
+     FOOTER
+═══════════════════════════════════ -->
+<footer class="mt-16 border-t border-white/[0.04]" style="background: #09193a; color: rgba(255,255,255,0.65);">
+  <div class="max-w-[1280px] mx-auto px-6 pt-14 pb-8">
+
+    <!-- Footer grid -->
+    <div class="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr] gap-10 md:gap-12">
+
+      <!-- Col 1 — Brand -->
+      <div>
+        <div class="flex items-center gap-[0.65rem] mb-[0.9rem]">
+          <img src="{% static 'images/logo/logo-icon.png' %}"
+               class="h-[34px] w-auto opacity-85" alt="eBharat Tender">
+          <span class="font-sora font-extrabold text-white text-[1rem] tracking-[-0.01em]">
+            eBharat Tender
+          </span>
+        </div>
+        <p class="text-[0.845rem] text-white/45 max-w-[270px] leading-[1.75]">
+          Official e-Procurement platform for transparent, efficient, and accountable government tender management.
+        </p>
+        <!-- Social links -->
+        <div class="flex gap-2 mt-5">
+          <a href="#" aria-label="Twitter"
+             class="w-[33px] h-[33px] bg-white/[0.08] border border-white/10 rounded-lg
+                    flex items-center justify-center text-white/55 no-underline text-[0.82rem]
+                    transition-all duration-[0.18s]
+                    hover:bg-white/15 hover:border-white/25 hover:text-white hover:-translate-y-[2px]">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" aria-label="LinkedIn"
+             class="w-[33px] h-[33px] bg-white/[0.08] border border-white/10 rounded-lg
+                    flex items-center justify-center text-white/55 no-underline text-[0.82rem]
+                    transition-all duration-[0.18s]
+                    hover:bg-white/15 hover:border-white/25 hover:text-white hover:-translate-y-[2px]">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+          <a href="#" aria-label="Email"
+             class="w-[33px] h-[33px] bg-white/[0.08] border border-white/10 rounded-lg
+                    flex items-center justify-center text-white/55 no-underline text-[0.82rem]
+                    transition-all duration-[0.18s]
+                    hover:bg-white/15 hover:border-white/25 hover:text-white hover:-translate-y-[2px]">
+            <i class="fas fa-envelope"></i>
+          </a>
+          <a href="#" aria-label="YouTube"
+             class="w-[33px] h-[33px] bg-white/[0.08] border border-white/10 rounded-lg
+                    flex items-center justify-center text-white/55 no-underline text-[0.82rem]
+                    transition-all duration-[0.18s]
+                    hover:bg-white/15 hover:border-white/25 hover:text-white hover:-translate-y-[2px]">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
       </div>
 
-      <!-- Column 3 -->
-      <div class="col-md-4 mb-3">
-        <h6>Help & Support</h6>
-        <a href="#">User Manual</a>
-        <a href="#">FAQ</a>
-        <a href="#">Contact Support</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms & Conditions</a>
+      <!-- Col 2 — Quick Links -->
+      <div>
+        <p class="text-white/85 text-[0.72rem] font-bold tracking-[0.09em] uppercase
+                  mb-4 pb-[0.6rem] border-b border-white/[0.08]">
+          Quick Links
+        </p>
+        <a href="/" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                            text-white/50 no-underline mb-[0.6rem]
+                            transition-colors duration-[0.18s] hover:text-white">
+          Home
+        </a>
+        <a href="/tenders/" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                                    text-white/50 no-underline mb-[0.6rem]
+                                    transition-colors duration-[0.18s] hover:text-white">
+          Active Tenders
+        </a>
+        <a href="/funding/" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                                    text-white/50 no-underline mb-[0.6rem]
+                                    transition-colors duration-[0.18s] hover:text-white">
+          Funding Programs
+        </a>
+        <a href="/guidelines/" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                                       text-white/50 no-underline mb-[0.6rem]
+                                       transition-colors duration-[0.18s] hover:text-white">
+          Guidelines
+        </a>
+        <a href="/workflow/" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                                     text-white/50 no-underline mb-[0.6rem]
+                                     transition-colors duration-[0.18s] hover:text-white">
+          How It Works
+        </a>
+      </div>
+
+      <!-- Col 3 — Support -->
+      <div>
+        <p class="text-white/85 text-[0.72rem] font-bold tracking-[0.09em] uppercase
+                  mb-4 pb-[0.6rem] border-b border-white/[0.08]">
+          Support
+        </p>
+        <a href="#" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                            text-white/50 no-underline mb-[0.6rem]
+                            transition-colors duration-[0.18s] hover:text-white">
+          FAQ
+        </a>
+        <a href="#" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                            text-white/50 no-underline mb-[0.6rem]
+                            transition-colors duration-[0.18s] hover:text-white">
+          Contact Support
+        </a>
+        <a href="#" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                            text-white/50 no-underline mb-[0.6rem]
+                            transition-colors duration-[0.18s] hover:text-white">
+          Vendor Helpdesk
+        </a>
+        <a href="#" class="footer-link flex items-center gap-[6px] text-[0.855rem]
+                            text-white/50 no-underline mb-[0.6rem]
+                            transition-colors duration-[0.18s] hover:text-white">
+          Grievance Portal
+        </a>
+
+        <!-- Helpline card -->
+        <div class="mt-4 px-4 py-[0.85rem] bg-white/[0.05] border border-white/[0.08] rounded-[10px]">
+          <p class="text-[0.7rem] text-white/35 mb-1 tracking-[0.05em] uppercase">Helpline</p>
+          <p class="font-sora text-[1rem] text-white font-bold">1800-XXX-XXXX</p>
+          <p class="text-[0.7rem] text-white/35 mt-[2px]">Mon–Sat · 9 AM – 6 PM IST</p>
+        </div>
       </div>
 
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="footer-bottom">
-      © 2026 Government of India. All Rights Reserved.  
-      <br>
-      Designed & Developed for Official Government Use
+    <!-- Footer bottom -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-[0.65rem]
+                border-t border-white/[0.07] pt-5 mt-10 text-center sm:text-left">
+      <p class="text-[0.78rem] text-white/30">
+        © 2026 Government of India. All Rights Reserved.
+      </p>
+      <div class="flex gap-6 flex-wrap justify-center">
+        <a href="#" class="text-[0.78rem] text-white/30 no-underline transition-colors duration-[0.18s] hover:text-white/70">
+          Privacy Policy
+        </a>
+        <a href="#" class="text-[0.78rem] text-white/30 no-underline transition-colors duration-[0.18s] hover:text-white/70">
+          Terms of Use
+        </a>
+        <a href="#" class="text-[0.78rem] text-white/30 no-underline transition-colors duration-[0.18s] hover:text-white/70">
+          Disclaimer
+        </a>
+      </div>
     </div>
+
   </div>
 </footer>
-<!-- ===== END FOOTER ===== -->
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
-<script src="{% static 'js/tenders.js' %}"></script>
-<script src="{% static 'js/main.js'}"></script>
+
+
+<!-- ═══════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════ -->
+<script>
+  // ── Dropdown toggles ──
+  const notifBtn        = document.getElementById('notificationBtn');
+  const notifDropdown   = document.getElementById('notificationDropdown');
+  const profileBtn      = document.getElementById('profileBtn');
+  const profileDropdown = document.getElementById('profileDropdown');
+
+  function closeAll() {
+    notifDropdown?.classList.add('hidden');
+    profileDropdown?.classList.add('hidden');
+    profileBtn?.setAttribute('aria-expanded', 'false');
+  }
+
+  notifBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasHidden = notifDropdown.classList.contains('hidden');
+    closeAll();
+    if (wasHidden) {
+      notifDropdown.classList.remove('hidden');
+      fetch("{% url 'accounts:mark_notifications_read' %}", {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }).then(() => {
+        const badge = document.getElementById('notificationBadge');
+        if (badge) badge.style.display = 'none';
+      });
+    }
+  });
+
+  profileBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasHidden = profileDropdown.classList.contains('hidden');
+    closeAll();
+    if (wasHidden) {
+      profileDropdown.classList.remove('hidden');
+      profileBtn.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  document.addEventListener('click', closeAll);
+  notifDropdown?.addEventListener('click',   e => e.stopPropagation());
+  profileDropdown?.addEventListener('click', e => e.stopPropagation());
+
+  // Expand notification list
+  document.getElementById('viewAllNotif')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const list = document.getElementById('notificationList');
+    list.style.maxHeight = list.style.maxHeight === 'none' ? '280px' : 'none';
+  });
+
+  // ── Mobile drawer ──
+  const hamburgerBtn  = document.getElementById('hamburgerBtn');
+  const mobileDrawer  = document.getElementById('mobileDrawer');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+  const drawerClose   = document.getElementById('drawerClose');
+
+  function openDrawer() {
+    mobileDrawer.classList.remove('translate-x-full');
+    mobileOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    mobileOverlay.classList.add('opacity-100');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    mobileDrawer.classList.add('translate-x-full');
+    mobileOverlay.classList.add('opacity-0', 'pointer-events-none');
+    mobileOverlay.classList.remove('opacity-100');
+    document.body.style.overflow = '';
+  }
+
+  hamburgerBtn.addEventListener('click', openDrawer);
+  drawerClose.addEventListener('click',  closeDrawer);
+  mobileOverlay.addEventListener('click', closeDrawer);
+</script>
+
 </body>
 </html>

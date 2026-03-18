@@ -1,81 +1,16 @@
-from pyexpat.errors import messages
+from django.contrib import messages
 from django.shortcuts import redirect, render
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse
 
-# Create your views here.
+# ==============================================================================
+# AUTHENTICATION & NOTIFICATION VIEWS
+# ==============================================================================
 
-# =======================
-# bidder profile update view
-# =======================
-def updateProfile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-
-        profile.full_name = request.POST.get("full_name")
-        profile.mobile = request.POST.get("mobile")
-        profile.address = request.POST.get("address")
-        profile.gov_id_type = request.POST.get("gov_id_type")
-        profile.gov_id_number = request.POST.get("gov_id_number")
-
-        # Profile picture upload
-        if request.FILES.get("profile_pic"):
-            profile.profile_pic = request.FILES.get("profile_pic")
-
-        # Government ID upload
-        if request.FILES.get("gov_id_upload"):
-            profile.gov_id_upload = request.FILES.get("gov_id_upload")
-
-        # 🔒 Role only set if not already assigned
-        if not profile.role:
-            role = request.POST.get("role")
-            if role:
-                profile.role = role
-
-        profile.save()
-        return redirect("accounts:updateProfile")   # reload page after save
-
-    return render(request, 'bidersProfileupdate.html')
-
-# =======================
-# tender creation & management views
-# =======================
-def updateProfile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-
-        profile.full_name = request.POST.get("full_name")
-        profile.mobile = request.POST.get("mobile")
-        profile.address = request.POST.get("address")
-        profile.gov_id_type = request.POST.get("gov_id_type")
-        profile.gov_id_number = request.POST.get("gov_id_number")
-
-        # Profile picture upload
-        if request.FILES.get("profile_pic"):
-            profile.profile_pic = request.FILES.get("profile_pic")
-
-        # Government ID upload
-        if request.FILES.get("gov_id_upload"):
-            profile.gov_id_upload = request.FILES.get("gov_id_upload")
-
-        # 🔒 Role only set if not already assigned
-        if not profile.role:
-            role = request.POST.get("role")
-            if role:
-                profile.role = role
-
-        profile.save()
-        return redirect("accounts:updatemyprofile")   # reload page after save
-
-    return render(request, 'vendorsProfileupdate.html')
-
-# =======================
-# LOGIN & LOGOUT VIEWS
-# =======================
+# View for user login
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("user_name")
@@ -85,18 +20,73 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect("public:home")  # create dashboard page
+            if user.is_superuser:
+                return HttpResponse("Welcome Superuser")
+            return redirect("public:home")
         else:
             return redirect("accounts:login")
-
     return render(request, "login.html")
 
+# Mark notifications as read
+@login_required
+def mark_notifications_read(request):
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+# Clear all user notifications
+@login_required
+def clear_notifications(request):
+    Notification.objects.filter(user=request.user).delete()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+# View history of notifications
+@login_required
+def view_all_notifications(request):
+    all_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, "all_notifications.html", {"all_notifications": all_notifications})
+
+
+# ==============================================================================
+# PROFILE MANAGEMENT VIEWS
+# ==============================================================================
+
+# Update role-based profile details
+@login_required
+def updateProfile(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        profile.full_name = request.POST.get("full_name")
+        profile.mobile = request.POST.get("mobile")
+        profile.address = request.POST.get("address")
+        profile.gov_id_type = request.POST.get("gov_id_type")
+        profile.gov_id_number = request.POST.get("gov_id_number")
+
+        if request.FILES.get("profile_pic"):
+            profile.profile_pic = request.FILES.get("profile_pic")
+        if request.FILES.get("gov_id_upload"):
+            profile.gov_id_upload = request.FILES.get("gov_id_upload")
+
+        if not profile.role:
+            role = request.POST.get("role")
+            if role:
+                profile.role = role
+
+        profile.save()
+        messages.success(request, "Profile Updated Successfully.")
+        return redirect("accounts:updateProfile")
+
+    template_name = 'vendorsProfileupdate.html' if profile.role == 'creator' else 'bidersProfileupdate.html'
+    return render(request, template_name, {'profile': profile})
+
+# View for user logout
 def logout_view(request):
     logout(request)
     return redirect("accounts:login")
 # =======================
 # PROFILE VIEW
 # =======================
+# Manage personal KYC profile
 @login_required
 def my_profile(request):
     profile = request.user.userprofile
@@ -129,13 +119,14 @@ def my_profile(request):
             return redirect("tenders:dashboard") # replace with actual redirect
 
         elif profile.role == "bidder":
-            return redirect("bids:bidsdeshboard")  # replace with actual redirect
+            return redirect("bids:bids_dashboard")  # replace with actual redirect
 
     return render(request, "myprofile.html", {"profile": profile})
 
-# =======================
-# REGISTRATION VIEW
-# =======================
+# ==============================================================================
+# REGISTRATION VIEWS
+# ==============================================================================
+# View for user registration
 def register(request):
     if request.method == "POST":
         full_name = request.POST.get("full_name")

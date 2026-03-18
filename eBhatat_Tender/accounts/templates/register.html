@@ -1,114 +1,391 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block content %}
 
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+<style>
+  :root {
+    --navy:       #0f2a5e;
+    --navy-mid:   #163472;
+    --blue:       #1a56db;
+    --blue-light: #3b82f6;
+    --surface:    #f1f5f9;
+    --text:       #1e293b;
+    --muted:      #64748b;
+    --border:     #e2e8f0;
+  }
 
-      <div class="card shadow border-0 rounded-4">
-        <div class="card-body p-5 text-center">
-         <div class="row justify-content-center" style="margin-left: 115px;">
-          <!-- Centered Logo -->
-            <div class="col-md-7 text-center">
-              <img src="{% static 'images/Logo/gov-logo.png' %}"
-                  class="img-fluid "
-                  alt="Government Logo"
-                  style="max-width: 150px;">
+  /* ── PAGE: vertically centered, no page scroll ── */
+  .register-page {
+    min-height: calc(100vh - 66px);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+  }
+
+  /* ── CARD ── */
+  .register-card {
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 32px rgba(15,42,94,0.1), 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .card-top {
+    background: linear-gradient(135deg, #0b1e4a 0%, #0f2a5e 55%, #163472 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-top::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .card-top::after {
+    content: '';
+    position: absolute; top:-40px; right:-40px;
+    width:150px; height:150px;
+    background: radial-gradient(circle, rgba(26,86,219,0.28) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .top-logo {
+    position: relative; z-index: 1;
+    width: 56px; height: 56px;
+    object-fit: contain; flex-shrink: 0;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+  }
+  .top-text { position: relative; z-index: 1; }
+  .top-brand-name {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.05rem; font-weight: 800; color: white;
+    line-height: 1.2; margin-bottom: 2px;
+  }
+  .top-brand-sub {
+    font-size: 0.63rem; color: rgba(255,255,255,0.45);
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* ── BODY ── */
+  .card-body {
+    padding: 1.5rem 1.75rem 1.6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  /* watermark */
+  .card-body::before {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: -30px;
+    width: 200px; height: 200px;
+    background-image: url("{% static 'images/Logo/gov-logo.png' %}");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.045;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .card-body > * { position: relative; z-index: 1; }
+
+  .form-heading {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.18rem; font-weight: 800; color: var(--navy);
+    margin-bottom: 0.18rem; line-height: 1.2;
+  }
+  .form-subheading {
+    font-size: 0.8rem; color: var(--muted);
+    margin-bottom: 1.25rem; line-height: 1.5;
+  }
+
+  /* messages */
+  .alert-msg {
+    padding: 0.55rem 0.8rem; border-radius: 8px;
+    font-size: 0.78rem; font-weight: 500; margin-bottom: 0.9rem;
+    display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;
+  }
+  .alert-error   { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
+  .alert-success { background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
+
+  /* ── 2-COL GRID ── */
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 0.85rem;
+  }
+  .field-full { grid-column: 1 / -1; }
+
+  /* fields */
+  .field-group { margin-bottom: 0.8rem; }
+  .field-label {
+    display: block; font-size: 0.75rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.3rem;
+  }
+  .field-label sup { color: #ef4444; font-size: 0.68rem; }
+
+  .field-wrap { position: relative; }
+  .field-icon {
+    position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+    color: #b0bac7; font-size: 0.78rem; pointer-events: none; transition: color 0.18s;
+  }
+  .field-wrap:focus-within .field-icon { color: var(--blue); }
+
+  .field-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.3rem;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 0.875rem; color: var(--text); background: #f8faff;
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    font-family: 'DM Sans', sans-serif;
+    box-sizing: border-box; -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: #b0bac7; }
+  .field-input:focus {
+    border-color: var(--blue-light); background: white;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.11);
+  }
+
+  /* password toggle */
+  .pw-toggle {
+    position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #b0bac7; font-size: 0.78rem; padding: 0; transition: color 0.18s;
+  }
+  .pw-toggle:hover { color: var(--navy); }
+
+  /* declaration checkbox */
+  .declaration-wrap {
+    display: flex; align-items: flex-start; gap: 0.55rem;
+    margin-bottom: 1rem; cursor: pointer;
+  }
+  .declaration-check {
+    width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px;
+    border-radius: 4px; border: 1.5px solid var(--border);
+    accent-color: var(--blue); cursor: pointer;
+  }
+  .declaration-label {
+    font-size: 0.78rem; color: var(--muted); line-height: 1.5; cursor: pointer;
+    user-select: none;
+  }
+  .declaration-label a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  .declaration-label a:hover { color: var(--navy); }
+
+  /* register button */
+  .btn-register {
+    width: 100%; padding: 0.72rem;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(15,42,94,0.26);
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .btn-register:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(15,42,94,0.34); }
+  .btn-register:active { transform:translateY(0); }
+
+  /* login link */
+  .login-row {
+    text-align: center; margin-top: 1rem;
+    font-size: 0.82rem; color: var(--muted);
+  }
+  .login-row a { color: var(--blue); font-weight: 700; text-decoration: none; transition: color 0.18s; }
+  .login-row a:hover { color: var(--navy); }
+
+  /* trust strip */
+  .trust-strip {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1.1rem; flex-wrap: wrap;
+    margin-top: 1rem; padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.71rem; color: var(--muted); font-weight: 500;
+  }
+  .trust-item i { font-size: 0.65rem; color: #22c55e; }
+
+  /* mobile */
+  @media (max-width: 540px) {
+    .register-page { padding: 1rem 0.75rem; align-items: flex-start; }
+    .card-top  { padding: 1.1rem 1.25rem; }
+    .card-body { padding: 1.25rem 1.25rem 1.35rem; }
+    .top-logo  { width: 46px; height: 46px; }
+    .fields-grid { grid-template-columns: 1fr; }
+    .field-full { grid-column: 1; }
+  }
+</style>
+
+
+<div class="register-page">
+  <div class="register-card">
+
+    <!-- HEADER -->
+    <div class="card-top">
+      <!-- <img src="{% static 'images/Logo/gov-logo.png' %}" class="top-logo" alt="eBharat Tender"> -->
+      <div class="top-text">
+        <p class="top-brand-name">eBharat Tender</p>
+        <p class="top-brand-sub">e-Procurement Portal &nbsp;·&nbsp; Government of India</p>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card-body">
+
+      <h1 class="form-heading">Create your account</h1>
+      <p class="form-subheading">Register to access the eBharat Government Tender Portal.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert-msg {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+          <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" autocomplete="off">
+        {% csrf_token %}
+
+        <div class="fields-grid">
+
+          <!-- Full Name -->
+          <div class="field-group field-full">
+            <label class="field-label" for="full_name">Full Name <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-id-card field-icon"></i>
+              <input type="text" name="full_name" id="full_name"
+                     class="field-input" placeholder="Enter your full name" required>
             </div>
-          </div>   
-          <!-- Heading -->
-          <h2 class="fw-normal mb-3" style="letter-spacing: 1px;">
-            Create Your Account
-          </h2>
+          </div>
 
-          <p class="text-muted mb-4">
-            Register to access the eBharat Government Tender Portal
-          </p>
-
-          <!-- Registration Form -->
-          <form method="POST">
-            {% csrf_token %}
-
-            <!-- Full Name -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Full Name</label>
-              <input type="text" name="full_name"
-                     class="form-control form-control-lg"
-                     placeholder="Enter your full name" required>
+          <!-- Email -->
+          <div class="field-group">
+            <label class="field-label" for="email">Email Address <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-envelope field-icon"></i>
+              <input type="email" name="email" id="email"
+                     class="field-input" placeholder="you@example.com" required>
             </div>
+          </div>
 
-            <!-- Email -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Email Address</label>
-              <input type="email" name="email"
-                     class="form-control form-control-lg"
-                     placeholder="Enter your email address" required>
+          <!-- Mobile -->
+          <div class="field-group">
+            <label class="field-label" for="mobile">Mobile Number <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-mobile-alt field-icon"></i>
+              <input type="tel" name="mobile" id="mobile"
+                     class="field-input" placeholder="+91 XXXXX XXXXX" required>
             </div>
+          </div>
 
-            <!-- Mobile -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Mobile Number</label>
-              <input type="tel" name="mobile"
-                     class="form-control form-control-lg"
-                     placeholder="Enter your mobile number" required>
+          <!-- Username -->
+          <div class="field-group field-full">
+            <label class="field-label" for="username">Username <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-user field-icon"></i>
+              <input type="text" name="username" id="username"
+                     class="field-input" placeholder="Choose a unique username" required>
             </div>
+          </div>
 
-            <!-- Username -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Username</label>
-              <input type="text" name="username"
-                     class="form-control form-control-lg"
-                     placeholder="Choose username" required>
-            </div>
-
-            <!-- Password -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Password</label>
-              <input type="password" name="password"
-                     class="form-control form-control-lg"
-                     placeholder="Enter password" required>
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="mb-3 text-start">
-              <label class="form-label">Confirm Password</label>
-              <input type="password" name="confirm_password"
-                     class="form-control form-control-lg"
-                     placeholder="Confirm password" required>
-            </div>
-
-            <!-- Declaration -->
-            <div class="form-check mb-4 text-start">
-              <input class="form-check-input" type="checkbox" required>
-              <label class="form-check-label">
-                I declare that the information provided is true and correct.
-              </label>
-            </div>
-
-            <!-- Register Button -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-lg">
-                Register
+          <!-- Password -->
+          <div class="field-group">
+            <label class="field-label" for="password">Password <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-lock field-icon"></i>
+              <input type="password" name="password" id="password"
+                     class="field-input" placeholder="Min. 8 characters"
+                     style="padding-right:2.4rem;" required>
+              <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Toggle password">
+                <i class="fas fa-eye" id="pwIcon1"></i>
               </button>
             </div>
+          </div>
 
-            <!-- Login Link -->
-            <p class="mt-3 mb-0">
-              Already have an account?
-              <a href="{% url 'accounts:login' %}" class="text-decoration-none">
-                Login here
-              </a>
-            </p>
+          <!-- Confirm Password -->
+          <div class="field-group">
+            <label class="field-label" for="confirm_password">Confirm Password <sup>*</sup></label>
+            <div class="field-wrap">
+              <i class="fas fa-lock field-icon"></i>
+              <input type="password" name="confirm_password" id="confirm_password"
+                     class="field-input" placeholder="Re-enter password"
+                     style="padding-right:2.4rem;" required>
+              <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Toggle confirm password">
+                <i class="fas fa-eye" id="pwIcon2"></i>
+              </button>
+            </div>
+          </div>
 
-          </form>
+        </div><!-- /fields-grid -->
 
-        </div>
+        <!-- Declaration -->
+        <label class="declaration-wrap">
+          <input type="checkbox" class="declaration-check" name="declaration" required>
+          <span class="declaration-label">
+            I declare that the information provided is true and correct, and I agree to the
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </span>
+        </label>
+
+        <!-- Register Button -->
+        <button type="submit" class="btn-register">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+
+        <!-- Login link -->
+        <p class="login-row">
+          Already have an account?
+          <a href="{% url 'accounts:login' %}">Login here</a>
+        </p>
+
+      </form>
+
+      <!-- Trust strip -->
+      <div class="trust-strip">
+        <span class="trust-item"><i class="fas fa-check-circle"></i> Secure Registration</span>
+        <span class="trust-item"><i class="fas fa-check-circle"></i> SSL Encrypted</span>
+        <span class="trust-item"><i class="fas fa-check-circle"></i> Govt. Verified</span>
       </div>
 
     </div>
   </div>
 </div>
+
+
+<script>
+  // Password toggle — field 1
+  const pw1 = document.getElementById('password');
+  const pt1 = document.getElementById('pwToggle1');
+  const pi1 = document.getElementById('pwIcon1');
+  pt1.addEventListener('click', () => {
+    const h = pw1.type === 'password';
+    pw1.type = h ? 'text' : 'password';
+    pi1.className = h ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+
+  // Password toggle — field 2
+  const pw2 = document.getElementById('confirm_password');
+  const pt2 = document.getElementById('pwToggle2');
+  const pi2 = document.getElementById('pwIcon2');
+  pt2.addEventListener('click', () => {
+    const h = pw2.type === 'password';
+    pw2.type = h ? 'text' : 'password';
+    pi2.className = h ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+</script>
 
 {% endblock %}

@@ -2,198 +2,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>CreatorDashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>eBharat Tender — Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body {
-            overflow-x: hidden;
-            background-color: #f8f9fa;
-            body {
-    padding-top: 70px; /* adjust if navbar height is different */
-}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:        '#0f2a5e',
+            'navy-mid':  '#163472',
+            'navy-dark': '#0a1745',
+            blue:        '#1a56db',
+            'blue-light':'#3b82f6',
+            accent:      '#f59e0b',
+            surface:     '#f8faff',
+            'surface-2': '#f1f5f9',
+            text:        '#1e293b',
+            muted:       '#64748b',
+            border:      '#e2e8f0',
+          },
+          fontFamily: {
+            sora:   ['Sora', 'sans-serif'],
+            dmSans: ['"DM Sans"', 'sans-serif'],
+          },
+          width:  { sidebar: '240px' },
+          height: { topbar:  '62px'  },
+          margin: { sidebar: '240px', topbar: '62px' },
+          spacing:{ sidebar: '240px', topbar: '62px' },
         }
+      }
+    }
+  </script>
 
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            background: #ffffff;
-            border-right: 1px solid #ddd;
-            transition: 0.3s;
-        }
+  <style>
+    /* CSS variables still needed for a few dynamic/pseudo uses */
+    :root {
+      --navy-dark: #0a1745;
+      --blue:      #1a56db;
+      --blue-light:#3b82f6;
+      --border:    #e2e8f0;
+      --surface:   #f8faff;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --navy:      #0f2a5e;
+      --sidebar-w: 240px;
+      --topbar-h:  62px;
+    }
 
-        .sidebar a {
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-            color: #333;
-            font-weight: 500;
-        }
+    /* Scrollbar & grid texture can't be done in pure Tailwind */
+    .sidebar-nav::-webkit-scrollbar        { width: 3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
-        .sidebar a:hover {
-            background: #f1f1f1;
-        }
+    .sidebar::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
 
-        .sidebar .logout {
-            color: red;
-        }
+    /* Active nav-item left accent bar */
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 3px;
+      background: #3b82f6;
+      border-radius: 0 3px 3px 0;
+    }
 
-        /* Main content */
-        .main-content {
-            margin-left: 250px;
-            transition: 0.3s;
-        }
+    /* Profile dropdown transition */
+    .profile-dropdown {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .profile-wrap.show .profile-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .profile-wrap.show .profile-chevron {
+      transform: rotate(180deg);
+    }
 
-        /* Mobile View */
-        @media(max-width: 991px){
-            .sidebar {
-                left: -250px;
-            }
+    /* Sidebar slide transition */
+    .sidebar { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .topbar  { transition: left 0.3s; }
+    .main-wrap { transition: margin-left 0.3s; }
+    .profile-chevron { transition: transform 0.2s; }
 
-            .sidebar.active {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-        }
-    </style>
+    /* Font smoothing */
+    body { -webkit-font-smoothing: antialiased; }
+    h1,h2,h3,h4,h5,h6 { font-family: 'Sora', sans-serif; }
+  </style>
 </head>
-<body>
 
-<!-- Sidebar -->
-<div class="sidebar p-3" id="sidebar">
-    <div class="navbar-brand">
-                    <a href="{% url 'tenders:dashboard' %}">
-                        <b class="logo-icon d-flex align-items-center justify-content-center">
-                            <img src="{% static 'assets/images/logo/gov-logo.png' %}"
-                                 alt="logo"
-                                 height="120"
-                                 width="200" />
-                        </b>
-                    </a>
-                </div>
+<body class="font-dmSans bg-surface text-text overflow-x-hidden">
 
-    <div class="mb-3 text-muted small">ACTIONS</div>
+<!-- ═══════ SIDEBAR OVERLAY (mobile) ═══════ -->
+<div id="sidebarOverlay"
+     onclick="closeSidebar()"
+     class="sidebar-overlay hidden fixed inset-0 bg-[rgba(9,25,58,0.55)] backdrop-blur-sm z-[199]">
+</div>
 
-   <nav class="sidebar">
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside id="sidebar"
+       class="sidebar fixed top-0 left-0 w-[240px] h-screen bg-navy-dark flex flex-col z-[200] overflow-hidden
+              -translate-x-full lg:translate-x-0">
+
+  <!-- Brand -->
+  <a href="{% url 'tenders:dashboard' %}"
+     class="flex items-center gap-[0.65rem] px-5 py-[1.1rem] border-b border-white/[0.07] flex-shrink-0 relative z-[1] no-underline">
+    <img src="{% static 'assets/images/logo/gov-logo.png' %}"
+         class="w-[38px] h-[38px] object-contain flex-shrink-0 drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]"
+         alt="eBharat Tender">
+    <div>
+      <span class="font-sora text-[0.95rem] font-extrabold text-white leading-tight">
+        eBharat Tender
+        <span class="block text-[0.58rem] font-normal text-white/40 tracking-[0.06em] uppercase mt-px">
+          Department Dashboard
+        </span>
+      </span>
+    </div>
+  </a>
+
+  <!-- Nav -->
+  <nav class="sidebar-nav flex-1 overflow-y-auto px-3 pb-4 pt-1 relative z-[1]">
+
+    <p class="px-2 pt-[1.1rem] pb-[0.4rem] text-[0.62rem] font-bold text-white/30 tracking-[0.1em] uppercase">
+      Main Menu
+    </p>
 
     <a href="{% url 'tenders:dashboard' %}"
-       class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2 me-2"></i>
-        Dashboard
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'dashboard' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-chart-pie w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'dashboard' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Dashboard
     </a>
 
     <a href="{% url 'tenders:tenderCreator' %}"
-       class="{% if request.resolver_match.url_name == 'tenderCreator' %}active{% endif %}">
-        <i class="bi bi-plus-circle me-2"></i>
-        Publish Tender
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'tenderCreator' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-plus-circle w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'tenderCreator' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Publish Tender
     </a>
 
+    <a href="{% url 'tenders:request_admin' %}"
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'request_admin' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-user-shield w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'request_admin' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Request Admin
+    </a>
+
+    {% if user.is_superuser %}
+    <a href="{% url 'tenders:admin_view_requests' %}"
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-yellow-400/80 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-yellow-500/[0.12] hover:text-yellow-300
+              {% if request.resolver_match.url_name == 'admin_view_requests' %}
+                active bg-gradient-to-br from-yellow-500/50 to-yellow-500/25 text-white font-semibold border border-yellow-400/25
+              {% endif %}">
+      <i class="fas fa-tasks w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'admin_view_requests' %}text-yellow-300{% else %}text-yellow-400/80{% endif %}"></i>
+      Manage Requests
+    </a>
+    {% endif %}
+
     <a href="{% url 'tenders:mytenders' %}"
-       class="{% if request.resolver_match.url_name == 'mytenders' %}active{% endif %}">
-        <i class="bi bi-folder2-open me-2"></i>
-        Issued Tenders
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'mytenders' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-folder-open w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'mytenders' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Issued Tenders
     </a>
 
     <a href="{% url 'tenders:myBiddsApplications' %}"
-       class="{% if request.resolver_match.url_name == 'all_bids' %}active{% endif %}">
-        <i class="bi bi-clipboard-data me-2"></i>
-        Bid Applications
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'all_bids' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-clipboard-list w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'all_bids' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Bid Applications
     </a>
+
+    <hr class="border-0 h-px bg-white/[0.07] my-[0.65rem]">
+
+    <p class="px-2 pt-[1.1rem] pb-[0.4rem] text-[0.62rem] font-bold text-white/30 tracking-[0.1em] uppercase">
+      Account
+    </p>
 
     <a href="{% url 'tenders:updateProfile' %}"
-       class="{% if request.resolver_match.url_name == 'updateProfile' %}active{% endif %}">
-        <i class="bi bi-person-gear me-2"></i>
-         Profile
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-white/55 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-white/[0.08] hover:text-white
+              {% if request.resolver_match.url_name == 'updateProfile' %}
+                active bg-gradient-to-br from-blue/50 to-blue/25 text-white font-semibold border border-blue-light/25
+              {% endif %}">
+      <i class="fas fa-user-cog w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'updateProfile' %}text-blue-300{% else %}text-white/55{% endif %}"></i>
+      Profile Settings
     </a>
 
-    <a href="{% url 'accounts:logout' %}" class="logout">
-        <i class="bi bi-box-arrow-right me-2"></i>
-        Sign Out
+    <hr class="border-0 h-px bg-white/[0.07] my-[0.65rem]">
+
+    <a href="{% url 'accounts:logout' %}"
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px]
+              text-red-400/70 no-underline text-[0.865rem] font-medium transition-all duration-[0.18s] mb-[2px]
+              hover:bg-red-500/[0.12] hover:text-red-300">
+      <i class="fas fa-sign-out-alt w-[18px] text-center text-[0.9rem] flex-shrink-0 text-red-400/70"></i>
+      Sign Out
     </a>
 
-</nav>
-</div>
+  </nav>
 
-<!-- Main Content -->
-<div class="main-content">
-
-    <!-- Top Navbar -->
-    <nav class="navbar navbar-light bg-white shadow-sm px-3 sticky-top">
-        <button class="btn btn-outline-secondary d-lg-none" onclick="toggleSidebar()">
-            <i class="bi bi-list"></i>
-        </button>
-
-        <span class="ms-3 fw-semibold">
-    Welcome, {{ user.username }} 👋🏻
-    {% if user.userprofile.role %}
-        <small class="text-muted">
-            ({{ user.userprofile.role|title }})
-        </small>
+  <!-- Footer -->
+  <div class="flex items-center gap-[0.65rem] px-[1.1rem] py-[0.85rem] border-t border-white/[0.07] flex-shrink-0 relative z-[1]">
+    {% if user.is_authenticated and user.userprofile and user.userprofile.profile_pic and user.userprofile.profile_pic.name %}
+      <img src="{{ user.userprofile.profile_pic.url }}"
+           class="w-[34px] h-[34px] rounded-full object-cover border-2 border-white/15 flex-shrink-0" alt="Profile">
+    {% else %}
+      <img src="{% static 'images/Logo/default-profile.png' %}"
+           class="w-[34px] h-[34px] rounded-full object-cover border-2 border-white/15 flex-shrink-0" alt="Profile">
     {% endif %}
-</span>
+    <div class="min-w-0">
+      <p class="text-[0.82rem] font-bold text-white/85 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ user.username }}
+      </p>
+      {% if user.is_authenticated and user.userprofile and user.userprofile.role %}
+        <p class="text-[0.67rem] text-white/35 capitalize">{{ user.userprofile.role }}</p>
+      {% endif %}
+    </div>
+  </div>
 
-        <div class="ms-auto">
-                <ul class="navbar-nav float-right">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle"
-                           href="#"
-                           data-toggle="dropdown">
-                            {% if user.userprofile.profile_pic %}
-                                <img src="{{ user.userprofile.profile_pic.url }}"
-                                     class="rounded-circle"
-                                     width="45"
-                                     height="45" 
-                                     alt="profile"
-                                     />
-                            {% else %}
-                                <img src="{% static 'images/Logo/default-profile.png' %}"
-                                     class="rounded-circle"
-                                     width="45"
-                                     height="45"
-                                     alt="profile"
-                                     />
-                            {% endif %}
+</aside>
 
-                            <span class="ml-2 d-none d-lg-inline-block">
-                                <span class="text-dark">{{ user.username }}</span>
-                            </span>
-                        </a>
-                    </li>
-                </ul>
-        </div>
+
+<!-- ═══════ TOPBAR ═══════ -->
+<header class="topbar fixed top-0 right-0 h-[62px] bg-white/[0.98] backdrop-blur-[12px]
+               border-b border-border flex items-center px-6 gap-3 z-[100]
+               shadow-[0_1px_0_rgba(15,42,94,0.06)]
+               left-0 lg:left-[240px]">
+
+  <!-- Mobile hamburger -->
+  <button id="sidebarToggle"
+          onclick="openSidebar()"
+          aria-label="Open menu"
+          class="lg:hidden flex w-9 h-9 rounded-[9px] border-[1.5px] border-border bg-white
+                 items-center justify-center cursor-pointer text-muted text-[0.95rem] flex-shrink-0
+                 transition-all duration-[0.18s] hover:border-blue-light hover:text-blue hover:bg-blue-50">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Page title + breadcrumb -->
+  <div class="flex-1 min-w-0 flex flex-col justify-center">
+    <h1 class="font-sora text-[1.1rem] md:text-[1.2rem] font-extrabold text-navy leading-snug whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
+      {{ page_title|default:"Dashboard" }}
+    </h1>
+    <nav aria-label="Breadcrumb" class="flex items-center gap-[0.4rem] text-[0.7rem] font-medium text-muted mt-[0.1rem]">
+      <span class="hover:text-blue transition-colors duration-200 cursor-pointer">eBharat Tender</span>
+      <i class="fas fa-chevron-right text-[0.55rem] opacity-60"></i>
+      <span class="text-blue font-semibold drop-shadow-sm">{{ page_title|default:"Dashboard" }}</span>
     </nav>
+  </div>
 
-    <!-- Dashboard Content -->
-    <div class="container-fluid p-4">
-        <div class="card shadow-sm border-0 rounded-4">
-        
-                {% block content %}
-                <!-- Dashboard content will be injected here -->
-                {% endblock %}
-      
+  <!-- Welcome chip -->
+  <div class="hidden md:flex items-center gap-2.5 px-4 py-1.5
+              bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100/60 rounded-full
+              shadow-[0_2px_8px_rgba(26,86,219,0.08)] backdrop-blur-md transition-all duration-300 hover:shadow-[0_4px_12px_rgba(26,86,219,0.15)] hover:-translate-y-[1px] group cursor-default">
+    <span class="text-[1.05rem] group-hover:rotate-12 transition-transform duration-300 origin-bottom-right inline-block">👋</span>
+    <span class="text-[0.82rem] text-slate-600 font-medium whitespace-nowrap">
+      Welcome back, <strong class="text-navy font-bold tracking-wide">{{ user.username }}</strong>
+    </span>
+  </div>
+
+  <!-- Role badge -->
+  {% if user.is_authenticated and user.userprofile and user.userprofile.role %}
+  <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 pb-[0.45rem] pt-[0.45rem] ml-1
+              bg-gradient-to-r from-blue/10 to-blue/5 border border-blue/20 rounded-full 
+              shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md transition-all duration-300
+              hover:bg-blue/15 hover:border-blue/30 cursor-default group">
+    <div class="relative flex items-center justify-center">
+      <div class="w-2.5 h-2.5 rounded-full bg-blue group-hover:animate-ping absolute opacity-40"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-blue relative z-10"></div>
+    </div>
+    <span class="text-[0.68rem] font-bold uppercase tracking-widest text-blue whitespace-nowrap leading-none mt-px">
+      {{ user.userprofile.role }}
+    </span>
+  </div>
+  {% endif %}
+
+  <!-- Profile dropdown -->
+  <div class="profile-wrap relative" id="profileWrap">
+    <div onclick="toggleProfileDropdown()"
+         class="flex items-center gap-2 pl-[0.28rem] pr-[0.65rem] py-[0.28rem]
+                rounded-full border-[1.5px] border-border bg-white cursor-pointer flex-shrink-0
+                transition-all duration-[0.18s] hover:border-blue-light hover:bg-surface">
+      {% if user.is_authenticated and user.userprofile and user.userprofile.profile_pic and user.userprofile.profile_pic.name %}
+        <img src="{{ user.userprofile.profile_pic.url }}"
+             class="w-7 h-7 rounded-full object-cover border-[1.5px] border-border" alt="Profile">
+      {% else %}
+        <img src="{% static 'images/Logo/default-profile.png' %}"
+             class="w-7 h-7 rounded-full object-cover border-[1.5px] border-border" alt="Profile">
+      {% endif %}
+      <span class="hidden sm:block text-[0.82rem] font-semibold text-text max-w-[100px] whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ user.username }}
+      </span>
+      <i class="fas fa-chevron-down profile-chevron text-[0.62rem] text-muted"></i>
     </div>
 
+    <!-- Dropdown -->
+    <div class="profile-dropdown absolute top-full right-0 mt-2 bg-white border border-border
+                rounded-xl shadow-[0_4px_16px_rgba(15,42,94,0.1)] min-w-[160px] z-[200] overflow-hidden">
+      <a href="{% url 'public:home' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem]
+                text-text text-[0.85rem] font-medium no-underline
+                transition-colors duration-[0.15s] hover:bg-surface hover:text-blue">
+        <i class="fas fa-home text-[0.9rem] text-muted"></i>
+        Home
+      </a>
+      <hr class="border-0 h-px bg-border my-1">
+      <a href="{% url 'accounts:logout' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem]
+                text-red-500 text-[0.85rem] font-medium no-underline
+                transition-colors duration-[0.15s] hover:bg-red-50 hover:text-red-600">
+        <i class="fas fa-sign-out-alt text-[0.9rem] text-red-500"></i>
+        Sign Out
+      </a>
+    </div>
+  </div>
+
+</header>
+
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="main-wrap ml-0 lg:ml-[240px] pt-[62px] min-h-screen">
+  <div class="p-4 sm:p-7">
+    <div class="bg-white rounded-2xl border border-border shadow-[0_2px_12px_rgba(15,42,94,0.05)] overflow-hidden">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function toggleSidebar(){
-        document.getElementById('sidebar').classList.toggle('active');
+  function openSidebar() {
+    document.getElementById('sidebar').classList.remove('-translate-x-full');
+    document.getElementById('sidebarOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 991) closeSidebar();
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 991) closeSidebar();
+  });
+
+  function toggleProfileDropdown() {
+    document.getElementById('profileWrap').classList.toggle('show');
+  }
+
+  window.addEventListener('click', function(e) {
+    const profileWrap = document.getElementById('profileWrap');
+    if (profileWrap && !profileWrap.contains(e.target)) {
+      profileWrap.classList.remove('show');
     }
+  });
 </script>
 
 </body>

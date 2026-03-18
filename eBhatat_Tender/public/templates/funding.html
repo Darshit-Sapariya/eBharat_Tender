@@ -1,200 +1,373 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 
-<!-- Funding Section -->
-<section id="funding" class="py-16 lg:py-24 bg-gray-100">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="container my-5">
-      <div class="text-center mb-4">
-        <h2
-          class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins"
-        >
-          Funding Opportunities
-        </h2>
-        <h5 class="fw-semibold">
-          Access grants and funding programs to accelerate your projects
-        </h5>
-      </div>
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim-1 { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.05s both; }
+  .anim-2 { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+  .anim-card { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+  .anim-card:nth-child(1) { animation-delay: 0.10s; }
+  .anim-card:nth-child(2) { animation-delay: 0.15s; }
+  .anim-card:nth-child(3) { animation-delay: 0.20s; }
+  .anim-card:nth-child(4) { animation-delay: 0.25s; }
+  .anim-card:nth-child(5) { animation-delay: 0.30s; }
+  .anim-card:nth-child(6) { animation-delay: 0.35s; }
+  .anim-card:nth-child(7) { animation-delay: 0.40s; }
 
-      <div class="row g-4">
-        <!-- Card 1 -->
-        <div class="container py-5">
-  <div class="row g-4">
+  /* Title bar grid texture */
+  .title-bar::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .title-bar::after {
+    content: ''; position: absolute;
+    width: 340px; height: 340px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    right: -70px; top: -140px; pointer-events: none;
+  }
 
-    <!-- Card 1 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Green Energy Startup Fund</h5>
-          <p class="small text-muted flex-grow-1">
-            Financial assistance for renewable energy innovation projects.
+  .card-top-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0; }
+  .card-hover-lift { transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+  .card-hover-lift:hover { transform: translateY(-5px); border-color: #bfdbfe; }
+</style>
+
+<!-- ══════════════════════════════════
+     TITLE BAR
+══════════════════════════════════ -->
+<div class="title-bar relative overflow-hidden"
+     style="background: linear-gradient(135deg, #09193a 0%, #0f2a5e 52%, #163472 100%);">
+
+  <div class="absolute inset-0 pointer-events-none"
+       style="background: radial-gradient(ellipse 48% 100% at 88% 50%, rgba(26,86,219,0.17) 0%, transparent 68%);"></div>
+
+  <div class="relative z-[1] max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+
+      <!-- Left -->
+      <div class="flex items-center gap-4 anim-1 min-w-0">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center
+                    text-white text-[1.1rem] sm:text-[1.25rem] flex-shrink-0
+                    shadow-[0_4px_16px_rgba(0,0,0,0.22)]"
+             style="background: linear-gradient(135deg, #1a56db, #163472);">
+          <i class="fas fa-hand-holding-usd"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="font-sora text-[1.3rem] sm:text-[1.6rem] font-extrabold text-white leading-tight mb-1">
+            Funding Opportunities
+          </h1>
+          <p class="font-dmSans text-[0.82rem] sm:text-[0.9rem] text-white/60">
+            Access grants and funding programs to accelerate your projects
           </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$450K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Startups</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Aug 12, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
         </div>
       </div>
-    </div>
-
-    <!-- Card 2 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Smart Agriculture Grant</h5>
-          <p class="small text-muted flex-grow-1">
-            Supporting digital transformation in modern farming systems.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$300K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>SMEs</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Sep 05, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
+      
+      <!-- Right: active count -->
+      <div class="anim-2">
+        <span class="inline-flex items-center gap-[6px] px-4 py-[6px] rounded-full
+                     font-sora text-[0.65rem] font-bold tracking-[0.06em] uppercase
+                     bg-emerald-500/15 border border-emerald-400/25 text-emerald-300">
+          <span class="relative flex h-[6px] w-[6px]">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-65"></span>
+            <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-emerald-400"></span>
+          </span>
+          7 Active Programs
+        </span>
       </div>
-    </div>
 
-    <!-- Card 3 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Healthcare Innovation Support</h5>
-          <p class="small text-muted flex-grow-1">
-            Funding for medical device and telehealth solutions.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$600K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Hospitals</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Jul 28, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
-      </div>
     </div>
-
-    <!-- Card 4 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Digital Education Program</h5>
-          <p class="small text-muted flex-grow-1">
-            Grants for smart classrooms and digital curriculum.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$250K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Schools</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Oct 02, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 5 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Urban Development Scheme</h5>
-          <p class="small text-muted flex-grow-1">
-            Financial support for sustainable city infrastructure.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$1.2M</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Contractors</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Nov 15, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 6 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">AI Research Funding</h5>
-          <p class="small text-muted flex-grow-1">
-            Encouraging artificial intelligence research projects.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$800K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Universities</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Dec 01, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 7 -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card grant-card h-100 border-0 shadow-sm rounded-4 bg-light-blue">
-        <div class="card-body p-4 d-flex flex-column">
-          <h5 class="fw-semibold text-primary">Women Entrepreneur Scheme</h5>
-          <p class="small text-muted flex-grow-1">
-            Supporting small businesses led by women entrepreneurs.
-          </p>
-          <div class="bg-white rounded-3 p-3 mb-3 shadow-sm small">
-            <div class="d-flex justify-content-between mb-1">
-              <span>Amount</span><strong>$150K</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Eligibility</span><strong>Women-led SMEs</strong>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>Deadline</span><strong>Aug 30, 2025</strong>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary w-100">Apply Now</a>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
+<!-- ══════════════════════════════════
+     PAGE BODY
+══════════════════════════════════ -->
+<div class="bg-[#f8faff] min-h-screen">
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
 
+    <!-- Filters/Sorting Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8 anim-1">
+      <div class="flex items-center gap-3">
+        <p class="font-sora text-[0.95rem] font-bold text-[#0f2a5e]">Available Grants</p>
+        <span class="px-2.5 py-[3px] rounded-md bg-blue-50 border border-blue-100 text-[#1a56db] font-sora text-[0.68rem] font-bold">2025-2026</span>
+      </div>
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <div class="relative w-full sm:w-[260px]">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[0.7rem] z-10 w-4 pl-1"></i>
+          <input type="text" placeholder="Search funding programs..." 
+                 class="pl-9 pr-4 py-[0.6rem] bg-white border border-slate-200 rounded-xl text-[0.85rem] font-dmSans text-slate-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all w-full shadow-sm">
+        </div>
       </div>
     </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
+
+      <!-- Card 1 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #10b981, #059669);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-[1rem] mb-4">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Green Energy Startup Fund</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Financial assistance for renewable energy innovation projects.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$450K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Startups</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Aug 12, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-[1rem] mb-4">
+            <i class="fas fa-seedling"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Smart Agriculture Grant</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Supporting digital transformation in modern farming systems.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$300K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">SMEs</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Sep 05, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #ec4899, #db2777);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-600 text-[1rem] mb-4">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Healthcare Innovation Support</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Funding for medical device and telehealth solutions.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$600K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Hospitals</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Jul 28, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-[1rem] mb-4">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Digital Education Program</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Grants for smart classrooms and digital curriculum.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$250K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Schools</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Oct 02, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #8b5cf6, #6d28d9);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 text-[1rem] mb-4">
+            <i class="fas fa-city"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Urban Development Scheme</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Financial support for sustainable city infrastructure.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$1.2M</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Contractors</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Nov 15, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #ef4444, #dc2626);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 text-[1rem] mb-4">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">AI Research Funding</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Encouraging artificial intelligence research projects.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$800K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Universities</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Dec 01, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="card-hover-lift anim-card relative bg-white rounded-[1.25rem] border border-slate-200 flex flex-col
+                  shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+        <div class="card-top-accent" style="background: linear-gradient(90deg, #14b8a6, #059669);"></div>
+        <div class="p-6 flex flex-col flex-1">
+          <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 text-[0.95rem] mb-4">
+            <i class="fas fa-venus text-[0.95rem]"></i>
+          </div>
+          <h3 class="font-sora text-[1.05rem] font-extrabold text-[#0f2a5e] mb-2 leading-snug">Women Entrepreneur Scheme</h3>
+          <p class="font-dmSans text-[0.85rem] text-slate-500 leading-relaxed mb-5 flex-1">
+            Supporting small businesses led by women entrepreneurs.
+          </p>
+
+          <div class="bg-[#f8faff] rounded-xl p-4 border border-blue-50 mb-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Amount</span>
+              <span class="font-sora text-[0.85rem] font-extrabold text-emerald-600">$150K</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Eligibility</span>
+              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e]">Women-led SMEs</span>
+            </div>
+            <div class="h-px w-full bg-slate-200 my-2.5"></div>
+            <div class="flex items-center justify-between">
+              <span class="font-dmSans text-[0.72rem] text-slate-400 uppercase tracking-widest font-bold">Deadline</span>
+              <span class="font-sora text-[0.8rem] font-bold text-amber-600">Aug 30, 2025</span>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center justify-center gap-2 w-full py-[0.75rem]
+                             bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.85rem] font-bold rounded-xl
+                             shadow-[0_4px_12px_rgba(15,42,94,0.15)] transition-all duration-200">
+            <span>Apply Now</span> <i class="fas fa-arrow-right text-[0.7rem]"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
   </div>
-</section>
+</div>
 
 {% endblock %}

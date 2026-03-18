@@ -10,6 +10,7 @@ urlpatterns = [
     path('workflow/', views.workflow, name='workflow'),
     path('guidelines/', views.guidelines, name='guidelines'),
     path('tenderDetails/<int:tender_id>/', views.tenderDetails, name='tenderDetails'),
+    path('noticeboard/', views.noticeboard, name='noticeboard'),
    
 
 ]

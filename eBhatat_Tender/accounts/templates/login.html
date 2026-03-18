@@ -1,59 +1,353 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% load static %}
- {% block content %}
+{% block content %}
 
-<section class="vh-80 mt-5">
-  <div class="container-fluid h-custom">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-9 col-lg-6 col-xl-5">
-        <img src="{% static 'images/Logo/gov-logo.png' %}"
-          class="img-fluid" alt="Sample image">
-      </div>
-      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-        <form method="POST">
-          {% csrf_token %}
-           <h1 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h1>
+<style>
+  :root {
+    --navy:       #0f2a5e;
+    --navy-mid:   #163472;
+    --blue:       #1a56db;
+    --blue-light: #3b82f6;
+    --surface:    #f1f5f9;
+    --text:       #1e293b;
+    --muted:      #64748b;
+    --border:     #e2e8f0;
+  }
 
-     
+  /* fills viewport exactly — no page scroll */
+  .login-page {
+    height: calc(100vh - 66px);
+    min-height: 580px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
 
-          <!-- Email input -->
-          <div data-mdb-input-init class="form-outline mb-4">
-            <label class="form-label" for="form3Example3">User Name</label>
-            <input type="text" name="user_name" id="form3Example3" class="form-control form-control-lg"
-              placeholder="User Name " />
-          </div>
+  .login-card {
+    width: 100%;
+    max-width: 460px;
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 32px rgba(15,42,94,0.1), 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
 
-          <!-- Password input -->
-          <div data-mdb-input-init class="form-outline mb-3">
-            <label class="form-label" for="form3Example4">Password</label>
-            <input type="password" name="password" id="form3Example4" class="form-control form-control-lg"
-              placeholder="Enter password" />
-          </div>
+  /* ── HEADER ── */
+  .card-top {
+    background: linear-gradient(135deg, #0b1e4a 0%, #0f2a5e 55%, #163472 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-top::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .card-top::after {
+    content: '';
+    position: absolute; top:-40px; right:-40px;
+    width:150px; height:150px;
+    background: radial-gradient(circle, rgba(26,86,219,0.28) 0%, transparent 70%);
+    border-radius: 50%;
+  }
 
-          <div class="d-flex justify-content-between align-items-center">
-            <!-- Checkbox -->
-            <div class="form-check mb-0">
-              <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
-              <label class="form-check-label" for="form2Example3">
-                Remember me
-              </label>
-            </div>
-            <a href="#!" class="text-body">Forgot password?</a>
-          </div>
+  .top-logo {
+    position: relative; z-index: 1;
+    width: 56px; height: 56px;
+    object-fit: contain; flex-shrink: 0;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+  }
+  .top-text { position: relative; z-index: 1; }
+  .top-brand-name {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.05rem; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 2px;
+  }
+  .top-brand-sub {
+    font-size: 0.63rem; color: rgba(255,255,255,0.45);
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  }
 
-          <div class="text-center text-lg-start mt-4 pt-2">
-            <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
-              style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-            <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="{% url 'accounts:register' %}"
-                class="link-danger">Register</a></p>
-          </div>
+  /* ── BODY ── */
+  .card-body {
+    padding: 1.35rem 1.75rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  /* watermark logo */
+  .card-body::before {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    width: 200px;
+    height: 200px;
+    background-image: url("{% static 'images/Logo/gov-logo.png' %}");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.045;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* keep all form content above watermark */
+  .card-body > * { position: relative; z-index: 1; }
 
-        </form>
+  .form-heading {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.18rem; font-weight: 800; color: var(--navy);
+    margin-bottom: 0.18rem; line-height: 1.2;
+  }
+  .form-subheading {
+    font-size: 0.8rem; color: var(--muted); margin-bottom: 1.1rem; line-height: 1.5;
+  }
+
+  /* messages */
+  .alert-msg {
+    padding: 0.55rem 0.8rem; border-radius: 8px;
+    font-size: 0.78rem; font-weight: 500; margin-bottom: 0.9rem;
+    display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;
+  }
+  .alert-error   { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
+  .alert-success { background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
+
+  /* fields */
+  .field-group { margin-bottom: 0.8rem; }
+  .field-label {
+    display: block; font-size: 0.75rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.3rem;
+  }
+  .field-label sup { color: #ef4444; font-size: 0.68rem; }
+
+  .field-wrap { position: relative; }
+  .field-icon {
+    position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+    color: #b0bac7; font-size: 0.78rem; pointer-events: none; transition: color 0.18s;
+  }
+  .field-wrap:focus-within .field-icon { color: var(--blue); }
+
+  .field-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.3rem;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 0.875rem; color: var(--text); background: #f8faff;
+    outline: none; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    font-family: 'DM Sans', sans-serif;
+    box-sizing: border-box; -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: #b0bac7; }
+  .field-input:focus {
+    border-color: var(--blue-light); background: white;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.11);
+  }
+
+  .pw-toggle {
+    position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #b0bac7; font-size: 0.78rem; padding: 0; transition: color 0.18s;
+  }
+  .pw-toggle:hover { color: var(--navy); }
+
+  /* remember + forgot */
+  .form-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem; flex-wrap: wrap; gap: 0.4rem;
+  }
+  .remember-wrap { display:flex; align-items:center; gap:0.4rem; cursor:pointer; }
+  .remember-check {
+    width:14px; height:14px; border-radius:4px;
+    border:1.5px solid var(--border); accent-color:var(--blue); cursor:pointer;
+  }
+  .remember-label { font-size:0.79rem; color:var(--muted); user-select:none; cursor:pointer; }
+  .forgot-link {
+    font-size:0.79rem; color:var(--blue); font-weight:600;
+    text-decoration:none; transition:color 0.18s;
+  }
+  .forgot-link:hover { color:var(--navy); }
+
+  /* login button */
+  .btn-login {
+    width: 100%; padding: 0.7rem;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(15,42,94,0.26);
+    display: flex; align-items: center; justify-content: center; gap: 0.48rem;
+  }
+  .btn-login:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(15,42,94,0.34); }
+  .btn-login:active { transform:translateY(0); }
+
+  /* or divider */
+  .or-divider {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin: 0.8rem 0;
+    font-size: 0.7rem; font-weight: 700;
+    color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* google */
+  .btn-google {
+    width: 100%; padding: 0.65rem 1rem;
+    background: white; color: var(--text);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    text-decoration: none; box-sizing: border-box;
+  }
+  .btn-google:hover {
+    border-color: #93c5fd; background: #f8faff;
+    transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    color: var(--text);
+  }
+  .btn-google:active { transform:translateY(0); }
+  .google-svg { width:18px; height:18px; flex-shrink:0; }
+
+  /* register */
+  .register-row {
+    text-align: center; margin-top: 0.9rem;
+    font-size: 0.82rem; color: var(--muted);
+  }
+  .register-row a { color:var(--blue); font-weight:700; text-decoration:none; transition:color 0.18s; }
+  .register-row a:hover { color:var(--navy); }
+
+  /* trust strip */
+  .trust-strip {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1.1rem; flex-wrap: wrap;
+    margin-top: 0.9rem; padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.71rem; color: var(--muted); font-weight: 500;
+  }
+  .trust-item i { font-size: 0.65rem; color: #22c55e; }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .login-page { height: auto; min-height: calc(100vh - 66px); align-items: flex-start; padding: 1rem 0.75rem; }
+    .card-top  { padding: 1.1rem 1.25rem; }
+    .card-body { padding: 1.1rem 1.25rem 1.25rem; }
+    .top-logo  { width: 46px; height: 46px; }
+  }
+</style>
+
+
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- HEADER -->
+    <div class="card-top">
+      <!-- <img src="{% static 'images/Logo/gov-logo.png' %}" class="top-logo" alt="eBharat Tender"> -->
+      <div class="top-text">
+        <p class="top-brand-name">eBharat Tender</p>
+        <p class="top-brand-sub">e-Procurement Portal &nbsp;·&nbsp; Government of India</p>
       </div>
     </div>
+
+    <!-- FORM -->
+    <div class="card-body">
+
+      <h1 class="form-heading">Sign in to your account</h1>
+      <p class="form-subheading">Welcome back — enter your credentials to continue.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert-msg {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+          <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" autocomplete="off">
+        {% csrf_token %}
+
+        <div class="field-group">
+          <label class="field-label" for="user_name">Username <sup>*</sup></label>
+          <div class="field-wrap">
+            <i class="fas fa-user field-icon"></i>
+            <input type="text" name="user_name" id="user_name" class="field-input"
+                   placeholder="Enter your username" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="password">Password <sup>*</sup></label>
+          <div class="field-wrap">
+            <i class="fas fa-lock field-icon"></i>
+            <input type="password" name="password" id="password" class="field-input"
+                   placeholder="Enter your password" autocomplete="current-password"
+                   style="padding-right:2.7rem;" required>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password">
+              <i class="fas fa-eye" id="pwIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="remember-wrap">
+            <input type="checkbox" class="remember-check" name="remember">
+            <span class="remember-label">Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Login to Portal
+        </button>
+
+        <div class="or-divider">or</div>
+
+        <a href="#" class="btn-google">
+          <svg class="google-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </a>
+
+        <p class="register-row">
+          Don't have an account?
+          <a href="{% url 'accounts:register' %}">Register New account</a>
+        </p>
+
+      </form>
+
+      <div class="trust-strip">
+        <span class="trust-item"><i class="fas fa-check-circle"></i> Secure Login</span>
+        <span class="trust-item"><i class="fas fa-check-circle"></i> SSL Encrypted</span>
+        <span class="trust-item"><i class="fas fa-check-circle"></i> Govt. Verified</span>
+      </div>
+
+    </div>
   </div>
-  <div
+</div>
 
-
+<script>
+  const pwInput  = document.getElementById('password');
+  const pwToggle = document.getElementById('pwToggle');
+  const pwIcon   = document.getElementById('pwIcon');
+  pwToggle.addEventListener('click', () => {
+    const hidden   = pwInput.type === 'password';
+    pwInput.type   = hidden ? 'text' : 'password';
+    pwIcon.className = hidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+</script>
 
 {% endblock %}

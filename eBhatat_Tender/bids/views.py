@@ -1,46 +1,28 @@
-from pyexpat.errors import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from  bids.models import TenderApplication
-from accounts.models import UserProfile
-from tenders.models import Tenderss
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from reportlab.lib.units import inch
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.units import inch
-from tenders.models import Tenderss
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-from .models import Tenderss, TenderApplication
+from django.urls import reverse
+from .models import TenderApplication
+from tenders.models import Tenderss
+from accounts.models import Notification
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
-def updateProfile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+# ==============================================================================
+# BIDDER DASHBOARD & MANAGEMENT VIEWS
+# ==============================================================================
 
-    if request.method == "POST":
-
-        profile.full_name = request.POST.get("full_name")
-        profile.mobile = request.POST.get("mobile")
-        profile.address = request.POST.get("address")
-        profile.gov_id_type = request.POST.get("gov_id_type")
-        profile.gov_id_number = request.POST.get("gov_id_number")
-        profile.save()
-        messages.success(request, "Profile Updated Successfully.")
-        return redirect("bids:updateprofile")
-
-    return render(request, 'updateProfile.html')    
-
-
-
-
-
+# View personal bidder dashboard
 @login_required
-def bidsdeshboard(request):
-
-    today = timezone.now()
+def bids_dashboard(request):
+    today = timezone.now().date()
+    
+    # Auto-close expired tenders globally
+    Tenderss.objects.filter(closing_date__lt=today, status='open').update(status='closed')
 
     # Open tenders (not expired)
     open_tenders = Tenderss.objects.filter(
@@ -68,7 +50,7 @@ def bidsdeshboard(request):
         "approved_tenders": approved_tenders,
         "rejected_tenders": rejected_tenders,
 
-        # Counts (very useful for dashboard cards)
+        # Counts
         "open_count": open_tenders.count(),
         "applied_count": applied_tenders.count(),
         "pending_count": pending_tenders.count(),
@@ -76,52 +58,82 @@ def bidsdeshboard(request):
         "rejected_count": rejected_tenders.count(),
     }
 
-    return render(request, 'bidsdeshboard.html', context)
+    return render(request, 'bids_dashboard.html', context)
 
 
+# Handle new bid submission
+@login_required
 def applybid(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id)
 
     # Prevent owner from bidding
     if tender.created_by == request.user:
+        messages.warning(request, "You cannot bid on your own tender.")
+        return redirect("tenders:tenderDetails", tender_id=tender.id)
+
+    # Prevent bidding on closed/expired tenders
+    if tender.status != 'open' or tender.closing_date < timezone.now().date():
+        messages.error(request, "This tender is no longer open for bidding.")
+        return redirect("tenders:tenderDetails", tender_id=tender.id)
+
+    # Prevent duplicate bidding
+    if TenderApplication.objects.filter(tender=tender, applicant=request.user).exists():
+        messages.info(request, "You have already applied for this tender.")
         return redirect("tenders:tenderDetails", tender_id=tender.id)
 
     if request.method == "POST":
-        application = TenderApplication.objects.create(
-            tender=tender,
-            applicant=request.user,
+        try:
+            bid_amount = request.POST.get("bid_amount")
+            if not bid_amount:
+                raise ValueError("Bid amount is required.")
 
-            # Company Details
-            company_name=request.POST.get("company_name"),
-            gst_number=request.POST.get("gst_number"),
-            registered_address=request.POST.get("registered_address"),
-            city=request.POST.get("city"),
-            state=request.POST.get("state"),
-            pin_code=request.POST.get("pin_code"),
-            gst_document=request.FILES.get("gst_document"),
+            application = TenderApplication.objects.create(
+                tender=tender,
+                applicant=request.user,
 
-            # Bidder Details
-            bidder_name=request.POST.get("bidder_name"),
-            designation=request.POST.get("designation"),
-            official_email=request.POST.get("email"),
-            mobile_number=request.POST.get("mobile"),
+                # Company Details
+                company_name=request.POST.get("company_name"),
+                gst_number=request.POST.get("gst_number"),
+                registered_address=request.POST.get("registered_address"),
+                city=request.POST.get("city"),
+                state=request.POST.get("state"),
+                pin_code=request.POST.get("pin_code"),
+                gst_document=request.FILES.get("gst_document"),
 
-            # Financial
-            financial_statement=request.FILES.get("financial_statement"),
+                # Bidder Details
+                bidder_name=request.POST.get("bidder_name"),
+                designation=request.POST.get("designation"),
+                official_email=request.POST.get("email"),
+                mobile_number=request.POST.get("mobile"),
 
-            # Bidding Details
-            bid_amount=request.POST.get("bid_amount"),
-            technical_document=request.FILES.get("technical_document"),
-            financial_document=request.FILES.get("financial_document"),
-            other_document=request.FILES.get("other_document"),
-        )
+                # Financial
+                financial_statement=request.FILES.get("financial_statement"),
 
-        messages.success(request, "Tender Application Submitted Successfully.")
-        return redirect("tenders:tenderDetails", tender_id=tender.id)
+                # Bidding Details
+                bid_amount=bid_amount,
+                technical_document=request.FILES.get("technical_document"),
+                financial_document=request.FILES.get("financial_document"),
+                other_document=request.FILES.get("other_document"),
+            )
+            
+            # 📌 Notify the Tender Creator about the new bid
+            Notification.objects.create(
+                user=tender.created_by,
+                message=f"New bid received from {application.company_name} for {tender.title}",
+                link=reverse("tenders:view_tender_bids", kwargs={"tender_id": tender.id})
+            )
+
+            messages.success(request, "Tender Application Submitted Successfully.")
+            return redirect("tenders:tenderDetails", tender_id=tender.id)
+            
+        except Exception as e:
+            messages.error(request, f"Error submitting application: {str(e)}")
+            return render(request, "applybid.html", {"tender": tender, "error": str(e)})
 
     return render(request, "applybid.html", {"tender": tender})
 
 
+# View applications for tender
 @login_required
 def tender_applications(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id)
@@ -131,16 +143,17 @@ def tender_applications(request, tender_id):
         messages.error(request, "You are not authorized to view applications.")
         return redirect("dashboard")
 
-    applications = tender.applications.all()
+    applications = tender.applications.all().order_by('-id')
 
     return render(request, "tender_applications.html", {
         "tender": tender,
         "applications": applications
     })
 
+# List user submitted bids
 @login_required
 def mybids(request):
-    bids = TenderApplication.objects.filter(applicant=request.user)
+    bids = TenderApplication.objects.filter(applicant=request.user).order_by('-id')
 
     search = request.GET.get("search")
     status = request.GET.get("status")
@@ -160,6 +173,7 @@ def mybids(request):
 
     return render(request, "mybids.html", context)
 
+# View submitted bid details
 @login_required
 def bid_detail(request, bid_id):
     bid = get_object_or_404(TenderApplication,id=bid_id,applicant=request.user)
@@ -167,15 +181,13 @@ def bid_detail(request, bid_id):
 
 
 
-from django.http import HttpResponse
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from reportlab.platypus import HRFlowable
-from django.utils.timezone import now
 
 
+# ==============================================================================
+# DOCUMENT GENERATION VIEWS
+# ==============================================================================
+
+# Generate bid summary PDF
 @login_required
 def download_bid_pdf(request, bid_id):
     bid = get_object_or_404(TenderApplication, id=bid_id, applicant=request.user)

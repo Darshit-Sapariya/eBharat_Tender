@@ -1,171 +1,637 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
-<section class="py-5 bg-light">
-  <div class="container">
+<style>
+  /* ── Pseudo-elements & keyframes only — Tailwind cannot replicate ── */
 
-    <!-- Page Title -->
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Tender Portal Guidelines</h2>
-      <p class="text-muted">
-        Official instructions and procedures for Vendors, Departments and Government Authorities
-      </p>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim-1 { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.05s both; }
+  .anim-2 { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+  .anim-3 { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.20s both; }
+
+  /* Title bar grid texture */
+  .title-bar::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .title-bar::after {
+    content: ''; position: absolute;
+    width: 340px; height: 340px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    right: -70px; top: -140px; pointer-events: none;
+  }
+
+  /* Guide card top accent */
+  .card-top { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0; }
+
+  /* Guide card hover lift */
+  .guide-card { transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+  .guide-card:hover { transform: translateY(-5px); }
+
+  /* Contact band texture */
+  .contact-band::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* FAQ toggle animation */
+  .faq-answer {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.32s ease, padding 0.32s ease;
+    padding: 0 1.4rem;
+  }
+  .faq-item.open .faq-answer  { max-height: 320px; padding: 0 1.4rem 1.15rem; }
+  .faq-icon                   { transition: transform 0.25s, background 0.2s, color 0.2s, border-color 0.2s; }
+  .faq-item.open .faq-icon    { transform: rotate(180deg); background: #0f2a5e; color: white; border-color: #0f2a5e; }
+
+  /* Doc grid borders */
+  @media (min-width: 1024px) {
+    .doc-item:nth-child(4n)        { border-right: none; }
+    .doc-item:nth-last-child(-n+4) { border-bottom: none; }
+  }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .doc-item:nth-child(2n)        { border-right: none; }
+    .doc-item:nth-last-child(-n+2) { border-bottom: none; }
+  }
+  @media (max-width: 639px) {
+    .doc-item { border-right: none; }
+    .doc-item:last-child { border-bottom: none; }
+  }
+</style>
+
+
+<!-- ══════════════════════════════════
+     TITLE BAR
+══════════════════════════════════ -->
+<div class="title-bar relative overflow-hidden"
+     style="background: linear-gradient(135deg, #09193a 0%, #0f2a5e 52%, #163472 100%);">
+
+  <div class="absolute inset-0 pointer-events-none"
+       style="background: radial-gradient(ellipse 48% 100% at 88% 50%, rgba(26,86,219,0.17) 0%, transparent 68%);"></div>
+
+  <div class="relative z-[1] max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="flex flex-wrap items-center justify-between gap-5">
+
+      <!-- Left -->
+      <div class="flex items-center gap-4 anim-1 min-w-0">
+        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center
+                    text-white text-[1rem] sm:text-[1.1rem] flex-shrink-0
+                    shadow-[0_4px_16px_rgba(0,0,0,0.22)]"
+             style="background: linear-gradient(135deg, #1a56db, #163472);">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="font-sora text-[1.15rem] sm:text-[1.35rem] font-extrabold text-white leading-tight mb-[2px]">
+            Tender Portal Guidelines
+          </h1>
+          <p class="font-dmSans text-[0.75rem] sm:text-[0.8rem] text-white/45 truncate">
+            Official instructions &amp; procedures for Vendors, Departments &amp; Government Authorities
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: role pills -->
+      <div class="flex flex-wrap items-center gap-2 anim-2">
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
+                     bg-[#1a56db]/22 border border-[#3b82f6]/28 text-blue-200">
+          <i class="fas fa-users text-[0.5rem]"></i> Vendors
+        </span>
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
+                     bg-emerald-500/15 border border-emerald-400/25 text-emerald-300">
+          <i class="fas fa-building text-[0.5rem]"></i> Departments
+        </span>
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
+                     bg-amber-500/14 border border-amber-400/22 text-amber-300">
+          <i class="fas fa-landmark text-[0.5rem]"></i> Government
+        </span>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="row g-4">
 
-      <!-- Vendor Guidelines -->
-      <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-          <div class="card-body">
-            <h5 class="fw-semibold text-primary mb-3">
-              Vendor Guidelines
-            </h5>
+<!-- ══════════════════════════════════
+     PAGE BODY
+══════════════════════════════════ -->
+<div class="bg-[#f8faff] min-h-screen">
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col gap-14">
 
-            <ul class="small">
-              <li>Register on the portal with valid business documents.</li>
-              <li>Complete profile with GST, PAN, and company details.</li>
-              <li>Download tender documents carefully.</li>
-              <li>Submit technical and financial bids before deadline.</li>
-              <li>Pay EMD (Earnest Money Deposit) if applicable.</li>
-              <li>Attend pre-bid meeting (if required).</li>
-              <li>Track application status from dashboard.</li>
-              <li>Maintain compliance with procurement rules.</li>
+
+    <!-- ── SECTION: GUIDELINE CARDS ── -->
+    <section>
+
+      <!-- Section header -->
+      <div class="mb-7 anim-1">
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.68rem] font-bold tracking-[0.08em] uppercase
+                     bg-blue-50 text-[#1a56db] border border-blue-100 mb-3">
+          <i class="fas fa-layer-group text-[0.58rem]"></i> Role-Based Guidelines
+        </span>
+        <h2 class="font-sora text-[clamp(1.25rem,3vw,1.7rem)] font-extrabold text-[#0f2a5e] leading-[1.25] mb-1">
+          Guidelines by Role
+        </h2>
+        <p class="font-dmSans text-[0.88rem] text-slate-500 leading-[1.65] max-w-2xl">
+          Select your role to view the relevant procurement guidelines and compliance requirements.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- ── Vendor ── -->
+        <div class="guide-card relative bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col
+                    shadow-[0_2px_12px_rgba(15,42,94,0.06)]
+                    hover:border-blue-200 hover:shadow-[0_18px_40px_rgba(15,42,94,0.1)] anim-1">
+          <div class="card-top" style="background: linear-gradient(90deg, #0f2a5e, #1a56db);"></div>
+          <div class="flex flex-col flex-1 px-6 pt-6 pb-6">
+
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-[#1a56db] text-[1.05rem] flex-shrink-0">
+                <i class="fas fa-store"></i>
+              </div>
+              <div>
+                <p class="font-sora text-[0.95rem] font-extrabold text-[#0f2a5e] leading-tight">Vendor Guidelines</p>
+                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">For registered &amp; prospective vendors</p>
+              </div>
+            </div>
+
+            <ul class="flex flex-col gap-[0.5rem] flex-1 mb-6">
+              {% for txt in vendor_items %}
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px">
+                  <i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i>
+                </span>{{ txt }}
+              </li>
+              {% empty %}
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Register on the portal with valid business documents
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Complete profile with GST, PAN and company details
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Download and read tender documents before bidding
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Submit technical and financial bids on time
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Pay EMD if applicable to this tender
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Attend pre-bid meeting if required by department
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Track application status from your dashboard
+              </li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]">
+                <span class="w-[18px] h-[18px] rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-[#1a56db] text-[0.46rem]"></i></span>
+                Maintain compliance with all procurement rules
+              </li>
+              {% endfor %}
             </ul>
 
-            <a href="#" class="btn btn-sm btn-outline-primary mt-3">
-              Download Vendor Manual
+            <a href="#"
+               class="inline-flex items-center gap-2 px-4 py-[0.55rem] w-fit
+                      bg-blue-50 hover:bg-[#1a56db] text-[#1a56db] hover:text-white
+                      border border-blue-200 hover:border-[#1a56db]
+                      font-sora text-[0.77rem] font-bold rounded-xl no-underline
+                      transition-all duration-200">
+              <i class="fas fa-download text-[0.68rem]"></i> Download Vendor Manual
             </a>
           </div>
         </div>
-      </div>
 
-      <!-- Department Guidelines -->
-      <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-          <div class="card-body">
-            <h5 class="fw-semibold text-success mb-3">
-              Department Guidelines
-            </h5>
+        <!-- ── Department ── -->
+        <div class="guide-card relative bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col
+                    shadow-[0_2px_12px_rgba(15,42,94,0.06)]
+                    hover:border-emerald-200 hover:shadow-[0_18px_40px_rgba(15,42,94,0.1)] anim-2">
+          <div class="card-top" style="background: linear-gradient(90deg, #059669, #10b981);"></div>
+          <div class="flex flex-col flex-1 px-6 pt-6 pb-6">
 
-            <ul class="small">
-              <li>Create tender with complete and clear specifications.</li>
-              <li>Upload BOQ, technical documents and drawings.</li>
-              <li>Set transparent eligibility criteria.</li>
-              <li>Define submission and closing dates properly.</li>
-              <li>Evaluate bids based on approved procedure.</li>
-              <li>Publish corrigendum if required.</li>
-              <li>Declare results officially through portal.</li>
-              <li>Maintain audit transparency.</li>
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-[1.05rem] flex-shrink-0">
+                <i class="fas fa-building"></i>
+              </div>
+              <div>
+                <p class="font-sora text-[0.95rem] font-extrabold text-[#0f2a5e] leading-tight">Department Guidelines</p>
+                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">For government departments &amp; offices</p>
+              </div>
+            </div>
+
+            <ul class="flex flex-col gap-[0.5rem] flex-1 mb-6">
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Create tenders with complete and clear specifications</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Upload BOQ, technical documents and drawings</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Set transparent and fair eligibility criteria</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Define submission and closing dates precisely</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Evaluate bids strictly on the approved procedure</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Publish corrigendum through the portal if required</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Declare results officially through the portal</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-emerald-600 text-[0.46rem]"></i></span>Maintain full audit trail and transparency</li>
             </ul>
 
-            <a href="#" class="btn btn-sm btn-outline-success mt-3">
-              Download Department Manual
+            <a href="#"
+               class="inline-flex items-center gap-2 px-4 py-[0.55rem] w-fit
+                      bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white
+                      border border-emerald-200 hover:border-emerald-600
+                      font-sora text-[0.77rem] font-bold rounded-xl no-underline
+                      transition-all duration-200">
+              <i class="fas fa-download text-[0.68rem]"></i> Download Department Manual
             </a>
           </div>
         </div>
-      </div>
 
-      <!-- Government Guidelines -->
-      <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-          <div class="card-body">
-            <h5 class="fw-semibold text-danger mb-3">
-              Government Guidelines
-            </h5>
+        <!-- ── Government ── -->
+        <div class="guide-card relative bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col
+                    shadow-[0_2px_12px_rgba(15,42,94,0.06)]
+                    hover:border-amber-200 hover:shadow-[0_18px_40px_rgba(15,42,94,0.1)] anim-3">
+          <div class="card-top" style="background: linear-gradient(90deg, #b45309, #f59e0b);"></div>
+          <div class="flex flex-col flex-1 px-6 pt-6 pb-6">
 
-            <ul class="small">
-              <li>Ensure transparency and fairness in procurement.</li>
-              <li>Follow national procurement policy framework.</li>
-              <li>Promote equal opportunity to vendors.</li>
-              <li>Maintain digital audit records.</li>
-              <li>Prevent corruption and malpractice.</li>
-              <li>Monitor compliance with financial rules.</li>
-              <li>Ensure timely contract award and execution.</li>
-              <li>Maintain public accountability.</li>
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-[1.05rem] flex-shrink-0">
+                <i class="fas fa-landmark"></i>
+              </div>
+              <div>
+                <p class="font-sora text-[0.95rem] font-extrabold text-[#0f2a5e] leading-tight">Government Guidelines</p>
+                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">For authorities &amp; policy enforcement</p>
+              </div>
+            </div>
+
+            <ul class="flex flex-col gap-[0.5rem] flex-1 mb-6">
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Ensure transparency and fairness in all procurement</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Follow the national procurement policy framework</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Promote equal opportunity to all eligible vendors</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Maintain complete digital audit records</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Prevent corruption and malpractice at all levels</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Monitor compliance with financial rules and norms</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Ensure timely contract award and execution</li>
+              <li class="flex items-start gap-[0.55rem] font-dmSans text-[0.83rem] text-slate-700 leading-[1.55]"><span class="w-[18px] h-[18px] rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 mt-px"><i class="fas fa-check text-amber-600 text-[0.46rem]"></i></span>Maintain public accountability in all decisions</li>
             </ul>
 
-            <a href="#" class="btn btn-sm btn-outline-danger mt-3">
-              Download Government Policy
+            <a href="#"
+               class="inline-flex items-center gap-2 px-4 py-[0.55rem] w-fit
+                      bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white
+                      border border-amber-200 hover:border-amber-500
+                      font-sora text-[0.77rem] font-bold rounded-xl no-underline
+                      transition-all duration-200">
+              <i class="fas fa-download text-[0.68rem]"></i> Download Government Policy
             </a>
           </div>
         </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── SECTION: DOCUMENTS ── -->
+    <section>
+
+      <div class="mb-7">
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.68rem] font-bold tracking-[0.08em] uppercase
+                     bg-blue-50 text-[#1a56db] border border-blue-100 mb-3">
+          <i class="fas fa-file-alt text-[0.58rem]"></i> Resources
+        </span>
+        <h2 class="font-sora text-[clamp(1.25rem,3vw,1.7rem)] font-extrabold text-[#0f2a5e] leading-[1.25] mb-1">
+          Important Forms &amp; Documents
+        </h2>
+        <p class="font-dmSans text-[0.88rem] text-slate-500 leading-[1.65] max-w-2xl">
+          Download official templates, policy documents, and forms required for the tendering process.
+        </p>
       </div>
 
-    </div>
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden
+                  shadow-[0_2px_14px_rgba(15,42,94,0.07)]">
 
-    <!-- Other Important Forms -->
-    <div class="mt-5">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
+        <!-- Card header -->
+        <div class="flex items-center justify-between flex-wrap gap-3 px-5 sm:px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[0.85rem] flex-shrink-0
+                        shadow-[0_2px_8px_rgba(15,42,94,0.18)]"
+                 style="background: linear-gradient(135deg, #0f2a5e, #1a56db);">
+              <i class="fas fa-folder-open"></i>
+            </div>
+            <div>
+              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">Document Repository</p>
+              <p class="font-dmSans text-[0.68rem] text-slate-400 mt-px">All documents are PDF format unless specified</p>
+            </div>
+          </div>
+          <span class="font-sora text-[0.68rem] font-bold px-3 py-[3px] rounded-full
+                       bg-blue-50 text-[#1a56db] border border-blue-200">8 Documents</span>
+        </div>
 
-          <h5 class="fw-semibold mb-4">Important Forms & Documents</h5>
+        <!-- Docs grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Document Name</th>
-                  <th>Category</th>
-                  <th>Last Updated</th>
-                  <th>Download</th>
-                </tr>
-              </thead>
-              <tbody>
-
-                <tr>
-                  <td>Vendor Registration Form</td>
-                  <td>Form</td>
-                  <td>Jan 2026</td>
-                  <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary">
-                      Download
-                    </a>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Technical Bid Template</td>
-                  <td>Template</td>
-                  <td>Feb 2026</td>
-                  <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary">
-                      Download
-                    </a>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Financial Bid Format (BOQ)</td>
-                  <td>Template</td>
-                  <td>Feb 2026</td>
-                  <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary">
-                      Download
-                    </a>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Procurement Policy Document</td>
-                  <td>Policy</td>
-                  <td>2026 Edition</td>
-                  <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary">
-                      Download
-                    </a>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
+          <!-- reusable structure — 8 items -->
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-blue-50 text-blue-700"><i class="fas fa-file-alt text-[0.48rem]"></i> Form</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Vendor Registration Form</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Jan 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
           </div>
 
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-violet-50 text-violet-700"><i class="fas fa-file-code text-[0.48rem]"></i> Template</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Technical Bid Template</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Feb 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-violet-50 text-violet-700"><i class="fas fa-file-code text-[0.48rem]"></i> Template</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Financial Bid Format (BOQ)</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Feb 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-red-50 text-red-700"><i class="fas fa-balance-scale text-[0.48rem]"></i> Policy</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Procurement Policy Document</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> 2026 Edition</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-blue-50 text-blue-700"><i class="fas fa-file-alt text-[0.48rem]"></i> Form</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">EMD Exemption Request Form</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Mar 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-b border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700"><i class="fas fa-book text-[0.48rem]"></i> Guide</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Pre-Bid Meeting Guidelines</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Jan 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 border-r border-slate-100 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-red-50 text-red-700"><i class="fas fa-balance-scale text-[0.48rem]"></i> Policy</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">Revised EMD Rules 2026</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Apr 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+          <div class="doc-item flex flex-col gap-[0.55rem] px-5 py-5 hover:bg-[#f8faff] transition-colors">
+            <span class="inline-flex items-center gap-1 px-2 py-[2px] rounded-full w-fit font-sora text-[0.58rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700"><i class="fas fa-book text-[0.48rem]"></i> Guide</span>
+            <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e] leading-[1.35]">KYC Verification Manual</p>
+            <p class="font-dmSans text-[0.7rem] text-slate-400 flex items-center gap-1 mt-auto"><i class="fas fa-clock text-[0.56rem]"></i> Mar 2026</p>
+            <a href="#" class="inline-flex items-center gap-[5px] px-3 py-[5px] w-fit bg-[#0f2a5e] hover:bg-[#1a56db] text-white font-sora text-[0.72rem] font-semibold rounded-lg no-underline transition-all duration-200">
+              <i class="fas fa-download text-[0.6rem]"></i> Download
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ── SECTION: FAQ ── -->
+    <section>
+
+      <div class="mb-7">
+        <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
+                     font-sora text-[0.68rem] font-bold tracking-[0.08em] uppercase
+                     bg-blue-50 text-[#1a56db] border border-blue-100 mb-3">
+          <i class="fas fa-question-circle text-[0.58rem]"></i> FAQ
+        </span>
+        <h2 class="font-sora text-[clamp(1.25rem,3vw,1.7rem)] font-extrabold text-[#0f2a5e] leading-[1.25] mb-1">
+          Frequently Asked Questions
+        </h2>
+        <p class="font-dmSans text-[0.88rem] text-slate-500 leading-[1.65] max-w-2xl">
+          Quick answers to the most common questions about the eBharat Tender portal.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- FAQ items -->
+        {% for q,a in faq_list|default:"" %}{% empty %}
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              Who is eligible to register as a vendor on eBharat Tender?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            Any legally registered business — proprietorships, partnerships, LLPs, and private/public limited companies — with valid GST and PAN is eligible to register and participate in tenders.
+          </div>
+        </div>
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              Is it mandatory to pay EMD for every tender?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            No. As per revised rules effective April 2026, EMD is mandatory only for tenders with an estimated value above ₹50 Lakhs. The department specifies this in each individual tender notice.
+          </div>
+        </div>
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              Can I modify my bid after submission?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            Yes, you can revise and resubmit any number of times before the deadline. Only your most recent submission is considered for evaluation. Once the deadline passes, no modifications are permitted.
+          </div>
+        </div>
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              How long does vendor KYC verification take?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            KYC verification typically takes 3–5 working days from document submission. You'll receive an email once approved. Ensure all documents are self-attested and clearly legible to avoid delays.
+          </div>
+        </div>
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              What happens if I miss the bid submission deadline?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            Late submissions are not accepted under any circumstances. The portal automatically locks once the deadline passes. Vendors should submit at least 24 hours early to avoid any technical issues.
+          </div>
+        </div>
+
+        <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden
+                    shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                    hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,42,94,0.08)]
+                    transition-all duration-200">
+          <button class="faq-question w-full flex items-center justify-between gap-3
+                         px-5 py-[1.05rem] bg-transparent border-none cursor-pointer text-left
+                         hover:bg-[#f8faff] transition-colors"
+                  onclick="toggleFaq(this)">
+            <span class="font-sora text-[0.86rem] font-bold text-[#0f2a5e] leading-[1.4]">
+              How are bids evaluated and winners selected?
+            </span>
+            <span class="faq-icon w-[28px] h-[28px] rounded-lg border border-slate-200 bg-slate-50
+                         flex items-center justify-center text-slate-400 text-[0.66rem] flex-shrink-0">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+          <div class="faq-answer font-dmSans text-[0.83rem] text-slate-500 leading-[1.72]">
+            Bids go through two-stage evaluation: technical compliance first, then financial comparison of qualified bids. For most tenders, L-1 (lowest compliant bidder) method applies. QCBS may apply for consultancy.
+          </div>
+        </div>
+
+        {% endfor %}
+      </div>
+    </section>
+
+
+    <!-- ── CONTACT BAND ── -->
+    <div class="contact-band relative overflow-hidden rounded-2xl
+                shadow-[0_8px_32px_rgba(9,25,58,0.24)]"
+         style="background: linear-gradient(135deg, #09193a 0%, #0f2a5e 55%, #163472 100%);">
+
+      <div class="absolute inset-0 pointer-events-none"
+           style="background: radial-gradient(ellipse 40% 100% at 85% 50%, rgba(26,86,219,0.18) 0%, transparent 70%);"></div>
+
+      <div class="relative z-[1] grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center
+                  px-7 py-8 sm:px-10 sm:py-10">
+
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/15
+                        flex items-center justify-center text-white text-[0.88rem] flex-shrink-0">
+              <i class="fas fa-headset"></i>
+            </div>
+            <p class="font-sora text-[1.05rem] sm:text-[1.15rem] font-extrabold text-white leading-tight">
+              Need Help? Contact the Procurement Helpdesk
+            </p>
+          </div>
+          <p class="font-dmSans text-[0.82rem] text-white/48 leading-[1.65] max-w-xl">
+            Our team is available Monday to Saturday, 9:00 AM – 6:00 PM IST to assist with any
+            queries related to the portal, tenders, or compliance requirements.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <a href="#"
+             class="inline-flex items-center gap-2 px-5 py-[0.7rem]
+                    bg-amber-500 hover:bg-amber-400 text-amber-950
+                    font-sora text-[0.84rem] font-bold rounded-xl no-underline
+                    shadow-[0_4px_14px_rgba(245,158,11,0.35)] transition-all duration-200
+                    hover:-translate-y-px hover:shadow-[0_8px_22px_rgba(245,158,11,0.45)]">
+            <i class="fas fa-headset text-[0.76rem]"></i> Contact Support
+          </a>
+          <a href="#"
+             class="inline-flex items-center gap-2 px-5 py-[0.7rem]
+                    bg-white/10 hover:bg-white/18 border border-white/20 hover:border-white/35
+                    text-white font-sora text-[0.84rem] font-semibold rounded-xl no-underline
+                    transition-all duration-200">
+            <i class="fas fa-question-circle text-[0.76rem]"></i> View FAQ
+          </a>
         </div>
       </div>
     </div>
 
   </div>
-</section>
+</div>
+
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  }
+</script>
 
 {% endblock %}

@@ -1,28 +1,108 @@
-from time import timezone
-from urllib import request
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.dateparse import parse_datetime
-from django.db.models import Count
-from bids.models import TenderApplication
-from accounts.models import UserProfile
-from .models import *
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User 
+import datetime
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.dateparse import parse_datetime
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
+from django.urls import reverse
+
+from bids.models import TenderApplication
+from accounts.models import UserProfile, Notification, AdminRequest, Department, Category
 from .models import Tenderss
 
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
 
-# Create your views here.
-def tenderCreator(request):
-    return render(request, 'tenderCreator.html')
-def updateProfile(request):
-    if request.method == 'POST':
-        # Handle form submission and update profile logic here
-        pass
-    return render(request, 'updateProfile.html')
-def deshboard(request):
+# Mask sensitive ID numbers
+def mask_id(value):
+    if not value: return ""
+    val = str(value)
+    mask_count = max(7, len(val) - 4)
+    return "*" * mask_count + val[-4:]
+
+# ==============================================================================
+# TENDER MANAGEMENT VIEWS
+# ==============================================================================
+
+# Handle admin permission requests
+@login_required
+def request_admin(request):
+    if request.method == "POST":
+        dept_name = request.POST.get("department_name")
+        cat_name = request.POST.get("category_name")
+        
+        AdminRequest.objects.create(
+            user=request.user,
+            department_name=dept_name,
+            category_name=cat_name
+        )
+        messages.success(request, "Your request has been submitted for admin approval.")
+        return redirect("tenders:dashboard")
+
+    requests = AdminRequest.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, 'admin_request.html', {
+        'page_title': 'Request Admin Permission',
+        'requests': requests
+    })
+
+# Manage administrative user requests
+@login_required
+def admin_view_requests(request):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied.")
+        return redirect("tenders:dashboard")
+
+    if request.method == "POST":
+        req_id = request.POST.get("request_id")
+        action = request.POST.get("action")
+        remark = request.POST.get("remark")
+        
+        admin_req = get_object_or_404(AdminRequest, id=req_id)
+        
+        if action == "approve":
+            admin_req.status = "approved"
+            # Create Department and Category if they don't exist
+            Department.objects.get_or_create(name=admin_req.department_name)
+            Category.objects.get_or_create(name=admin_req.category_name)
+            
+            Notification.objects.create(
+                user=admin_req.user,
+                message=f"Your request for {admin_req.department_name} - {admin_req.category_name} has been approved.",
+                link=reverse("tenders:tenderCreator")
+            )
+        elif action == "reject":
+            admin_req.status = "rejected"
+            Notification.objects.create(
+                user=admin_req.user,
+                message=f"Your request for {admin_req.department_name} has been rejected.",
+            )
+            
+        admin_req.admin_remark = remark
+        admin_req.save()
+        messages.success(request, f"Request {action}ed successfully.")
+        return redirect("tenders:admin_view_requests")
+
+    all_requests = AdminRequest.objects.all().order_by("-created_at")
+    return render(request, 'admin_requests_list.html', {
+        'page_title': 'Manage Admin Requests',
+        'all_requests': all_requests
+    })
+
+
+# ==============================================================================
+# DASHBOARD & LIST VIEWS
+# ==============================================================================
+
+# Main dashboard for users
+def dashboard(request):
+    today = timezone.now().date()
+    
+    # Auto-close expired open tenders globally
+    Tenderss.objects.filter(closing_date__lt=today, status='open').update(status='closed')
+
     tenders = Tenderss.objects.filter(created_by=request.user)
 
     total_tenders = tenders.count()
@@ -44,15 +124,15 @@ def deshboard(request):
         "closed_tenders": closed_tenders,
         "total_applications": total_applications,
         "recent_tenders": recent_tenders,
+        "page_title": "Dashboard",
     }
     return render(request, 'dashboard.html', context)
-def mytenders(request):
-    return render(request, 'mytenders.html')
 
 # Create your views here.
+# Create and publish tenders
 def tenderCreator(request):
     if request.method == "POST":
-        Tenderss.objects.create(
+        tender = Tenderss.objects.create(
             title=request.POST.get("title"),
             department=request.POST.get("department"),
             category=request.POST.get("category"),
@@ -67,14 +147,46 @@ def tenderCreator(request):
             document=request.FILES.get("document"),
             created_by=request.user
         )
+        
+        # 📌 Notify all specific bidders about the new tender
+        bidders = UserProfile.objects.filter(role='bidder')
+        for bidder in bidders:
+            Notification.objects.create(
+                user=bidder.user,
+                message=f"New Tender Published: {tender.title}",
+                link=reverse("tenders:tenderDetails", kwargs={"tender_id": tender.id})
+            )
+            
         return redirect("tenders:mytenders")
 
-    return render(request, 'tenderCreator.html')
+    # Fetch approved departments and categories for this user
+    approved_requests = AdminRequest.objects.filter(user=request.user, status='approved')
+    approved_depts = sorted(list(set([r.department_name for r in approved_requests])))
+    approved_cats = sorted(list(set([r.category_name for r in approved_requests])))
 
+    return render(request, 'tenderCreator.html', {
+        'page_title': 'Publish Tender',
+        'approved_depts': approved_depts,
+        'approved_cats': approved_cats
+    })
+
+# List user issued tenders
 def mytenders(request):
+   today = timezone.now().date()
+   Tenderss.objects.filter(closing_date__lt=today, status='open').update(status='closed')
+   
    tenders = Tenderss.objects.filter(created_by=request.user).order_by('-created_at')
-   return render(request, 'mytenders.html', {'tenders': tenders})
+   
+   # Prefetch awarded application for each tender to show company name in list
+   for t in tenders:
+       app = t.applications.filter(status='awarded').first()
+       if app:
+           app.masked_gst = mask_id(app.gst_number)
+           t.awarded_application = app
+       
+   return render(request, 'mytenders.html', {'tenders': tenders, 'page_title': 'Issued Tenders'})
 
+# Update user profile details
 def updateProfile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
@@ -83,8 +195,21 @@ def updateProfile(request):
         profile.full_name = request.POST.get("full_name")
         profile.mobile = request.POST.get("mobile")
         profile.address = request.POST.get("address")
-        profile.gov_id_type = request.POST.get("gov_id_type")
-        profile.gov_id_number = request.POST.get("gov_id_number")
+        
+        # Only allow setting designation if it's currently blank
+        designation = request.POST.get("designation")
+        if designation and not profile.designation:
+            profile.designation = designation
+        
+        # Only update ID fields if they are actually in the POST data 
+        # (they might be disabled in the HTML once verified, and thus not sent)
+        gov_id_type = request.POST.get("gov_id_type")
+        if gov_id_type:
+            profile.gov_id_type = gov_id_type
+            
+        gov_id_number = request.POST.get("gov_id_number")
+        if gov_id_number:
+            profile.gov_id_number = gov_id_number
 
         # Profile picture upload
         if request.FILES.get("profile_pic"):
@@ -103,13 +228,27 @@ def updateProfile(request):
         profile.save()
         return redirect("tenders:updateProfile")   # reload page after save
 
-    return render(request, 'updateProfile.html')
+    profile_data = {
+        'full_name': profile.full_name,
+        'mobile': profile.mobile,
+        'address': profile.address,
+        'designation': profile.designation,
+        'gov_id_type': profile.gov_id_type,
+        'gov_id_number': mask_id(profile.gov_id_number),
+        'role': profile.role,
+        'profile_pic': profile.profile_pic,
+        'gov_id_upload': profile.gov_id_upload,
+    }
 
+    return render(request, 'updateProfile.html', {'page_title': 'Profile Settings', 'profile': profile_data})
+
+# Simple tender deletion view
 def tender_delete(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id, created_by=request.user)
     tender.delete()
     return redirect('tenders:mytenders')
 
+# Edit existing tender details
 @login_required
 def tender_edit(request, tender_id):
     tender = get_object_or_404(
@@ -155,9 +294,10 @@ def tender_edit(request, tender_id):
         return redirect("tenders:mytenders")
 
     return render(request, "tender_edit.html", {
-        "tender": tender
+        "tender": tender,
+        "page_title": "Edit Tender",
     })
-
+# View single tender details
 def tenderDetails(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id)
 
@@ -166,31 +306,54 @@ def tenderDetails(request, tender_id):
     if is_expired and tender.status == "open":
         tender.status = "closed"
         tender.save()
+        
+    has_applied = False
+    if request.user.is_authenticated:
+        has_applied = TenderApplication.objects.filter(tender=tender, applicant=request.user).exists()
+
+    applications = tender.applications.all().order_by('-applied_at')
+    awarded_bid = applications.filter(status='awarded').first()
+
+    if awarded_bid:
+        awarded_bid.masked_gst = mask_id(awarded_bid.gst_number)
 
     context = {
         "tender": tender,
-        "is_expired": is_expired
+        "is_expired": is_expired,
+        "has_applied": has_applied,
+        "applications": applications,
+        "awarded_bid": awarded_bid,
+        "page_title": "Tender Details",
     }
     return render(request, 'tenderDetails.html', context)
 
+# List vendor submitted bids
 def bids(request):
     bids = TenderApplication.objects.filter(applicant=request.user).order_by('-applied_at') 
     return render(request, 'bids.html', {'bids': bids})
 
-def bidsinfo(request, tender_id):
+# View tender application status
+def viewbids(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id)
     is_expired = tender.closing_date < timezone.now().date()
 
-    if is_expired and tender.status == "Open":
-        tender.status = "Closed"
+    if is_expired and tender.status.lower() == "open":
+        tender.status = "closed"
         tender.save()
+
+    has_applied = False
+    if request.user.is_authenticated:
+        has_applied = tender.applications.filter(applicant=request.user).exists()
 
     context = {
         "tender": tender,
-        "is_expired": is_expired
+        "is_expired": is_expired,
+        "has_applied": has_applied,
+        "page_title": "View Bids",
     }
-    return render(request, 'bidsinfo.html', context)
+    return render(request, 'viewbids.html', context)
 
+# See all tender applications
 @login_required
 def view_tender_bids(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id, created_by=request.user)
@@ -199,13 +362,19 @@ def view_tender_bids(request, tender_id):
         tender=tender
     ).select_related("applicant").order_by("bid_amount")
 
+    for bid in bids:
+        bid.masked_gst = mask_id(bid.gst_number)
+
     context = {
         "tender": tender,
-        "bids": bids
+        "bids": bids,
+        "has_awarded_bid": bids.filter(status='awarded').exists(),
+        "page_title": "Tender Bids",
     }
     return render(request, "tender_bids.html", context)
 
-login_required
+# Update bid evaluation status
+@login_required
 def update_bid_status(request, bid_id):
     # Only tender creator can update bid
     bid = get_object_or_404(
@@ -215,35 +384,40 @@ def update_bid_status(request, bid_id):
     )
 
     if request.method == "POST":
-
-        # Prevent changing status again
-        if bid.status != "pending":
-            messages.warning(request, "This bid has already been reviewed.")
+        # Prevent changing status if already awarded
+        if bid.tender.applications.filter(status="awarded").exists() and bid.status != "awarded":
+            messages.error(request, "This tender has already been awarded to another bidder.")
             return redirect("tenders:view_tender_bids", tender_id=bid.tender.id)
 
         action = request.POST.get("action")
         remark = request.POST.get("remark")
 
-        if action == "approve":
-            bid.status = "approved"
-
-            # OPTIONAL: auto reject all other bids
+        if action == "award":
+            bid.status = "awarded"
+            # Auto-reject all other bids for this tender
             TenderApplication.objects.filter(
                 tender=bid.tender
             ).exclude(id=bid.id).update(status="rejected")
+            
+            # Close/Award the tender
+            bid.tender.status = "awarded"
+            bid.tender.save()
+            messages.success(request, f"Tender awarded to {bid.company_name} successfully!")
 
+        elif action == "approve":
+            bid.status = "approved"
             messages.success(request, "Bid approved successfully.")
 
         elif action == "reject":
             bid.status = "rejected"
             messages.error(request, "Bid rejected.")
 
-        # Save remark
         bid.remark = remark
         bid.save()
 
     return redirect("tenders:view_tender_bids", tender_id=bid.tender.id)
 # View to display all bids across tenders for the logged-in user
+# View consolidated bid applications
 @login_required
 def myBiddsApplications(request):
 
@@ -265,6 +439,7 @@ def myBiddsApplications(request):
         "pending_count": pending_count,
         "approved_count": approved_count,
         "rejected_count": rejected_count,
+        "page_title": "Bid Applications",
     }
 
     return render(request, "myBiddsApplications.html", context)

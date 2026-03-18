@@ -1,281 +1,297 @@
 {% extends "base2.html" %}
 {% block content %}
+
 <style>
+  /* ── Dashboard tokens ── */
+  :root {
+    --card-radius: 16px;
+    --card-shadow: 0 2px 16px rgba(15,42,94,0.07);
+    --gradient-hero: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);
+  }
 
-/* ===== Summary Cards Responsive ===== */
-@media (max-width: 991px) {
-    .row.mb-4 > div {
-        margin-bottom: 15px;
-    }
-}
+  .db-wrap {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  @media (max-width: 640px) { .db-wrap { gap: 1rem; } }
 
-/* ===== Filter Section Responsive ===== */
-@media (max-width: 767px) {
-
-    .card .row.g-3 > div {
-        width: 100%;
-    }
-
-    .card .row.g-3 .d-flex {
-        margin-top: 10px;
-    }
-}
-
-/* ===== Table Mobile View ===== */
-@media (max-width: 768px) {
-
-    .table-responsive {
-        border: 0;
-    }
-
-    table thead {
-        display: none;
-    }
-
-    table,
-    table tbody,
-    table tr,
-    table td {
-        display: block;
-        width: 100%;
-    }
-
-    table tr {
-        background: #fff;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    table td {
-        text-align: right;
-        padding: 8px 0;
-        border: none;
-        position: relative;
-        padding-left: 50%;
-    }
-
-    table td::before {
-        position: absolute;
-        left: 0;
-        width: 50%;
-        padding-left: 10px;
-        font-weight: 600;
-        text-align: left;
-        white-space: nowrap;
-    }
-
-    table td:nth-of-type(1)::before { content: "*"; }
-    table td:nth-of-type(2)::before { content: "Tender Title"; }
-    table td:nth-of-type(3)::before { content: "Company"; }
-    table td:nth-of-type(4)::before { content: "Bid Amount"; }
-    table td:nth-of-type(5)::before { content: "Submitted Date"; }
-    table td:nth-of-type(6)::before { content: "Status"; }
-    table td:nth-of-type(7)::before { content: "Remark"; }
-    table td:nth-of-type(8)::before { content: "Action"; }
-
-    table td.text-center {
-        text-align: left !important;
-        padding-left: 0;
-    }
-
-    table td.text-center {
-    text-align: left !important;
-    padding-left: 0 !important;
-}
-
-table td.text-center::before {
+  /* ══════════════════════════════════
+     HERO BANNER
+  ══════════════════════════════════ */
+  .hero-banner {
+    background: var(--gradient-hero);
+    border-radius: var(--card-radius);
+    padding: 1.75rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
     position: relative;
-    display: block;
-    width: 100%;
-    padding-left: 0;
-    margin-bottom: 6px;
-}
+    overflow: hidden;
+    flex-wrap: wrap;
+    box-shadow: 0 8px 24px rgba(26,86,219,0.15);
+  }
+  .hero-banner::before, .hero-banner::after {
+    content: ''; position: absolute; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.08); pointer-events: none;
+  }
+  .hero-banner::before { width: 260px; height: 260px; right: -60px; top: -80px; }
+  .hero-banner::after { width: 160px; height: 160px; right: 40px; bottom: -60px; border-color: rgba(255,255,255,0.05); }
+  
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
 
-}
+  .hero-text { position: relative; z-index: 1; flex: 1; min-width: 0; }
+  .hero-eyebrow { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.3rem; }
+  .hero-title { font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 0.35rem; }
+  .hero-sub { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0; }
+
+  /* ══════════════════════════════════
+     STAT CARDS
+  ══════════════════════════════════ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+  .stat-card {
+    background: white; border: 1px solid var(--border); border-radius: var(--card-radius);
+    padding: 1.5rem; box-shadow: var(--card-shadow);
+    display: flex; align-items: flex-start; gap: 1rem;
+    transition: all 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,42,94,0.12); border-color: #cbd5e1; }
+  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+  .stat-icon.primary { background: #eff6ff; color: #3b82f6; }
+  .stat-icon.warning { background: #fffbeb; color: #f59e0b; }
+  .stat-icon.success { background: #f0fdf4; color: #10b981; }
+  .stat-icon.danger  { background: #fef2f2; color: #ef4444; }
+
+  .stat-info { flex: 1; min-width: 0; }
+  .stat-label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .stat-val { font-family: 'Sora', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--navy); line-height: 1; }
+
+  /* ══════════════════════════════════
+     PANEL & TABLE
+  ══════════════════════════════════ */
+  .panel {
+    background: white; border: 1px solid var(--border); border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow); overflow: hidden;
+  }
+  .panel-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+    background: #fcfdfd;
+  }
+  .panel-title { font-family: 'Sora', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--navy); margin: 0; }
+
+  /* Filters */
+  .filter-bar {
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+  }
+  .filter-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.4rem; }
+  @media(max-width:768px) { .filter-group { min-width: 100%; } }
+  .filter-label { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+  .filter-input {
+    padding: 0.65rem 1rem; border-radius: 10px; border: 1.5px solid var(--border);
+    font-size: 0.85rem; color: var(--text); transition: all 0.2s;
+  }
+  .filter-input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  .btn-filter {
+    background: var(--navy); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 10px;
+    font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-filter:hover { background: var(--blue); transform: translateY(-1px); }
+
+  /* Table styles matching myBiddsApplications */
+  .bid-table { width: 100%; border-collapse: collapse; }
+  .bid-table th {
+    background: var(--surface-2); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; padding: 1rem 1.5rem; text-align: left;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .bid-table td {
+    padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+    font-size: 0.88rem; color: var(--text); vertical-align: middle;
+  }
+  .bid-table tr:last-child td { border-bottom: none; }
+  .bid-table tr:hover td { background: #fafafa; }
+  
+  .td-title { font-weight: 600; color: var(--navy); display: block; margin-bottom: 2px; }
+  .td-company { font-size: 0.8rem; color: var(--muted); }
+  .td-amount { font-family: 'Sora', sans-serif; font-weight: 700; color: #10b981; }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .status-badge.pending { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .status-badge.approved { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .status-badge.rejected { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+  .btn-action {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.4rem 1rem; border-radius: 8px; border: 1px solid var(--border);
+    background: white; color: var(--navy); font-size: 0.75rem; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .btn-action:hover { background: #eff6ff; border-color: #bfdbfe; color: var(--blue); }
+
+  /* Mobile Responsive Table */
+  @media(max-width:900px) {
+    .table-overflow { overflow-x: auto; }
+  }
 
 </style>
-<div class="container py-5">
 
-    <!-- Header -->
-    <div class="mb-4">
-        <h3 class="fw-bold">Bid Requests</h3>
-        <small class="text-muted">
-            Manage and review submitted bid applications
-        </small>
+<div class="db-wrap">
+
+  <!-- ══════ HERO ══════ -->
+  <div class="hero-banner">
+    <div class="hero-grid"></div>
+    <div class="hero-text">
+      <p class="hero-eyebrow">Bid Management</p>
+      <h1 class="hero-title">My Bids History</h1>
+      <p class="hero-sub">Track all your submitted tender applications and their current evaluation status.</p>
+    </div>
+  </div>
+
+  <!-- ══════ STATS GRID ══════ -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon primary"><i class="fas fa-folder-open"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Total Submissions</div>
+        <div class="stat-val">{{ bids|length }}</div>
+      </div>
     </div>
 
-
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Bids</h6>
-                    <h4 class="fw-bold">{{ bids|length }}</h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Pending</h6>
-                    <h4 class="fw-bold text-warning">
-                        {{ pending_count }}
-                    </h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Approved</h6>
-                    <h4 class="fw-bold text-success">
-                        {{ approved_count }}
-                    </h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Rejected</h6>
-                    <h4 class="fw-bold text-danger">
-                        {{ rejected_count }}
-                    </h4>
-                </div>
-            </div>
-        </div>
-
+    <div class="stat-card">
+      <div class="stat-icon warning"><i class="fas fa-clock"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-val">{{ pending_count }}</div>
+      </div>
     </div>
 
-
-    <!-- Filter Section -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-
-                <div class="col-md-4">
-                    <label class="form-label">Search</label>
-                    <input type="text"
-                           name="search"
-                           class="form-control"
-                           placeholder="Search by tender title"
-                           value="{{ request.GET.search }}">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="">All</option>
-                        <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
-                        <option value="approved" {% if request.GET.status == "approved" %}selected{% endif %}>Approved</option>
-                        <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>Rejected</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-dark w-100" type="submit">
-                        Filter
-                    </button>
-                </div>
-
-            </form>
-        </div>
+    <div class="stat-card">
+      <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Approved Bids</div>
+        <div class="stat-val">{{ approved_count }}</div>
+      </div>
     </div>
 
-
-    <!-- Table -->
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Tender Title</th>
-                        <th>Company</th>
-                        <th>Bid Amount</th>
-                        <th>Submitted Date</th>
-                        <th>Status</th>
-                        <th>Remark</th>
-                        <th class="text-center">Details</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    {% for bid in bids %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td class="fw-semibold">
-                            {{ bid.tender.title }}
-                        </td>
-                        <td>{{ bid.company_name }}</td>
-                        <td>₹ {{ bid.bid_amount|floatformat:2 }}</td>
-                        <td>{{ bid.applied_at|date:"d M Y" }}</td>
-
-                        <!-- STATUS -->
-                        <td>
-                            {% if bid.status == "pending" %}
-                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
-                                    Pending
-                                </span>
-
-                            {% elif bid.status == "approved" %}
-                                <span class="badge rounded-pill bg-success px-3 py-2">
-                                    Approved
-                                </span>
-
-                            {% elif bid.status == "rejected" %}
-                                <span class="badge rounded-pill bg-danger px-3 py-2">
-                                    Rejected
-                                </span>
-
-                            {% else %}
-                                <span class="badge bg-secondary px-3 py-2">
-                                    {{ bid.status }}
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <!-- REMARK -->
-                        <td>
-                            {% if bid.remark %}
-                                {{ bid.remark }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-
-                        <!-- ACTION -->
-                        <td class="text-center">
-                            <a href="{% url 'bids:bid_detail' bid.id %}"
-                               class="btn btn-sm btn-outline-dark">
-                                View
-                            </a>
-                        </td>
-
-                    </tr>
-
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5">
-                            No bid applications found.
-                        </td>
-                    </tr>
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-        </div>
+    <div class="stat-card">
+      <div class="stat-icon danger"><i class="fas fa-times-circle"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Rejected Bids</div>
+        <div class="stat-val">{{ rejected_count }}</div>
+      </div>
     </div>
+  </div>
+
+  <!-- ══════ FILTER & TABLE PANEL ══════ -->
+  <div class="panel">
+    
+    <!-- Filter Header -->
+    <div class="panel-header">
+      <form method="get" class="filter-bar w-100 m-0">
+        
+        <div class="filter-group">
+          <label class="filter-label">Search Tenders</label>
+          <input type="text" name="search" class="filter-input" placeholder="Search by tender title..." value="{{ request.GET.search }}">
+        </div>
+
+        <div class="filter-group" style="flex:0.5;">
+          <label class="filter-label">Status Filter</label>
+          <select name="status" class="filter-input" style="height: 40px; padding: 0.5rem 1rem;">
+            <option value="">All Statuses</option>
+            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if request.GET.status == "approved" %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-filter" style="height: 40px;"><i class="fas fa-filter"></i> Apply</button>
+      </form>
+    </div>
+
+    <!-- Table Body -->
+    <div class="table-overflow">
+      <table class="bid-table">
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th>Tender Details</th>
+            <th>Proposed Budget</th>
+            <th>Submission Date</th>
+            <th>Status</th>
+            <th>Official Remarks</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bid in bids %}
+          <tr>
+            <td style="color:var(--muted); font-weight:600;">{{ forloop.counter }}</td>
+            <td>
+              <span class="td-title">{{ bid.tender.title }}</span>
+              <span class="td-company"><i class="fas fa-building text-muted pe-1"></i> {{ bid.company_name }}</span>
+            </td>
+            <td class="td-amount">₹ {{ bid.bid_amount|floatformat:2 }}</td>
+            <td style="color:var(--muted);">{{ bid.applied_at|date:"d M Y" }}</td>
+            
+            <!-- STATUS -->
+            <td>
+              {% if bid.status == "pending" %}
+                <span class="status-badge pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+              {% elif bid.status == "approved" %}
+                <span class="status-badge approved"><i class="fas fa-check-circle"></i> Approved</span>
+              {% elif bid.status == "rejected" %}
+                <span class="status-badge rejected"><i class="fas fa-times-circle"></i> Rejected</span>
+              {% else %}
+                <span class="status-badge" style="background:var(--surface-2);border:1px solid var(--border);">{{ bid.status }}</span>
+              {% endif %}
+            </td>
+
+            <!-- REMARK -->
+            <td style="color:var(--muted); max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              {% if bid.remark %}
+                {{ bid.remark }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+
+            <!-- ACTION -->
+            <td style="text-align:right;">
+              <a href="{% url 'bids:bid_detail' bid.id %}" class="btn-action">
+                <i class="fas fa-eye pe-1"></i> View
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center; padding:3rem 1rem; color:var(--muted);">
+              <i class="fas fa-folder-open mb-3" style="font-size:2.5rem; opacity:0.3; display:block;"></i>
+              <p style="margin:0;">No bid applications found matching your criteria.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 
 </div>
 

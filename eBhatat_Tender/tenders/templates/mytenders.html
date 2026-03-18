@@ -1,262 +1,575 @@
 {% extends 'base1.html' %}
 {% load static %}
 {% block content %}
+
 <style>
-    .action-btns {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-}
+  /* ── Only pseudo-elements & things Tailwind cannot do ── */
 
-.action-btns .btn {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+  /* Header grid texture + ring */
+  .mt-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+  .mt-header::after {
+    content: '';
+    position: absolute;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    right: -50px; top: -70px;
+    pointer-events: none;
+  }
+
+  /* Card title / desc line-clamp */
+  .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Search focus ring */
+  .search-input:focus {
+    border-color: #1a56db;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
+    outline: none;
+  }
+  .search-input::placeholder { color: #b0bec5; }
+
+  /* View-toggle active state (set by JS) */
+  .view-btn.active { background: #eff6ff; color: #1a56db; }
+
+  /* Filter-pill active states (set by JS) */
+  .filter-pill.active          { border-color: #1a56db; color: #1a56db; background: #eff6ff; }
+  .filter-pill.active.green    { border-color: #10b981; color: #059669; background: #ecfdf5; }
+  .filter-pill.active.amber    { border-color: #f59e0b; color: #d97706; background: #fffbeb; }
+  .filter-pill.active.red      { border-color: #ef4444; color: #dc2626; background: #fef2f2; }
 </style>
-<section class="py-5 bg-light">
-<div class="container-fluid px-4">
 
-    <!-- ===== HEADER ===== -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold mb-1">Open Tenders</h3>
-            <p class="text-muted mb-0">Explore current procurement opportunities</p>
-        </div>
 
-        <!-- View Toggle -->
-        <div class="btn-group" role="group">
-            <button class="btn btn-outline-primary active" id="cardViewBtn">
-                <i class="bi bi-grid"></i> Cards
-            </button>
-            <button class="btn btn-outline-primary" id="tableViewBtn">
-                <i class="bi bi-table"></i> Table
-            </button>
-        </div>
+<div class="p-4 sm:p-7 flex flex-col gap-4 sm:gap-6">
+
+  <!-- ══════ HEADER ══════ -->
+  <div class="mt-header relative rounded-2xl overflow-hidden
+              flex items-center justify-between gap-4 flex-wrap
+              px-6 sm:px-8 py-6"
+       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+
+    <div class="relative z-[1]">
+      <p class="text-[0.7rem] font-semibold tracking-[0.1em] uppercase text-white/[0.42] mb-[0.25rem]">
+        Procurement Management
+      </p>
+      <h1 class="font-sora text-[1.35rem] font-extrabold text-white leading-tight mb-[0.2rem]">
+        Issued Tenders
+      </h1>
+      <p class="text-[0.8rem] text-white/[0.48]">
+        Manage and monitor all your published procurement notices
+      </p>
     </div>
 
-
-    <!-- ================= CARD VIEW ================= -->
-    <div id="cardView">
-    <div class="row g-4">
-
-    {% for tender in tenders %}
-    <div class="col-12 col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0 rounded-4 hover-shadow">
-            <div class="card-body d-flex flex-column">
-
-                <!-- Title + Status -->
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="fw-semibold mb-0 text-truncate">
-                        {{ tender.title }}
-                    </h5>
-
-                    <span class="badge
-                    {% if tender.status == 'open' %}
-                        bg-success
-                    {% elif tender.status == 'draft' %}
-                        bg-warning text-dark
-                    {% elif tender.status == 'closed' %}
-                        bg-danger
-                    {% else %}
-                        bg-secondary
-                    {% endif %}
-                    ">
-                    {{ tender.status|upper }}
-                    </span>
-                </div>
-
-                <!-- Department -->
-                <p class="text-muted small mb-1">
-                    <i class="bi bi-building"></i>
-                    {{ tender.department }}
-                </p>
-
-                <!-- Description -->
-                <p class="text-secondary small flex-grow-1">
-                    {{ tender.description|truncatewords:15 }}
-                </p>
-
-                <!-- Financial Info -->
-                <div class="row mb-3">
-                    <div class="col">
-                        <small class="text-muted">Estimated</small>
-                        <div class="fw-semibold text-success">
-                            ₹{{ tender.estimated_value }}
-                        </div>
-                    </div>
-                    <div class="col text-end">
-                        <small class="text-muted">Closing</small>
-                        <div class="fw-semibold">
-                            {{ tender.closing_date }}
-                        </div>
-                    </div>
-                </div>
-
-               <!-- ===== Action Section ===== -->
-<div class="mt-auto pt-3 border-top">
-
-    <div class="d-flex justify-content-between align-items-center">
-
-        <!-- View Bids Button -->
-        <a href="{% url 'tenders:bidsinfo' tender.id %}"
-           class="btn btn-primary d-flex align-items-center gap-2 px-4">
-
-            <i class="bi bi-eye"></i>
-            View Bids
-
-            {% if tender.applications.count > 0 %}
-            <span class="badge bg-light text-dark ms-2">
-                {{ tender.applications.count }}
-            </span>
-            {% endif %}
-        </a>
-
-        <!-- Small Icon Buttons -->
-        <div class="d-flex gap-2">
-
-            <a href="{% url 'tenders:tender_edit' tender.id %}"
-               class="btn btn-sm btn-outline-primary rounded-circle"
-               title="Edit">
-                <i class="bi bi-pencil"></i>
-            </a>
-
-            <a href="{% url 'tenders:tender_delete' tender.id %}"
-               class="btn btn-sm btn-outline-danger rounded-circle"
-               title="Delete">
-                <i class="bi bi-trash"></i>
-            </a>
-
-            
-
-
-
-        </div>
-
+    <div class="relative z-[1] flex gap-[0.6rem] flex-shrink-0">
+      <a href="{% url 'tenders:dashboard' %}"
+         class="inline-flex items-center gap-[0.4rem] px-4 py-2
+                bg-white/10 border-[1.5px] border-white/20 rounded-[10px]
+                text-white/80 font-sora text-[0.8rem] font-semibold no-underline
+                backdrop-blur-[6px] transition-all duration-200
+                hover:bg-white/[0.18] hover:text-white">
+        <i class="fas fa-arrow-left"></i> Dashboard
+      </a>
+      <a href="{% url 'tenders:tenderCreator' %}"
+         class="inline-flex items-center gap-[0.4rem] px-[1.1rem] py-2
+                bg-amber-500 border-none rounded-[10px]
+                text-slate-800 font-sora text-[0.82rem] font-bold no-underline
+                shadow-[0_2px_8px_rgba(245,158,11,0.35)] transition-all duration-200
+                hover:bg-amber-400 hover:text-slate-800 hover:-translate-y-px">
+        <i class="fas fa-plus"></i> New Tender
+      </a>
     </div>
-
-</div>
-
-            </div>
-        </div>
-    </div>
-    {% empty %}
-    <div class="col-12 text-center py-5">
-        <h5 class="text-muted">No tenders available.</h5>
-    </div>
-    {% endfor %}
-
-    </div>
-</div>
-
-
-
-    <!-- ================= TABLE VIEW ================= -->
-    <div id="tableView" class="d-none">
-
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Title</th>
-                                <th>Department</th>
-                                <th>Estimated Value</th>
-                                <th>Closing Date</th>
-                                <th>Status</th>
-                                <th width="160">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        {% for tender in tenders %}
-                        <tr>
-                            <td>{{ tender.title }}</td>
-                            <td>{{ tender.department }}</td>
-                            <td>₹{{ tender.estimated_value }}</td>
-                            <td>{{ tender.closing_date }}</td>
-                            <td>
-                                <span class="badge
-                                {% if tender.status == 'open' %}
-                                    bg-success
-                                {% elif tender.status == 'draft' %}
-                                    bg-warning text-dark
-                                {% elif tender.status == 'closed' %}
-                                    bg-danger
-                                {% else %}
-                                    bg-secondary
-                                {% endif %}
-                                ">
-                                {{ tender.status|upper }}
-                                </span>
-                            </td>
-                           <td class="align-middle text-center">
-  <div class="action-btns">
-
-    <a href="{% url 'tenders:tender_edit' tender.id %}"
-       class="btn btn-sm btn-outline-primary"
-       title="Edit">
-      <i class="bi bi-pencil"></i>
-    </a>
-
-    <a href="{% url 'tenders:tender_delete' tender.id %}"
-       class="btn btn-sm btn-outline-danger"
-       title="Delete">
-      <i class="bi bi-trash"></i>
-    </a>
-
-    <a href="{% url 'tenders:bidsinfo' tender.id %}"
-       class="btn btn-sm btn-primary"
-       title="View Bids">
-      <i class="bi bi-eye"></i>
-    </a>
-
   </div>
-</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
-                                No tenders available.
-                            </td>
-                        </tr>
-                        {% endfor %}
 
-                        </tbody>
-                    </table>
-                </div>
 
-            </div>
+  <!-- ══════ TOOLBAR ══════ -->
+  <div class="flex items-center gap-3 flex-wrap
+              bg-white border border-slate-200 rounded-[14px]
+              px-5 py-[0.9rem] shadow-[0_2px_8px_rgba(15,42,94,0.04)]">
+
+    <!-- Search -->
+    <div class="relative flex-1 min-w-[180px] max-w-[320px]">
+      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[0.78rem] pointer-events-none"></i>
+      <input type="text" id="searchInput" placeholder="Search tenders…"
+             class="search-input w-full pl-[2.1rem] pr-[0.85rem] py-2
+                    border-[1.5px] border-slate-200 rounded-[9px]
+                    font-dmSans text-[0.83rem] text-slate-800
+                    bg-slate-50 transition-all duration-[0.18s]">
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="flex gap-[0.4rem] flex-wrap">
+      <button class="filter-pill active
+                     inline-flex items-center gap-[0.3rem] px-[0.85rem] py-[0.38rem]
+                     rounded-full border-[1.5px] border-blue-500 bg-blue-50
+                     font-sora text-[0.73rem] font-semibold text-blue-600
+                     cursor-pointer transition-all duration-[0.18s] whitespace-nowrap
+                     hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              data-filter="all">
+        <span class="w-[6px] h-[6px] rounded-full bg-current"></span> All
+      </button>
+
+      <button class="filter-pill green
+                     inline-flex items-center gap-[0.3rem] px-[0.85rem] py-[0.38rem]
+                     rounded-full border-[1.5px] border-slate-200 bg-slate-50
+                     font-sora text-[0.73rem] font-semibold text-slate-400
+                     cursor-pointer transition-all duration-[0.18s] whitespace-nowrap
+                     hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              data-filter="open">
+        <span class="w-[6px] h-[6px] rounded-full bg-current"></span> Open
+      </button>
+
+      <button class="filter-pill amber
+                     inline-flex items-center gap-[0.3rem] px-[0.85rem] py-[0.38rem]
+                     rounded-full border-[1.5px] border-slate-200 bg-slate-50
+                     font-sora text-[0.73rem] font-semibold text-slate-400
+                     cursor-pointer transition-all duration-[0.18s] whitespace-nowrap
+                     hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              data-filter="draft">
+        <span class="w-[6px] h-[6px] rounded-full bg-current"></span> Draft
+      </button>
+
+      <button class="filter-pill red
+                     inline-flex items-center gap-[0.3rem] px-[0.85rem] py-[0.38rem]
+                     rounded-full border-[1.5px] border-slate-200 bg-slate-50
+                     font-sora text-[0.73rem] font-semibold text-slate-400
+                     cursor-pointer transition-all duration-[0.18s] whitespace-nowrap
+                     hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              data-filter="closed">
+        <span class="w-[6px] h-[6px] rounded-full bg-current"></span> Closed
+      </button>
+    </div>
+
+    <!-- Count chip -->
+    <span id="tenderCount"
+          class="ml-auto font-sora text-[0.73rem] font-bold text-slate-400 whitespace-nowrap">
+      {{ tenders|length }} tender{{ tenders|length|pluralize }}
+    </span>
+
+    <!-- View Toggle -->
+    <div class="flex border-[1.5px] border-slate-200 rounded-[9px] overflow-hidden flex-shrink-0">
+      <button id="cardViewBtn" title="Card view"
+              class="view-btn active w-[34px] h-[34px] flex items-center justify-center
+                     bg-blue-50 border-none border-r-[1.5px] border-slate-200
+                     cursor-pointer text-blue-600 text-[0.82rem] transition-all duration-[0.18s]">
+        <i class="fas fa-th-large"></i>
+      </button>
+      <button id="tableViewBtn" title="Table view"
+              class="view-btn w-[34px] h-[34px] flex items-center justify-center
+                     bg-white border-none cursor-pointer
+                     text-slate-400 text-[0.82rem] transition-all duration-[0.18s]
+                     hover:bg-slate-50 hover:text-[#0f2a5e]">
+        <i class="fas fa-list"></i>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══════ CARD VIEW ══════ -->
+  <div id="cardView">
+    {% if tenders %}
+    <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      {% for tender in tenders %}
+      <div class="tender-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden relative
+                  shadow-[0_2px_10px_rgba(15,42,94,0.05)]
+                  transition-all duration-[0.22s] ease-[cubic-bezier(0.4,0,0.2,1)]
+                  hover:-translate-y-1 hover:shadow-[0_10px_32px_rgba(15,42,94,0.12)] hover:border-blue-200"
+           data-status="{{ tender.status }}" data-title="{{ tender.title|lower }}">
+
+        <!-- Status stripe -->
+        <div class="h-1 flex-shrink-0
+          {% if tender.status == 'open' %}bg-gradient-to-r from-emerald-500 to-emerald-400
+          {% elif tender.status == 'draft' %}bg-gradient-to-r from-amber-500 to-amber-400
+          {% elif tender.status == 'closed' %}bg-gradient-to-r from-red-500 to-red-400
+          {% elif tender.status == 'awarded' %}bg-gradient-to-r from-amber-500 to-amber-300
+          {% else %}bg-gradient-to-r from-slate-400 to-slate-300{% endif %}">
         </div>
+
+        <div class="flex flex-col flex-1 px-5 pt-[1.1rem] pb-5">
+
+          <!-- Top: title + badge -->
+          <div class="flex items-start justify-between gap-2 mb-[0.25rem]">
+            <div class="flex flex-col gap-1">
+              <span class="inline-flex items-center text-[0.6rem] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit ring-1 ring-inset ring-blue-100">
+                {{ tender.tender_id }}
+              </span>
+              <h3 class="card-title font-sora text-[0.9rem] font-bold text-[#0f2a5e] leading-[1.35]">
+                {{ tender.title }}
+              </h3>
+            </div>
+            {% if tender.status == 'open' %}
+              <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full flex-shrink-0
+                           font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase whitespace-nowrap
+                           bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <i class="fas fa-circle text-[0.5rem]"></i> Open
+              </span>
+            {% elif tender.status == 'draft' %}
+              <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full flex-shrink-0
+                           font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase whitespace-nowrap
+                           bg-amber-50 text-amber-600 border border-amber-200">
+                <i class="fas fa-circle text-[0.5rem]"></i> Draft
+              </span>
+            {% elif tender.status == 'closed' %}
+              <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full flex-shrink-0
+                           font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase whitespace-nowrap
+                           bg-red-50 text-red-600 border border-red-200">
+                <i class="fas fa-circle text-[0.5rem]"></i> Closed
+              </span>
+            {% elif tender.status == 'awarded' %}
+              <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full flex-shrink-0
+                           font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase whitespace-nowrap
+                           bg-amber-50 text-amber-600 border border-amber-200">
+                <i class="fas fa-trophy text-[0.55rem]"></i> Awarded
+              </span>
+            {% else %}
+              <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full flex-shrink-0
+                           font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase whitespace-nowrap
+                           bg-slate-100 text-slate-500 border border-slate-200">
+                <i class="fas fa-circle text-[0.5rem]"></i> {{ tender.status|capfirst }}
+              </span>
+            {% endif %}
+          </div>
+
+          <!-- Department / Winner -->
+          <div class="flex items-center gap-[0.4rem] text-[0.76rem] text-slate-400 mb-[0.55rem]">
+            {% if tender.status == 'awarded' and tender.awarded_application %}
+              <i class="fas fa-trophy text-[0.7rem] text-amber-500"></i>
+              <span class="font-bold text-[#0f2a5e]">Awarded to: {{ tender.awarded_application.company_name }}</span>
+            {% else %}
+              <i class="fas fa-building text-[0.7rem] text-blue-600"></i>
+              {{ tender.department }}
+            {% endif %}
+          </div>
+
+          <!-- Description -->
+          <p class="card-desc flex-1 text-[0.78rem] text-slate-500 leading-[1.55] mb-[0.85rem]">
+            {{ tender.description|truncatewords:18 }}
+          </p>
+
+          <!-- Info grid -->
+          <div class="grid grid-cols-2 gap-2 mb-4 p-3 bg-slate-50 rounded-[10px] border border-slate-200">
+            <div>
+              <p class="text-[0.65rem] font-bold uppercase tracking-[0.07em] text-slate-400 mb-[2px]">Estimated Value</p>
+              <p class="font-sora text-[0.82rem] font-bold text-emerald-600">₹{{ tender.estimated_value }}</p>
+            </div>
+            <div>
+              <p class="text-[0.65rem] font-bold uppercase tracking-[0.07em] text-slate-400 mb-[2px]">Closing Date</p>
+              <p class="font-sora text-[0.82rem] font-bold text-[#0f2a5e]">{{ tender.closing_date|date:"d M Y" }}</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between gap-2 pt-[0.85rem] border-t border-slate-200 mt-auto">
+
+            <a href="{% url 'tenders:viewbids' tender.id %}"
+               class="inline-flex items-center gap-[0.4rem] px-[0.95rem] py-[0.48rem]
+                      rounded-[9px] no-underline text-white font-sora text-[0.77rem] font-bold
+                      shadow-[0_2px_6px_rgba(26,86,219,0.25)] transition-all duration-[0.18s]
+                      hover:text-white hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(26,86,219,0.35)]"
+               style="background: linear-gradient(135deg, #1a56db, #163472);">
+              <i class="fas fa-eye"></i> View Bids
+              {% if tender.applications.count > 0 %}
+                <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1
+                             bg-white/20 rounded-[10px] text-[0.65rem] font-extrabold text-white">
+                  {{ tender.applications.count }}
+                </span>
+              {% endif %}
+            </a>
+
+            <div class="flex gap-[0.4rem]">
+              <a href="{% url 'tenders:tender_edit' tender.id %}" title="Edit tender"
+                 class="w-8 h-8 rounded-lg border-[1.5px] border-slate-200 bg-white
+                        flex items-center justify-center text-[0.78rem] text-slate-400 no-underline
+                        transition-all duration-[0.18s]
+                        hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+              <a href="{% url 'tenders:tender_delete' tender.id %}" title="Delete tender"
+                 class="w-8 h-8 rounded-lg border-[1.5px] border-slate-200 bg-white
+                        flex items-center justify-center text-[0.78rem] text-slate-400 no-underline
+                        transition-all duration-[0.18s]
+                        hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
 
     </div>
 
-</div>
-</section>
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="text-center py-16 px-8
+                bg-white border border-slate-200 rounded-2xl
+                shadow-[0_2px_10px_rgba(15,42,94,0.04)]">
+      <div class="w-[70px] h-[70px] bg-blue-50 rounded-[20px]
+                  flex items-center justify-center text-[1.6rem] text-blue-600
+                  mx-auto mb-5">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <p class="font-sora text-[1rem] font-bold text-[#0f2a5e] mb-[0.4rem]">
+        No tenders published yet
+      </p>
+      <p class="text-[0.82rem] text-slate-400 mb-5">
+        Create your first procurement notice to get started
+      </p>
+      <a href="{% url 'tenders:tenderCreator' %}"
+         class="inline-flex items-center gap-[0.45rem] px-5 py-[0.58rem]
+                rounded-[10px] no-underline text-white font-sora text-[0.83rem] font-bold
+                shadow-[0_2px_8px_rgba(26,86,219,0.3)] transition-all duration-200
+                hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(26,86,219,0.4)]"
+         style="background: linear-gradient(135deg, #1a56db, #163472);">
+        <i class="fas fa-plus"></i> Publish a Tender
+      </a>
+    </div>
+    {% endif %}
+  </div>
 
 
-<!-- ===== VIEW TOGGLE SCRIPT ===== -->
+  <!-- ══════ TABLE VIEW ══════ -->
+  <div id="tableView" class="hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden
+                shadow-[0_2px_10px_rgba(15,42,94,0.05)]">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-[0.82rem]">
+          <thead>
+            <tr>
+              <th class="pl-5 px-4 py-[0.7rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em]
+                         text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">
+                Tender
+              </th>
+              <th class="px-4 py-[0.7rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em]
+                         text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">
+                Est. Value
+              </th>
+              <th class="px-4 py-[0.7rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em]
+                         text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">
+                Closing Date
+              </th>
+              <th class="px-4 py-[0.7rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em]
+                         text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">
+                Status
+              </th>
+              <th class="px-4 py-[0.7rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em]
+                         text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            {% for tender in tenders %}
+            <tr class="border-b border-slate-200 last:border-b-0 transition-colors duration-150 hover:bg-slate-50"
+                data-status="{{ tender.status }}" data-title="{{ tender.title|lower }}">
+
+              <!-- Tender -->
+              <td class="pl-5 px-4 py-[0.85rem] align-middle">
+                <span class="inline-flex items-center text-[0.6rem] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit ring-1 ring-inset ring-blue-100 mb-1">
+                  {{ tender.tender_id }}
+                </span>
+                <p class="font-sora text-[0.83rem] font-bold text-[#0f2a5e]
+                           whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">
+                  {{ tender.title }}
+                </p>
+                <p class="text-[0.7rem] text-slate-400 mt-[2px]">
+                  <i class="fas fa-building text-[0.62rem] mr-[3px]"></i>{{ tender.department }}
+                </p>
+              </td>
+
+              <!-- Value -->
+              <td class="px-4 py-[0.85rem] align-middle">
+                <span class="font-sora font-bold text-emerald-600 text-[0.83rem]">
+                  ₹{{ tender.estimated_value }}
+                </span>
+              </td>
+
+              <!-- Closing Date -->
+              <td class="px-4 py-[0.85rem] align-middle">
+                <span class="text-[0.78rem] text-slate-400 whitespace-nowrap">
+                  <i class="fas fa-calendar-alt text-[0.68rem] mr-1 text-slate-400"></i>
+                  {{ tender.closing_date|date:"d M Y" }}
+                </span>
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-[0.85rem] align-middle">
+                {% if tender.status == 'open' %}
+                  <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full
+                               font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase
+                               bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i class="fas fa-circle text-[0.5rem]"></i> Open
+                  </span>
+                {% elif tender.status == 'draft' %}
+                  <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full
+                               font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase
+                               bg-amber-50 text-amber-600 border border-amber-200">
+                    <i class="fas fa-circle text-[0.5rem]"></i> Draft
+                  </span>
+                {% elif tender.status == 'closed' %}
+                  <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full
+                               font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase
+                               bg-red-50 text-red-600 border border-red-200">
+                    <i class="fas fa-circle text-[0.5rem]"></i> Closed
+                  </span>
+                {% elif tender.status == 'awarded' %}
+                  <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full
+                               font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase
+                               bg-amber-50 text-amber-600 border border-amber-200">
+                    <i class="fas fa-trophy text-[0.55rem]"></i> Awarded
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-[3px] px-[9px] py-[3px] rounded-full
+                               font-sora text-[0.62rem] font-bold tracking-[0.05em] uppercase
+                               bg-slate-100 text-slate-500 border border-slate-200">
+                    {{ tender.status|capfirst }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Actions -->
+              <td class="px-4 py-[0.85rem] align-middle whitespace-nowrap">
+                <div class="flex items-center gap-[0.4rem] flex-nowrap">
+
+                  <a href="{% url 'tenders:viewbids' tender.id %}"
+                     class="inline-flex items-center justify-center gap-[0.3rem] h-8 w-auto
+                            px-[0.8rem]
+                            rounded-lg no-underline text-white font-sora text-[0.72rem] font-bold leading-none
+                            transition-all duration-150 flex-shrink-0
+                            hover:text-white hover:-translate-y-px hover:shadow-[0_3px_8px_rgba(26,86,219,0.3)]"
+                     style="background: linear-gradient(135deg, #1a56db, #163472);">
+                    <i class="fas fa-eye"></i> Bids
+                    {% if tender.applications.count > 0 %}
+                      <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-[5px]
+                                   bg-white/22 border border-white/30 rounded-[10px]
+                                   text-[0.62rem] font-extrabold text-white leading-none flex-shrink-0">
+                        {{ tender.applications.count | default:0 }}
+                      </span>
+                    {% endif %}
+                  </a>
+
+                  <a href="{% url 'tenders:tender_edit' tender.id %}" title="Edit"
+                     class="w-8 h-8 rounded-lg border-[1.5px] border-slate-200 bg-white
+                            flex items-center justify-center text-[0.78rem] text-slate-400 no-underline
+                            transition-all duration-[0.18s]
+                            hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600">
+                    <i class="fas fa-pencil-alt"></i>
+                  </a>
+
+                  <a href="{% url 'tenders:tender_delete' tender.id %}" title="Delete"
+                     class="w-8 h-8 rounded-lg border-[1.5px] border-slate-200 bg-white
+                            flex items-center justify-center text-[0.78rem] text-slate-400 no-underline
+                            transition-all duration-[0.18s]
+                            hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+                    <i class="fas fa-trash-alt"></i>
+                  </a>
+
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-12 text-slate-400 text-[0.82rem]">
+                No tenders available.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+
 <script>
-document.getElementById("cardViewBtn").addEventListener("click", function () {
-    document.getElementById("cardView").classList.remove("d-none");
-    document.getElementById("tableView").classList.add("d-none");
-    this.classList.add("active");
-    document.getElementById("tableViewBtn").classList.remove("active");
-});
+  /* ── View toggle ── */
+  const cardViewBtn  = document.getElementById('cardViewBtn');
+  const tableViewBtn = document.getElementById('tableViewBtn');
+  const cardView     = document.getElementById('cardView');
+  const tableView    = document.getElementById('tableView');
 
-document.getElementById("tableViewBtn").addEventListener("click", function () {
-    document.getElementById("tableView").classList.remove("d-none");
-    document.getElementById("cardView").classList.add("d-none");
-    this.classList.add("active");
-    document.getElementById("cardViewBtn").classList.remove("active");
-});
+  cardViewBtn.addEventListener('click', () => {
+    cardView.classList.remove('hidden');
+    tableView.classList.add('hidden');
+    cardViewBtn.classList.add('active');
+    tableViewBtn.classList.remove('active');
+  });
+  tableViewBtn.addEventListener('click', () => {
+    tableView.classList.remove('hidden');
+    cardView.classList.add('hidden');
+    tableViewBtn.classList.add('active');
+    cardViewBtn.classList.remove('active');
+  });
+
+  /* ── Filter pills ── */
+  const pills = document.querySelectorAll('.filter-pill');
+  let currentFilter = 'all';
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active', 'green', 'amber', 'red'));
+      pill.classList.add('active');
+      const f = pill.dataset.filter;
+      if (f === 'open')   pill.classList.add('green');
+      if (f === 'draft')  pill.classList.add('amber');
+      if (f === 'closed') pill.classList.add('red');
+      currentFilter = f;
+      applyFilters();
+    });
+  });
+
+  /* ── Search ── */
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+  function applyFilters() {
+    const q         = document.getElementById('searchInput').value.toLowerCase().trim();
+    const cardItems = document.querySelectorAll('#cardsGrid .tender-card');
+    const tableRows = document.querySelectorAll('#tableBody tr[data-status]');
+    let visible = 0;
+
+    const match = el => {
+      const status   = el.dataset.status;
+      const title    = el.dataset.title || '';
+      const filterOk = currentFilter === 'all' || status === currentFilter;
+      const searchOk = !q || title.includes(q);
+      return filterOk && searchOk;
+    };
+
+    cardItems.forEach(el => {
+      const show = match(el);
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    tableRows.forEach(el => {
+      el.style.display = match(el) ? '' : 'none';
+    });
+
+    document.getElementById('tenderCount').textContent =
+      visible + ' tender' + (visible !== 1 ? 's' : '');
+  }
 </script>
 
 {% endblock %}

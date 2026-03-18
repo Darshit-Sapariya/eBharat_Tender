@@ -1,0 +1,407 @@
+{% extends 'base1.html' %}
+{% block content %}
+
+<style>
+  /* ── Only pseudo-elements Tailwind cannot replicate ── */
+
+  /* Hero grid texture + decorative ring */
+  .td-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+  .td-hero::after {
+    content: '';
+    position: absolute;
+    width: 280px; height: 280px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    right: -60px; top: -90px; pointer-events: none;
+  }
+
+  /* Date item top accent bar */
+  .date-item::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--di-accent, #e2e8f0);
+  }
+  .date-item.publish { --di-accent: #1a56db; }
+  .date-item.closing { --di-accent: #ef4444; }
+  .date-item.prebid  { --di-accent: #f59e0b; }
+
+  /* Bid count hero grid texture */
+  .bid-count-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Panel left accent border */
+  .ph-blue  .panel-head { border-left: 3px solid #1a56db; }
+  .ph-green .panel-head { border-left: 3px solid #10b981; }
+  .ph-amber .panel-head { border-left: 3px solid #f59e0b; }
+</style>
+
+
+<div class="p-4 sm:p-7 flex flex-col gap-4 sm:gap-6">
+
+  <!-- ══════ HERO HEADER ══════ -->
+  <div class="td-hero relative rounded-2xl overflow-hidden px-6 sm:px-8 py-7"
+       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+
+    <!-- Second decorative ring -->
+    <div class="absolute w-[160px] h-[160px] rounded-full pointer-events-none
+                border border-white/[0.04] right-20 bottom-[-50px]"></div>
+
+    <div class="relative z-[1] flex items-start justify-between gap-4 flex-wrap">
+
+      <!-- Left: title + meta -->
+      <div>
+        <div class="flex items-center gap-3 mb-1.5 flex-wrap">
+          <p class="flex items-center gap-[0.4rem] text-[0.7rem] font-semibold
+                    tracking-[0.1em] uppercase text-white/[0.42]">
+            <i class="fas fa-folder-open"></i> Tender Detail
+          </p>
+          <span class="w-[3px] h-[3px] rounded-full bg-white/20"></span>
+          <p class="text-[0.7rem] font-bold tracking-[0.1em] uppercase text-white transition-colors">
+            ID: <span class="text-white">{{ tender.tender_id }}</span>
+          </p>
+        </div>
+        <h1 class="font-sora text-[1.4rem] font-extrabold text-white leading-[1.25]
+                   mb-[0.4rem] max-w-[600px]">
+          {{ tender.title }}
+        </h1>
+        <p class="flex items-center gap-[0.4rem] text-[0.8rem] text-white/50">
+          <i class="fas fa-building text-[0.72rem]"></i>
+          {{ tender.department }}
+        </p>
+
+        <!-- Meta row -->
+        <div class="flex gap-6 mt-4 flex-wrap">
+          <div>
+            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-white/35 mb-[2px]">
+              Estimated Value
+            </p>
+            <p class="font-sora text-[0.88rem] font-bold text-emerald-300">
+              ₹{{ tender.estimated_value }}
+            </p>
+          </div>
+          <div>
+            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-white/35 mb-[2px]">
+              Closing Date
+            </p>
+            <p class="font-sora text-[0.88rem] font-bold text-white/90">
+              {{ tender.closing_date|date:"d M Y" }}
+            </p>
+          </div>
+          <div>
+            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-white/35 mb-[2px]">
+              Category
+            </p>
+            <p class="font-sora text-[0.88rem] font-bold text-white/90">
+              {{ tender.category }}
+            </p>
+          </div>
+          <div>
+            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-white/35 mb-[2px]">
+              Location
+            </p>
+            <p class="font-sora text-[0.88rem] font-bold text-white/90">
+              {{ tender.location|default:"—" }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: back btn + status badge -->
+      <div class="flex flex-col items-end gap-[0.6rem] flex-shrink-0">
+        <a href="{% url 'tenders:mytenders' %}"
+           class="inline-flex items-center gap-[0.4rem] px-[0.9rem] py-[0.45rem]
+                  bg-white/10 border-[1.5px] border-white/20 rounded-[9px]
+                  text-white/75 font-sora text-[0.78rem] font-semibold no-underline
+                  backdrop-blur-[6px] transition-all duration-200
+                  hover:bg-white/[0.18] hover:text-white">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+
+        {% if tender.status == 'open' %}
+          <span class="inline-flex items-center gap-[5px] px-[14px] py-[5px] rounded-full
+                       font-sora text-[0.72rem] font-extrabold tracking-[0.05em] uppercase
+                       bg-emerald-500/[0.18] text-emerald-300 border border-emerald-500/30">
+            <i class="fas fa-circle text-[0.5rem]"></i> Open
+          </span>
+        {% elif tender.status == 'draft' %}
+          <span class="inline-flex items-center gap-[5px] px-[14px] py-[5px] rounded-full
+                       font-sora text-[0.72rem] font-extrabold tracking-[0.05em] uppercase
+                       bg-amber-500/[0.18] text-amber-200 border border-amber-500/30">
+            <i class="fas fa-circle text-[0.5rem]"></i> Draft
+          </span>
+        {% elif tender.status == 'closed' %}
+          <span class="inline-flex items-center gap-[5px] px-[14px] py-[5px] rounded-full
+                       font-sora text-[0.72rem] font-extrabold tracking-[0.05em] uppercase
+                       bg-red-500/[0.18] text-red-300 border border-red-500/30">
+            <i class="fas fa-circle text-[0.5rem]"></i> Closed
+          </span>
+        {% else %}
+          <span class="inline-flex items-center gap-[5px] px-[14px] py-[5px] rounded-full
+                       font-sora text-[0.72rem] font-extrabold tracking-[0.05em] uppercase
+                       bg-white/10 text-white/60 border border-white/15">
+            <i class="fas fa-circle text-[0.5rem]"></i> {{ tender.status|capfirst }}
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════ MAIN GRID ══════ -->
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start">
+
+    <!-- ── LEFT COLUMN ── -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Description Panel -->
+      <div class="ph-blue bg-white border border-slate-200 rounded-2xl overflow-hidden
+                  shadow-[0_2px_12px_rgba(15,42,94,0.05)]">
+        <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
+          <div class="w-8 h-8 rounded-[9px] flex items-center justify-center text-[0.82rem] flex-shrink-0
+                      bg-blue-50 text-blue-600">
+            <i class="fas fa-align-left"></i>
+          </div>
+          <div>
+            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Tender Description</p>
+            <p class="text-[0.7rem] text-slate-400 mt-px">Scope, objectives and requirements</p>
+          </div>
+        </div>
+        <div class="px-[1.35rem] py-5">
+          <p class="text-[0.85rem] leading-[1.75] text-slate-600">{{ tender.description }}</p>
+        </div>
+      </div>
+
+      <!-- Financial Panel -->
+      <div class="ph-green bg-white border border-slate-200 rounded-2xl overflow-hidden
+                  shadow-[0_2px_12px_rgba(15,42,94,0.05)]">
+        <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
+          <div class="w-8 h-8 rounded-[9px] flex items-center justify-center text-[0.82rem] flex-shrink-0
+                      bg-emerald-50 text-emerald-600">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <div>
+            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Financial Details</p>
+            <p class="text-[0.7rem] text-slate-400 mt-px">Budget and deposit information</p>
+          </div>
+        </div>
+        <div class="px-[1.35rem] py-5">
+          <div class="grid grid-cols-2 gap-4">
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl px-[1.1rem] py-4">
+              <p class="text-[0.67rem] font-bold uppercase tracking-[0.08em] text-slate-400 mb-[0.3rem]">
+                Estimated Value
+              </p>
+              <p class="font-sora text-[1.25rem] font-extrabold text-emerald-600">
+                ₹{{ tender.estimated_value }}
+              </p>
+              <p class="text-[0.68rem] text-slate-400 mt-[2px]">Total project cost</p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl px-[1.1rem] py-4">
+              <p class="text-[0.67rem] font-bold uppercase tracking-[0.08em] text-slate-400 mb-[0.3rem]">
+                EMD Amount
+              </p>
+              <p class="font-sora text-[1.25rem] font-extrabold text-[#0f2a5e]">
+                ₹{{ tender.emd_amount }}
+              </p>
+              <p class="text-[0.68rem] text-slate-400 mt-[2px]">Earnest money deposit</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates Panel -->
+      <div class="ph-amber bg-white border border-slate-200 rounded-2xl overflow-hidden
+                  shadow-[0_2px_12px_rgba(15,42,94,0.05)]">
+        <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
+          <div class="w-8 h-8 rounded-[9px] flex items-center justify-center text-[0.82rem] flex-shrink-0
+                      bg-amber-50 text-amber-600">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div>
+            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Important Dates</p>
+            <p class="text-[0.7rem] text-slate-400 mt-px">Timeline and key milestones</p>
+          </div>
+        </div>
+        <div class="px-[1.35rem] py-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+            <!-- Publish Date -->
+            <div class="date-item publish relative bg-slate-50 border border-slate-200
+                        rounded-xl px-4 py-[0.9rem] overflow-hidden transition-[border-color] duration-200">
+              <p class="flex items-center gap-[0.3rem] text-[0.65rem] font-bold uppercase
+                        tracking-[0.08em] text-slate-400 mb-[0.35rem]">
+                <i class="fas fa-calendar-plus text-[0.6rem]"></i> Publish Date
+              </p>
+              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+                {{ tender.publish_date|date:"d M Y"|default:"—" }}
+              </p>
+            </div>
+
+            <!-- Closing Date -->
+            <div class="date-item closing relative bg-slate-50 border border-slate-200
+                        rounded-xl px-4 py-[0.9rem] overflow-hidden transition-[border-color] duration-200">
+              <p class="flex items-center gap-[0.3rem] text-[0.65rem] font-bold uppercase
+                        tracking-[0.08em] text-slate-400 mb-[0.35rem]">
+                <i class="fas fa-calendar-times text-[0.6rem]"></i> Closing Date
+              </p>
+              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+                {{ tender.closing_date|date:"d M Y" }}
+              </p>
+            </div>
+
+            <!-- Pre-Bid Meeting -->
+            <div class="date-item prebid relative bg-slate-50 border border-slate-200
+                        rounded-xl px-4 py-[0.9rem] overflow-hidden transition-[border-color] duration-200">
+              <p class="flex items-center gap-[0.3rem] text-[0.65rem] font-bold uppercase
+                        tracking-[0.08em] text-slate-400 mb-[0.35rem]">
+                <i class="fas fa-handshake text-[0.6rem]"></i> Pre-Bid Meeting
+              </p>
+              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+                {{ tender.pre_bid_meeting|date:"d M Y, H:i"|default:"Not scheduled" }}
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /td-left -->
+
+
+    <!-- ── RIGHT — BID ACTIVITY ── -->
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden
+                shadow-[0_2px_12px_rgba(15,42,94,0.05)]
+                lg:sticky lg:top-[calc(62px+1rem)]">
+
+      <!-- Count hero -->
+      <div class="bid-count-hero relative text-center px-[1.35rem] py-6 overflow-hidden"
+           style="background: linear-gradient(135deg, #0a1745, #1a56db);">
+        <p class="relative z-[1] text-[0.65rem] font-semibold tracking-[0.1em] uppercase
+                  text-white/40 mb-2">
+          Bid Activity
+        </p>
+        <p class="relative z-[1] font-sora text-[3rem] font-extrabold text-white leading-none mb-[0.2rem]">
+          {{ tender.applications.count }}
+        </p>
+        <p class="relative z-[1] text-[0.75rem] text-white/50">
+          Total Applications Submitted
+        </p>
+      </div>
+
+      <!-- Recent bids header -->
+      <div class="flex items-center justify-between px-5 py-[0.9rem] pb-[0.65rem] border-b border-slate-200">
+        <span class="font-sora text-[0.78rem] font-bold text-[#0f2a5e]">Recent Applications</span>
+        <span class="text-[0.65rem] font-bold bg-blue-50 text-blue-600
+                     border border-blue-200 rounded-full px-2 py-[2px]">
+          Latest 3
+        </span>
+      </div>
+
+      <!-- Bids list -->
+      {% if tender.applications.all %}
+      <div>
+        {% for app in tender.applications.all|dictsortreversed:"applied_at"|slice:":3" %}
+        <div class="flex items-center gap-3 px-5 py-[0.6rem]
+                    border-b border-slate-200 last:border-b-0
+                    transition-colors duration-150 hover:bg-slate-50">
+
+          <!-- Avatar initials -->
+          <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                      font-sora text-[0.7rem] font-extrabold text-white"
+               style="background: linear-gradient(135deg, #1a56db, #163472);">
+            {{ app.company_name|slice:":2"|upper }}
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="font-sora text-[0.78rem] font-bold text-[#0f2a5e]
+                      whitespace-nowrap overflow-hidden text-ellipsis">
+              {{ app.company_name|truncatechars:22 }}
+            </p>
+            <p class="text-[0.7rem] text-emerald-600 font-semibold">₹{{ app.bid_amount }}</p>
+          </div>
+
+          <!-- Status pill -->
+          {% if app.status == 'pending' %}
+            <span class="inline-flex items-center px-2 py-[2px] rounded-full flex-shrink-0
+                         text-[0.62rem] font-bold tracking-[0.03em]
+                         bg-amber-50 text-amber-600 border border-amber-200">
+              Pending
+            </span>
+          {% elif app.status == 'approved' %}
+            <span class="inline-flex items-center px-2 py-[2px] rounded-full flex-shrink-0
+                         text-[0.62rem] font-bold tracking-[0.03em]
+                         bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Approved
+            </span>
+          {% elif app.status == 'rejected' %}
+            <span class="inline-flex items-center px-2 py-[2px] rounded-full flex-shrink-0
+                         text-[0.62rem] font-bold tracking-[0.03em]
+                         bg-red-50 text-red-600 border border-red-200">
+              Rejected
+            </span>
+          {% else %}
+            <span class="inline-flex items-center px-2 py-[2px] rounded-full flex-shrink-0
+                         text-[0.62rem] font-bold tracking-[0.03em]
+                         bg-slate-100 text-slate-500 border border-slate-200">
+              {{ app.status|capfirst }}
+            </span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="text-center px-5 py-6 text-[0.78rem] text-slate-400">
+        <i class="fas fa-inbox block text-[1.5rem] opacity-25 mb-[0.4rem]"></i>
+        No applications received yet
+      </div>
+      {% endif %}
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col gap-2 p-5 border-t border-slate-200">
+
+        {% if has_applied %}
+          <button disabled
+                  class="flex items-center justify-center gap-[0.45rem] py-[0.62rem]
+                         rounded-[10px] text-white font-sora text-[0.83rem] font-bold
+                         cursor-not-allowed shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
+                  style="background: linear-gradient(135deg, #10b981, #059669);">
+            <i class="fas fa-check-circle"></i> Already Applied
+          </button>
+        {% else %}
+          <a href="{% url 'tenders:view_tender_bids' tender.id %}"
+             class="flex items-center justify-center gap-[0.45rem] py-[0.62rem]
+                    rounded-[10px] no-underline text-white font-sora text-[0.83rem] font-bold
+                    shadow-[0_2px_8px_rgba(26,86,219,0.3)] transition-all duration-200
+                    hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(26,86,219,0.4)]"
+             style="background: linear-gradient(135deg, #1a56db, #163472);">
+            <i class="fas fa-paper-plane"></i> View All Applications
+          </a>
+        {% endif %}
+
+        
+
+      </div>
+    </div><!-- /bid-panel -->
+
+  </div><!-- /td-grid -->
+
+</div><!-- /td-wrap -->
+
+{% endblock %}
