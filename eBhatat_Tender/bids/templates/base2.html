@@ -9,6 +9,34 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:        '#0f2a5e',
+            'navy-mid':  '#163472',
+            'navy-dark': '#0a1745',
+            blue:        '#1a56db',
+            'blue-light':'#3b82f6',
+            accent:      '#f59e0b',
+            surface:     '#f8faff',
+            'surface-2': '#f1f5f9',
+            text:        '#1e293b',
+            muted:       '#64748b',
+            border:      '#e2e8f0',
+          },
+          fontFamily: {
+            sora:   ['Sora', 'sans-serif'],
+            dmSans: ['"DM Sans"', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
   <!-- Bootstrap 5 CSS for grid/buttons in children (since bidsdeshboard uses bootstrap) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -483,8 +511,8 @@
     <div class="nav-divider"></div>
     <div class="sidebar-label">Account</div>
 
-    <a href="{% url 'tenders:updateProfile' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'updateProfile' %}active{% endif %}">
+    <a href="{% url 'bids:vendor_profile_update' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'vendor_profile_update' %}active{% endif %}">
       <i class="fas fa-user-cog"></i> Profile Settings
     </a>
 
@@ -560,6 +588,9 @@
       <a href="{% url 'public:home' %}" class="dropdown-item">
         <i class="fas fa-home"></i> Home
       </a>
+      <a href="{% url 'bids:vendor_profile_update' %}" class="dropdown-item">
+        <i class="fas fa-user-circle"></i> My Profile
+      </a>
       <div class="dropdown-divider"></div>
       <a href="{% url 'accounts:logout' %}" class="dropdown-item text-danger">
         <i class="fas fa-sign-out-alt"></i> Sign Out
@@ -612,6 +643,23 @@
     if (profileWrap && !profileWrap.contains(e.target)) {
       profileWrap.classList.remove('show');
     }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // Django Messages as SweetAlerts
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if messages %}
+      {% for message in messages %}
+        Swal.fire({
+          icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+          title: "{{ message.tags|capfirst }}",
+          text: "{{ message }}",
+          confirmButtonColor: '#1a56db',
+          timer: 4000
+        });
+      {% endfor %}
+    {% endif %}
   });
 </script>
 

@@ -12,4 +12,5 @@ urlpatterns = [
     path("bid/<int:bid_id>/withdraw/", views.withdraw_bid, name="withdraw_bid"),
     path("tender/<int:tender_id>/watchlist/", views.toggle_watchlist, name="toggle_watchlist"),
     path("watchlist/", views.my_watchlist, name="my_watchlist"),
+    path("profile/", views.vendor_profile_update, name="vendor_profile_update"),
 ]

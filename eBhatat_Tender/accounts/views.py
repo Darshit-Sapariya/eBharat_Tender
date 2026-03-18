@@ -21,7 +21,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.is_superuser:
-                return HttpResponse("Welcome Superuser")
+                return redirect("coreadmin:base")
             return redirect("public:home")
         else:
             return redirect("accounts:login")
@@ -55,6 +55,9 @@ def view_all_notifications(request):
 def updateProfile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
+    # Note: Sensitive fields like gov_id_number are masked in templates 
+    # using the profile.masked_id property for security.
+
     if request.method == "POST":
         profile.full_name = request.POST.get("full_name")
         profile.mobile = request.POST.get("mobile")
@@ -76,6 +79,12 @@ def updateProfile(request):
         messages.success(request, "Profile Updated Successfully.")
         return redirect("accounts:updateProfile")
 
+    if profile.role == 'bidder':
+        return redirect("bids:vendor_profile_update")
+    elif profile.role == 'creator':
+        return redirect("tenders:updateProfile")
+    
+    # Fallback if no role is set yet
     template_name = 'vendorsProfileupdate.html' if profile.role == 'creator' else 'bidersProfileupdate.html'
     return render(request, template_name, {'profile': profile})
 
@@ -114,12 +123,10 @@ def my_profile(request):
 
     # 🔹 After admin approval → auto redirect
     if profile.status == "approved":
-
         if profile.role == "creator":
-            return redirect("tenders:dashboard") # replace with actual redirect
-
+            return redirect("tenders:dashboard")
         elif profile.role == "bidder":
-            return redirect("bids:bids_dashboard")  # replace with actual redirect
+            return redirect("bids:bids_dashboard")
 
     return render(request, "myprofile.html", {"profile": profile})
 

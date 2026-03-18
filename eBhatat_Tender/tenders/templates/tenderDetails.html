@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block content %}
 {% with s=tender.status|lower %}
 
 <style>
@@ -142,20 +143,27 @@
         </div>
       </div>
 
-      <!-- Right: Apply button (desktop) -->
       <div class="flex-shrink-0 hidden lg:block anim-up-3">
         {% if s == 'open' and not is_expired %}
-        <a href="{% url 'bids:applybid' tender.id %}"
-           class="relative overflow-hidden
-                  inline-flex items-center gap-2 px-6 py-[0.8rem]
-                  bg-[#2563eb] hover:bg-[#3b82f6] text-white
-                  font-sora text-[0.85rem] font-bold rounded-xl no-underline
-                  shadow-[0_4px_14px_rgba(37,99,235,0.4)]
-                  transition-all duration-200 hover:-translate-y-[2px]
-                  hover:shadow-[0_6px_20px_rgba(37,99,235,0.6)]">
-          <i class="fas fa-paper-plane text-[0.76rem]"></i>
-          <span>Apply for Tender</span>
-        </a>
+          {% if has_applied %}
+          <button onclick="showAlreadyAppliedPopup()"
+             class="relative overflow-hidden inline-flex items-center gap-2 px-6 py-[0.8rem] bg-slate-600 text-white font-sora text-[0.85rem] font-bold rounded-xl no-underline shadow-[0_4px_14px_rgba(71,85,105,0.4)] transition-all duration-200 hover:-translate-y-[2px]">
+            <i class="fas fa-check-double text-[0.76rem]"></i>
+            <span>Already Applied</span>
+          </button>
+          {% else %}
+          <a href="{% url 'bids:applybid' tender.id %}"
+             class="relative overflow-hidden
+                    inline-flex items-center gap-2 px-6 py-[0.8rem]
+                    bg-[#2563eb] hover:bg-[#3b82f6] text-white
+                    font-sora text-[0.85rem] font-bold rounded-xl no-underline
+                    shadow-[0_4px_14px_rgba(37,99,235,0.4)]
+                    transition-all duration-200 hover:-translate-y-[2px]
+                    hover:shadow-[0_6px_20px_rgba(37,99,235,0.6)]">
+            <i class="fas fa-paper-plane text-[0.76rem]"></i>
+            <span>Apply for Tender</span>
+          </a>
+          {% endif %}
         {% elif s == 'closed' or is_expired %}
         <div class="inline-flex items-center gap-2 px-5 py-[0.7rem] rounded-xl
                     bg-white/[0.08] border border-white/[0.12] text-white/50
@@ -471,17 +479,25 @@
 
             <!-- ★ APPLY BUTTON ★ -->
             {% if s == 'open' and not is_expired %}
-              <a href="{% url 'bids:applybid' tender.id %}"
-                 class="btn-apply relative overflow-hidden
-                        flex items-center justify-center gap-3 py-[0.95rem]
-                        bg-[#1a56db] hover:bg-[#2563eb] text-white
-                        font-sora text-[0.95rem] font-extrabold rounded-xl no-underline
-                        shadow-[0_4px_18px_rgba(26,86,219,0.3)]
-                        transition-all duration-200 hover:-translate-y-[2px]
-                        hover:shadow-[0_6px_22px_rgba(26,86,219,0.4)]">
-                <i class="fas fa-paper-plane text-[0.88rem] relative z-[1]"></i>
-                <span class="relative z-[1]">Apply for This Tender</span>
-              </a>
+              {% if has_applied %}
+                <button onclick="showAlreadyAppliedPopup()"
+                   class="btn-apply relative overflow-hidden flex items-center justify-center gap-3 py-[0.95rem] bg-slate-600 text-white font-sora text-[0.95rem] font-extrabold rounded-xl no-underline shadow-[0_4px_18px_rgba(71,85,105,0.3)] transition-all duration-200 hover:-translate-y-[2px]">
+                  <i class="fas fa-check-double text-[0.88rem] relative z-[1]"></i>
+                  <span class="relative z-[1]">Already Applied</span>
+                </button>
+              {% else %}
+                <a href="{% url 'bids:applybid' tender.id %}"
+                   class="btn-apply relative overflow-hidden
+                          flex items-center justify-center gap-3 py-[0.95rem]
+                          bg-[#1a56db] hover:bg-[#2563eb] text-white
+                          font-sora text-[0.95rem] font-extrabold rounded-xl no-underline
+                          shadow-[0_4px_18px_rgba(26,86,219,0.3)]
+                          transition-all duration-200 hover:-translate-y-[2px]
+                          hover:shadow-[0_6px_22px_rgba(26,86,219,0.4)]">
+                  <i class="fas fa-paper-plane text-[0.88rem] relative z-[1]"></i>
+                  <span class="relative z-[1]">Apply for This Tender</span>
+                </a>
+              {% endif %}
             {% else %}
               <div class="flex items-center justify-center gap-3 py-[0.9rem]
                           bg-slate-100 border border-slate-200 rounded-xl
@@ -507,8 +523,10 @@
                         font-dmSans text-[0.63rem] text-slate-400 font-semibold uppercase tracking-widest">
               <span class="flex items-center gap-1"><i class="fas fa-hashtag text-[0.56rem]"></i> {{ tender.tender_id }}</span>
               <div class="flex items-center gap-3">
-                <a href="{% url 'bids:toggle_watchlist' tender.id %}" class="flex items-center gap-1 cursor-pointer hover:text-[#1a56db] transition-colors no-underline text-slate-400">
-                  <i class="fas fa-star text-[0.58rem]"></i> Save
+                <a href="{% url 'bids:toggle_watchlist' tender.id %}" 
+                   class="flex items-center gap-1 cursor-pointer {% if is_in_watchlist %}text-amber-500 hover:text-amber-600{% else %}text-slate-400 hover:text-[#1a56db]{% endif %} transition-colors no-underline">
+                  <i class="{% if is_in_watchlist %}fas{% else %}far{% endif %} fa-star text-[0.58rem]"></i> 
+                  {% if is_in_watchlist %}Saved{% else %}Save{% endif %}
                 </a>
                 <span class="flex items-center gap-1 cursor-pointer hover:text-[#1a56db] transition-colors">
                   <i class="fas fa-share-alt text-[0.58rem]"></i> Share
@@ -552,16 +570,24 @@
         <!-- ── Mobile Apply Button ── -->
         <div class="lg:hidden">
           {% if s == 'open' and not is_expired %}
-          <a href="{% url 'bids:applybid' tender.id %}"
-             class="btn-apply relative overflow-hidden
-                    flex items-center justify-center gap-3 py-4 w-full
-                    bg-[#1a56db] hover:bg-[#2563eb] text-white
-                    font-sora text-[1rem] font-extrabold rounded-2xl no-underline
-                    shadow-[0_4px_18px_rgba(26,86,219,0.3)]
-                    transition-all duration-200">
-            <i class="fas fa-paper-plane text-[0.9rem] relative z-[1]"></i>
-            <span class="relative z-[1]">Apply for This Tender</span>
-          </a>
+            {% if has_applied %}
+            <button onclick="showAlreadyAppliedPopup()"
+               class="btn-apply relative overflow-hidden flex items-center justify-center gap-3 py-4 w-full bg-slate-600 text-white font-sora text-[1rem] font-extrabold rounded-2xl no-underline shadow-[0_4px_18px_rgba(71,85,105,0.3)] transition-all duration-200">
+              <i class="fas fa-check-double text-[0.9rem] relative z-[1]"></i>
+              <span class="relative z-[1]">Already Applied</span>
+            </button>
+            {% else %}
+            <a href="{% url 'bids:applybid' tender.id %}"
+               class="btn-apply relative overflow-hidden
+                      flex items-center justify-center gap-3 py-4 w-full
+                      bg-[#1a56db] hover:bg-[#2563eb] text-white
+                      font-sora text-[1rem] font-extrabold rounded-2xl no-underline
+                      shadow-[0_4px_18px_rgba(26,86,219,0.3)]
+                      transition-all duration-200">
+              <i class="fas fa-paper-plane text-[0.9rem] relative z-[1]"></i>
+              <span class="relative z-[1]">Apply for This Tender</span>
+            </a>
+            {% endif %}
           {% else %}
           <div class="flex items-center justify-center gap-3 py-4 w-full
                       bg-slate-100 border border-slate-200 rounded-2xl
@@ -594,6 +620,22 @@
     }
     updateTimer();
     setInterval(updateTimer, 1000);
+  }
+
+  function showAlreadyAppliedPopup() {
+    Swal.fire({
+      icon: 'info',
+      title: 'Already Applied',
+      text: 'You have already submitted a bid for this tender. You can view your application in your dashboard.',
+      confirmButtonColor: '#1a56db',
+      showCancelButton: true,
+      confirmButtonText: 'View Dashboard',
+      cancelButtonText: 'Close'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "{% url 'bids:mybids' %}";
+      }
+    });
   }
 </script>
 

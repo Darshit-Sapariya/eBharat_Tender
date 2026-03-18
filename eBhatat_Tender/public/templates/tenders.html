@@ -275,9 +275,9 @@
           </span>
           {% if user.is_authenticated and user.userprofile.role == 'bidder' %}
           <a href="{% url 'bids:toggle_watchlist' tender.id %}" 
-             class="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-amber-500 transition-colors border border-slate-100 no-underline"
-             title="Add to Watchlist">
-            <i class="fas fa-star text-[0.7rem]"></i>
+             class="w-7 h-7 rounded-full {% if tender.id in watchlist_ids %}bg-amber-50 text-amber-500 border-amber-200{% else %}bg-slate-50 text-slate-400 border-slate-100{% endif %} flex items-center justify-center hover:text-amber-600 transition-colors border no-underline"
+             title="{% if tender.id in watchlist_ids %}Remove from Watchlist{% else %}Add to Watchlist{% endif %}">
+            <i class="{% if tender.id in watchlist_ids %}fas{% else %}far{% endif %} fa-star text-[0.7rem]"></i>
           </a>
           {% endif %}
         </div>

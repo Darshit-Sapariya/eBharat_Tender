@@ -3,248 +3,311 @@
 {% block content %}
 
 <style>
-  /* Pseudo-elements that Tailwind cannot handle */
+  /* ── Table Aesthetics ── */
+  .eval-table th {
+    background: #f8fafc;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .eval-table td {
+    padding: 1.25rem;
+    vertical-align: middle;
+  }
+  .eval-row:hover {
+    background-color: #f1f5f9;
+  }
 
-  /* Hero decorative rings */
-  .hero-banner::before,
-  .hero-banner::after {
-    content: '';
-    position: absolute;
+  /* Remark input styling */
+  .table-remark {
+    font-size: 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.6rem;
+    width: 100%;
+    min-width: 200px;
+    transition: all 0.2s;
+  }
+  .table-remark:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    background: #fff;
+  }
+
+  /* Status pulse */
+  .pulse-blue {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #3b82f6;
     border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.08);
-    pointer-events: none;
+    animation: pulse 2s infinite;
   }
-  .hero-banner::before { width: 260px; height: 260px; right: -60px; top: -80px; }
-  .hero-banner::after  { width: 160px; height: 160px; right: 40px; bottom: -60px; border-color: rgba(255,255,255,0.05); }
-
-  /* Stat card bottom accent bar */
-  .stat-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: 0 0 16px 16px;
-    background: var(--stat-accent, #1a56db);
-    opacity: 0;
-    transition: opacity 0.2s;
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(59,130,246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); }
   }
-  .stat-card:hover::after { opacity: 1; }
-  .stat-card.blue  { --stat-accent: #1a56db; }
-  .stat-card.amber { --stat-accent: #f59e0b; }
-  .stat-card.green { --stat-accent: #10b981; }
-  .stat-card.red   { --stat-accent: #ef4444; }
-  .stat-card:hover { border-color: var(--stat-accent, #1a56db); }
 </style>
 
 
-<div class="p-4 sm:p-7 flex flex-col gap-4 sm:gap-6">
+<div class="flex flex-col min-h-screen bg-slate-50/50">
 
-  <!-- ══════ HERO BANNER ══════ -->
-  <div class="hero-banner relative rounded-2xl overflow-hidden flex items-center justify-between gap-4 px-6 sm:px-8 py-7"
+  <!-- ══════ HERO SECTION ══════ -->
+  <div class="relative overflow-hidden px-6 lg:px-10 pt-12 pb-16"
        style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+    
+    <!-- Grid overlay -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none"
+         style="background-image: radial-gradient(#fff 1px, transparent 0); background-size: 24px 24px;"></div>
 
-    <!-- Grid texture -->
-    <div class="absolute inset-0 pointer-events-none"
-         style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 28px 28px;"></div>
-
-    <!-- Text -->
-    <div class="relative z-[1]">
-      <p class="font-dmSans text-[0.72rem] font-medium tracking-[0.1em] uppercase text-white/45 mb-1">
-        Bid Management
-      </p>
-      <h1 class="font-sora text-[1.45rem] font-extrabold text-white leading-tight mb-1">
-        All Bid Applications
+    <div class="relative z-10">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="px-2.5 py-1 rounded-md bg-white/10 border border-white/20 text-[0.65rem] font-bold text-blue-100 uppercase tracking-widest">
+            Registry Control
+        </span>
+      </div>
+      <h1 class="font-sora text-[2rem] font-extrabold text-white leading-tight mb-3">
+        Bid Application Registry
       </h1>
-      <p class="text-[0.82rem] text-white/50">
-        Review and manage all submitted bids across your published tenders
+      <p class="text-[0.9rem] text-white/60 max-w-2xl leading-relaxed">
+        Manage and evaluate all incoming proposals across your tenders in a high-density, action-oriented table view.
       </p>
     </div>
   </div>
 
 
-  <!-- ══════ STAT CARDS ══════ -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-    <!-- Total Bids -->
-    <div class="stat-card blue relative bg-white border border-slate-200 rounded-2xl px-[1.35rem] py-[1.2rem]
-                flex items-start justify-between gap-3 overflow-hidden
-                shadow-[0_2px_16px_rgba(15,42,94,0.07)]
-                transition-all duration-[0.22s] hover:-translate-y-[3px] hover:shadow-[0_8px_32px_rgba(15,42,94,0.13)]">
-      <div class="min-w-0">
-        <p class="text-[0.72rem] font-semibold text-slate-500 uppercase tracking-[0.07em] mb-[0.35rem]">Total Bids</p>
-        <p class="font-sora text-[1.85rem] font-extrabold text-slate-800 leading-none">{{ total_bids }}</p>
+  <!-- ══════ STATS ROW ══════ -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 px-6 lg:px-10  relative z-20 mb-10">
+      <!-- Total -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+          <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shadow-inner">
+              <i class="fas fa-layer-group"></i>
+          </div>
+          <div>
+              <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Total Bids</p>
+              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ total_bids }}</p>
+          </div>
       </div>
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-[1.05rem] flex-shrink-0 bg-blue-50 text-blue-600">
-        <i class="fas fa-layer-group"></i>
+      <!-- Pending -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shadow-inner">
+              <i class="fas fa-clock"></i>
+          </div>
+          <div>
+              <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Pending</p>
+              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ pending_count }}</p>
+          </div>
       </div>
-    </div>
-
-    <!-- Pending -->
-    <div class="stat-card amber relative bg-white border border-slate-200 rounded-2xl px-[1.35rem] py-[1.2rem]
-                flex items-start justify-between gap-3 overflow-hidden
-                shadow-[0_2px_16px_rgba(15,42,94,0.07)]
-                transition-all duration-[0.22s] hover:-translate-y-[3px] hover:shadow-[0_8px_32px_rgba(15,42,94,0.13)]">
-      <div class="min-w-0">
-        <p class="text-[0.72rem] font-semibold text-slate-500 uppercase tracking-[0.07em] mb-[0.35rem]">Pending</p>
-        <p class="font-sora text-[1.85rem] font-extrabold text-slate-800 leading-none">{{ pending_count }}</p>
+      <!-- Approved -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner">
+              <i class="fas fa-check-circle"></i>
+          </div>
+          <div>
+              <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Approved</p>
+              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ approved_count }}</p>
+          </div>
       </div>
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-[1.05rem] flex-shrink-0 bg-amber-50 text-amber-500">
-        <i class="fas fa-clock"></i>
+      <!-- Rejected -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
+          <div class="w-11 h-11 rounded-xl bg-red-50 text-red-400 flex items-center justify-center text-xl shadow-inner">
+              <i class="fas fa-times-circle"></i>
+          </div>
+          <div>
+              <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Rejected</p>
+              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ rejected_count }}</p>
+          </div>
       </div>
-    </div>
-
-    <!-- Approved -->
-    <div class="stat-card green relative bg-white border border-slate-200 rounded-2xl px-[1.35rem] py-[1.2rem]
-                flex items-start justify-between gap-3 overflow-hidden
-                shadow-[0_2px_16px_rgba(15,42,94,0.07)]
-                transition-all duration-[0.22s] hover:-translate-y-[3px] hover:shadow-[0_8px_32px_rgba(15,42,94,0.13)]">
-      <div class="min-w-0">
-        <p class="text-[0.72rem] font-semibold text-slate-500 uppercase tracking-[0.07em] mb-[0.35rem]">Approved</p>
-        <p class="font-sora text-[1.85rem] font-extrabold text-slate-800 leading-none">{{ approved_count }}</p>
-      </div>
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-[1.05rem] flex-shrink-0 bg-emerald-50 text-emerald-500">
-        <i class="fas fa-check-circle"></i>
-      </div>
-    </div>
-
-    <!-- Rejected -->
-    <div class="stat-card red relative bg-white border border-slate-200 rounded-2xl px-[1.35rem] py-[1.2rem]
-                flex items-start justify-between gap-3 overflow-hidden
-                shadow-[0_2px_16px_rgba(15,42,94,0.07)]
-                transition-all duration-[0.22s] hover:-translate-y-[3px] hover:shadow-[0_8px_32px_rgba(15,42,94,0.13)]">
-      <div class="min-w-0">
-        <p class="text-[0.72rem] font-semibold text-slate-500 uppercase tracking-[0.07em] mb-[0.35rem]">Rejected</p>
-        <p class="font-sora text-[1.85rem] font-extrabold text-slate-800 leading-none">{{ rejected_count }}</p>
-      </div>
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-[1.05rem] flex-shrink-0 bg-red-50 text-red-400">
-        <i class="fas fa-times-circle"></i>
-      </div>
-    </div>
-
   </div>
 
 
-  <!-- ══════ BIDS TABLE ══════ -->
-  <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_2px_16px_rgba(15,42,94,0.07)] overflow-hidden">
+  <!-- ══════ TABLE SECTION ══════ -->
+  <div class="px-6 lg:px-10 pb-20">
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden">
+      
+      <div class="overflow-x-auto">
+        <table class="w-full eval-table border-collapse text-[0.82rem]">
+          <thead>
+            <tr>
+              <th class="text-left w-16">#</th>
+              <th class="text-left">Vendor & Company</th>
+              <th class="text-left">Tender Details</th>
+              <th class="text-left">Bid Amount</th>
+              <th class="text-left">Timeline</th>
+              <th class="text-left">Status</th>
+              <th class="text-left min-w-[320px]">Evaluation / Action</th>
+            </tr>
+          </thead>
+          
+          <tbody class="divide-y divide-slate-100">
+            {% for bid in bids %}
+            <tr class="eval-row transition-colors duration-150">
+              
+              <!-- # -->
+              <td class="font-bold text-slate-400">{{ forloop.counter }}</td>
 
-    <!-- Panel Head -->
-    <div class="flex items-center justify-between gap-2 px-[1.35rem] py-[1.1rem] pb-[0.85rem] border-b border-slate-200">
-      <span class="font-sora text-[0.9rem] font-bold text-[#0f2a5e] flex items-center gap-[0.45rem]">
-        <i class="fas fa-list-alt text-[0.82rem] text-blue-600"></i> Application Registry
-      </span>
-    </div>
+              <!-- Vendor & Company -->
+              <td>
+                <div class="flex flex-col">
+                  <span class="font-sora text-[0.9rem] font-bold text-navy mb-0.5">
+                    {{ bid.company_name }}
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[0.72rem] text-blue-500 font-bold">@{{ bid.applicant.username }}</span>
+                    <span class="text-slate-200">|</span>
+                    <span class="text-[0.68rem] text-slate-400 font-medium">{{ bid.city }}</span>
+                  </div>
+                </div>
+              </td>
 
-    <!-- Scrollable table -->
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse text-[0.82rem]">
-        <thead>
-          <tr>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">#</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Vendor</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Tender Details</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Company</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Bid Amount</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Submitted On</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Status</th>
-            <th class="px-[1.35rem] py-[0.65rem] text-left font-sora text-[0.68rem] font-bold uppercase tracking-[0.07em] text-slate-500 bg-slate-100 border-b border-slate-200 whitespace-nowrap">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {% for bid in bids %}
-          <tr class="border-b border-slate-200 last:border-b-0 transition-colors duration-150 hover:bg-slate-50">
-
-            <!-- # -->
-            <td class="px-[1.35rem] py-4 align-middle text-slate-400 font-semibold">
-              {{ forloop.counter }}
-            </td>
-
-            <!-- Vendor -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              <p class="font-semibold text-[#0f2a5e] text-[0.82rem]">@{{ bid.applicant.username }}</p>
-              <p class="text-[0.7rem] text-slate-400 mt-[2px]">{{ bid.applicant.email }}</p>
-            </td>
-
-            <!-- Tender Details -->
-            <td class="px-[1.35rem] py-4 align-middle max-w-[250px]">
-              <span class="inline-flex items-center text-[0.6rem] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit ring-1 ring-inset ring-blue-100 mb-1">
-                {{ bid.tender.tender_id }}
-              </span>
-              <p class="font-semibold text-[#0f2a5e] text-[0.82rem] truncate max-w-[250px]">
-                {{ bid.tender.title }}
-              </p>
-              <p class="text-[0.7rem] text-slate-400 mt-[2px]">{{ bid.tender.department }}</p>
-            </td>
-
-            <!-- Company -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              <p class="font-semibold text-[#0f2a5e] text-[0.82rem]">{{ bid.company_name }}</p>
-            </td>
-
-            <!-- Bid Amount -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              <span class="font-sora font-bold text-emerald-500 tracking-[0.02em]">
-                ₹ {{ bid.bid_amount }}
-              </span>
-            </td>
-
-            <!-- Submitted On -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              <span class="text-[0.75rem] text-slate-400 whitespace-nowrap">
-                <i class="fas fa-calendar-alt mr-1 text-[0.65rem]"></i>
-                {{ bid.applied_at|date:"d M Y, H:i" }}
-              </span>
-            </td>
-
-            <!-- Status Badge -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              {% if bid.status == "pending" %}
-                <span class="inline-flex items-center gap-1 px-[10px] py-1 rounded-full
-                             text-[0.67rem] font-bold tracking-[0.04em] uppercase
-                             bg-amber-50 text-amber-600 border border-amber-200">
-                  <i class="fas fa-circle text-[0.55rem]"></i> Pending
+              <!-- Tender -->
+              <td class="max-w-[200px]">
+                <span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-[0.58rem] font-black text-slate-500 uppercase tracking-tighter mb-1 border border-slate-200">
+                  {{ bid.tender.tender_id }}
                 </span>
-              {% elif bid.status == "approved" %}
-                <span class="inline-flex items-center gap-1 px-[10px] py-1 rounded-full
-                             text-[0.67rem] font-bold tracking-[0.04em] uppercase
-                             bg-emerald-50 text-emerald-600 border border-emerald-200">
-                  <i class="fas fa-circle text-[0.55rem]"></i> Approved
-                </span>
-              {% else %}
-                <span class="inline-flex items-center gap-1 px-[10px] py-1 rounded-full
-                             text-[0.67rem] font-bold tracking-[0.04em] uppercase
-                             bg-red-50 text-red-500 border border-red-200">
-                  <i class="fas fa-circle text-[0.55rem]"></i> Rejected
-                </span>
-              {% endif %}
-            </td>
+                <p class="text-[0.75rem] font-bold text-navy truncate block">{{ bid.tender.title }}</p>
+              </td>
 
-            <!-- Action -->
-            <td class="px-[1.35rem] py-4 align-middle">
-              <a href="{% url 'tenders:view_tender_bids' bid.tender.id %}"
-                 title="View Tender Bids"
-                 class="inline-flex items-center justify-center w-8 h-8 rounded-lg
-                        bg-slate-100 text-slate-400 border border-slate-200
-                        transition-all duration-200 no-underline
-                        hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:-translate-y-px">
-                <i class="fas fa-external-link-alt text-[0.75rem]"></i>
-              </a>
-            </td>
+              <!-- Amount -->
+              <td>
+                <div class="flex flex-col">
+                  <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-0.5">Proposed</span>
+                  <span class="font-sora text-[1.1rem] font-black text-emerald-600">₹{{ bid.bid_amount }}</span>
+                </div>
+              </td>
 
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="8" class="text-center py-14 text-slate-400 text-[0.85rem]">
-              <i class="fas fa-inbox block text-[2.5rem] mb-3 opacity-30"></i>
-              <p>No bid applications found.</p>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              <!-- Timeline -->
+              <td>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-1.5 text-slate-500">
+                    <i class="far fa-calendar-alt text-[0.7rem]"></i>
+                    <span class="text-[0.72rem] font-medium">{{ bid.applied_at|date:"d M Y" }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-slate-400">
+                    <i class="far fa-clock text-[0.7rem]"></i>
+                    <span class="text-[0.65rem]">{{ bid.applied_at|date:"H:i" }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Status -->
+              <td>
+                {% if bid.status == "pending" %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
+                    <span class="pulse-blue"></span> Pending
+                  </span>
+                {% elif bid.status == "awarded" %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
+                    <i class="fas fa-trophy text-[0.7rem]"></i> Awarded
+                  </span>
+                {% elif bid.status == "rejected" %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-500 border border-red-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
+                    <i class="fas fa-times-circle text-[0.7rem]"></i> Rejected
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
+                    <i class="fas fa-check-circle text-[0.7rem]"></i> Approved
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Evaluation Area -->
+              <td>
+                {% if bid.status == "pending" %}
+                  <form method="POST" action="{% url 'tenders:update_bid_status' bid.id %}" class="flex flex-col gap-3">
+                    {% csrf_token %}
+                    <div class="flex gap-2 items-start">
+                        <textarea name="remark" rows="2" required placeholder="Evaluation remark..."
+                                  class="table-remark font-dmSans"></textarea>
+                        
+                        <div class="flex flex-col gap-1.5 flex-shrink-0">
+                            <button type="button"
+                                    onclick="confirmTableAction(this, 'award', 'AWARD TENDER?', 'Award to {{ bid.company_name }}?')"
+                                    title="Award Tender"
+                                    class="w-9 h-9 flex items-center justify-center rounded-lg bg-navy text-white hover:bg-navy-dark transition-all shadow-md shadow-navy/10">
+                                <i class="fas fa-award text-[0.9rem]"></i>
+                            </button>
+                            <button type="button"
+                                    onclick="confirmTableAction(this, 'reject', 'REJECT BID?', 'Confirm rejection of {{ bid.company_name }}?')"
+                                    title="Reject Bid"
+                                    class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 transition-all">
+                                <i class="fas fa-times text-[0.9rem]"></i>
+                            </button>
+                        </div>
+                    </div>
+                  </form>
+                {% else %}
+                  <div class="flex flex-col">
+                    <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Final Remark</div>
+                    <p class="text-[0.75rem] text-slate-500 font-medium italic leading-relaxed">
+                        "{{ bid.remark|default:"No evaluation remark provided." }}"
+                    </p>
+                  </div>
+                {% endif %}
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="py-24 text-center">
+                <i class="fas fa-folder-open text-slate-200 text-[4rem] mb-4"></i>
+                <h3 class="font-sora text-[1.2rem] font-black text-navy mb-1">Registry Empty</h3>
+                <p class="text-slate-400">No applications have been submitted across your tenders yet.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
 </div>
+
+
+<script>
+  function confirmTableAction(button, actionValue, title, htmlContent) {
+    const form = button.closest('form');
+    if (!form.remark.value.trim()) {
+        form.remark.focus();
+        return;
+    }
+    
+    Swal.fire({
+      title: title,
+      html: htmlContent,
+      icon: actionValue === 'award' ? 'question' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: actionValue === 'award' ? '#0f2a5e' : '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: actionValue === 'award' ? 'Award Tender' : 'Reject Bid',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+      customClass: {
+        title: 'font-sora text-[1.1rem] font-bold text-navy',
+        htmlContainer: 'font-dmSans text-[0.85rem] text-slate-600',
+        confirmButton: 'font-sora text-[0.78rem] font-bold px-6 py-2.5 rounded-xl',
+        cancelButton: 'font-sora text-[0.78rem] font-bold px-6 py-2.5 rounded-xl'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let actionInput = form.querySelector('input[name="action"]');
+        if (!actionInput) {
+          actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          form.appendChild(actionInput);
+        }
+        actionInput.value = actionValue;
+        form.submit();
+      }
+    });
+  }
+</script>
 
 {% endblock %}

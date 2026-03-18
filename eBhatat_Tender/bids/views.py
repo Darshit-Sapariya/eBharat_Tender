@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import TenderApplication
 from tenders.models import Tenderss
-from accounts.models import Notification, Watchlist
+from accounts.models import UserProfile, Notification, Watchlist
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
@@ -42,6 +42,13 @@ def bids_dashboard(request):
     approved_tenders = applied_tenders.filter(status='approved')
     # Rejected bids
     rejected_tenders = applied_tenders.filter(status='rejected')
+    # Awarded bids
+    awarded_tenders = applied_tenders.filter(status='awarded')
+
+    # Calculate success rate
+    total_applied = applied_tenders.count()
+    awarded_count = awarded_tenders.count()
+    success_rate = (awarded_count / total_applied * 100) if total_applied > 0 else 0
 
     # Recent Open Tenders (Latest 5)
     recent_tenders = Tenderss.objects.filter(status='open').order_by('-created_at')[:5]
@@ -58,6 +65,8 @@ def bids_dashboard(request):
     context = {
         "open_tenders": open_tenders,
         "applied_tenders": applied_tenders,
+        "awarded_tenders": awarded_tenders,
+        "success_rate": round(success_rate, 1),
         "pending_tenders": pending_tenders,
         "approved_tenders": approved_tenders,
         "rejected_tenders": rejected_tenders,
@@ -76,6 +85,42 @@ def bids_dashboard(request):
     }
 
     return render(request, 'bids_dashboard.html', context)
+
+
+@login_required
+def vendor_profile_update(request):
+    """Premium profile update view for Vendors."""
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Secure Display: Sensitive ID numbers are masked via the profile.masked_id property
+    # in templates. The full ID is only shown when toggled by the user.
+    
+    # Strictly enforce vendor role if already set
+    if profile.role and profile.role != 'bidder':
+        messages.error(request, "Access denied. This portal is for vendors only.")
+        return redirect("tenders:dashboard")
+
+    if request.method == "POST":
+        profile.full_name = request.POST.get("full_name")
+        profile.mobile = request.POST.get("mobile")
+        profile.address = request.POST.get("address")
+        profile.gov_id_type = request.POST.get("gov_id_type")
+        profile.gov_id_number = request.POST.get("gov_id_number")
+
+        if request.FILES.get("profile_pic"):
+            profile.profile_pic = request.FILES.get("profile_pic")
+        if request.FILES.get("gov_id_upload"):
+            profile.gov_id_upload = request.FILES.get("gov_id_upload")
+
+        # Auto-assign 'bidder' role if not already set (since they are in this view)
+        if not profile.role:
+            profile.role = 'bidder'
+
+        profile.save()
+        messages.success(request, "Your vendor profile has been updated successfully.")
+        return redirect("bids:vendor_profile_update")
+
+    return render(request, "vendor_profile_update.html", {"profile": profile})
 
 
 # Handle new bid submission
@@ -97,6 +142,14 @@ def applybid(request, tender_id):
     if TenderApplication.objects.filter(tender=tender, applicant=request.user).exists():
         messages.info(request, "You have already applied for this tender.")
         return redirect("tenders:tenderDetails", tender_id=tender.id)
+
+    # Only bidders can apply
+    try:
+        if request.user.userprofile.role != 'bidder':
+            messages.error(request, "Only verified bidders can apply for tenders.")
+            return redirect("tenders:tenderDetails", tender_id=tender.id)
+    except:
+        return redirect("accounts:login")
 
     if request.method == "POST":
         try:
@@ -140,7 +193,7 @@ def applybid(request, tender_id):
                 link=reverse("tenders:view_tender_bids", kwargs={"tender_id": tender.id})
             )
 
-            messages.success(request, "Tender Application Submitted Successfully.")
+            messages.success(request, "Tender Application Submitted Successfully! Your bid has been recorded.")
             return redirect("tenders:tenderDetails", tender_id=tender.id)
             
         except Exception as e:

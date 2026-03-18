@@ -8,6 +8,7 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -352,6 +353,13 @@
                 transition-colors duration-[0.15s] hover:bg-surface hover:text-blue">
         <i class="fas fa-home text-[0.9rem] text-muted"></i>
         Home
+      </a>
+      <a href="{% url 'tenders:updateProfile' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem]
+                text-text text-[0.85rem] font-medium no-underline
+                transition-colors duration-[0.15s] hover:bg-surface hover:text-blue">
+        <i class="fas fa-user-circle text-[0.9rem] text-muted"></i>
+        My Profile
       </a>
       <hr class="border-0 h-px bg-border my-1">
       <a href="{% url 'accounts:logout' %}"

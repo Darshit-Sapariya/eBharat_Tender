@@ -56,6 +56,14 @@ class UserProfile(models.Model):
 
     admin_remark = models.TextField(blank=True, null=True)
 
+    @property
+    def masked_id(self):
+        if not self.gov_id_number:
+            return ""
+        # Mask all but the last 4 characters
+        val = str(self.gov_id_number)
+        return "*" * (len(val) - 4) + val[-4:] if len(val) > 4 else val
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -136,6 +136,8 @@ def tenders(request):
     # 5. Registered Vendors
     registered_vendors = UserProfile.objects.filter(role='bidder').count()
 
+    # 6. Watchlist for current user
+    
     context = {
         'tenders': tenders,
         'search_query': search_query,
@@ -162,10 +164,24 @@ def tenderDetails(request, tender_id):
     if awarded_bid:
         awarded_bid.masked_gst = mask_id(awarded_bid.gst_number)
     
+    # Check if in watchlist/applied
+    is_in_watchlist = False
+    has_applied = False
+    if request.user.is_authenticated:
+        try:
+            if request.user.userprofile.role == 'bidder':
+                from accounts.models import Watchlist
+                is_in_watchlist = Watchlist.objects.filter(user=request.user, tender=tender).exists()
+                has_applied = TenderApplication.objects.filter(applicant=request.user, tender=tender).exists()
+        except:
+            pass
+
     return render(request, "tenderDetails.html", {
         "tender": tender,
         "applications": applications,
-        "awarded_bid": awarded_bid
+        "awarded_bid": awarded_bid,
+        "is_in_watchlist": is_in_watchlist,
+        "has_applied": has_applied,
     })
 
 

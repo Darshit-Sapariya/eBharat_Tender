@@ -309,6 +309,22 @@
       </div>
     </a>
 
+    <a href="#" class="stat-card">
+      <div class="stat-icon success" style="background: #ecfdf5; color: #059669;"><i class="fas fa-trophy"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Awarded Bids</div>
+        <div class="stat-val">{{ awarded_tenders.count }}</div>
+      </div>
+    </a>
+
+    <a href="#" class="stat-card">
+      <div class="stat-icon primary" style="background: #eef2ff; color: #4f46e5;"><i class="fas fa-chart-line"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Success Rate</div>
+        <div class="stat-val">{{ success_rate }}%</div>
+      </div>
+    </a>
+
     <a href="{% url 'bids:my_watchlist' %}" class="stat-card">
       <div class="stat-icon primary" style="background: #fffbeb; color: #f59e0b;"><i class="fas fa-star"></i></div>
       <div class="stat-info">

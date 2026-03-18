@@ -84,12 +84,7 @@ def admin_view_requests(request):
         admin_req.save()
         messages.success(request, f"Request {action}ed successfully.")
         return redirect("tenders:admin_view_requests")
-
-    all_requests = AdminRequest.objects.all().order_by("-created_at")
-    return render(request, 'admin_requests_list.html', {
-        'page_title': 'Manage Admin Requests',
-        'all_requests': all_requests
-    })
+    
 
 
 # ==============================================================================
@@ -156,7 +151,7 @@ def tenderCreator(request):
                 message=f"New Tender Published: {tender.title}",
                 link=reverse("tenders:tenderDetails", kwargs={"tender_id": tender.id})
             )
-            
+                
         return redirect("tenders:mytenders")
 
     # Fetch approved departments and categories for this user
@@ -189,6 +184,10 @@ def mytenders(request):
 # Update user profile details
 def updateProfile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    # 🔀 Redirect Vendors (Bidders) to their dedicated premium profile page
+    if profile.role == 'bidder':
+        return redirect("bids:vendor_profile_update")
 
     if request.method == "POST":
 
