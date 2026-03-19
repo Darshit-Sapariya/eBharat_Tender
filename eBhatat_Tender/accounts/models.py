@@ -35,18 +35,18 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    full_name = models.CharField(max_length=150)
+    full_name = models.CharField(max_length=150, blank=True, null=True)
     profile_pic = models.ImageField(upload_to='profile_pic/', null=True, blank=True)
-    mobile = models.CharField(max_length=15)
-    address = models.TextField()
+    mobile = models.CharField(max_length=15, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
 
-    gov_id_type = models.CharField(max_length=50)
-    gov_id_number = models.CharField(max_length=50)
-    gov_id_upload = models.FileField(upload_to='gov_id/')
+    gov_id_type = models.CharField(max_length=50, blank=True, null=True)
+    gov_id_number = models.CharField(max_length=50, blank=True, null=True)
+    gov_id_upload = models.FileField(upload_to='gov_id/', blank=True, null=True)
 
     designation = models.CharField(max_length=100, blank=True, null=True)
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True, null=True)
 
     status = models.CharField(
         max_length=20,

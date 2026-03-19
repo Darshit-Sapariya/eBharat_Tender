@@ -1,0 +1,258 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+
+{% block title %}Approvals · Super Admin{% endblock %}
+
+{% block nav_vendors %}{% if type == 'users' %}active{% endif %}{% endblock %}
+{% block nav_bids %}{% if type == 'applications' %}active{% endif %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'coreadmin:deshbord' %}">Dashboard</a>
+<i class="fas fa-chevron-right"></i>
+<span>{% if type == 'users' %}User Approvals{% else %}Application Approvals{% endif %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">{% if type == 'users' %}User Registration Approvals{% else %}Tender Application Approvals{% endif %}</div>
+        <div class="page-subtitle">Review and authorize pending requests in the system.</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div class="card-title">Pending {% if type == 'users' %}Users{% elif type == 'applications' %}Applications{% else %}Admin Requests{% endif %}</div>
+        <span class="badge badge-orange">{{ pending_users.count }}{{ pending_apps.count }}{{ pending_requests.count }} Pending</span>
+    </div>
+    <div class="card-body" style="padding:0;">
+        <table class="data-table">
+            <thead>
+                {% if type == 'users' %}
+                <tr>
+                    <th>User Details</th>
+                    <th>Gov ID / Document</th>
+                    <th>Requested Role</th>
+                    <th>Applied On</th>
+                    <th>Action</th>
+                </tr>
+                {% elif type == 'applications' %}
+                <tr>
+                    <th>Company / Applicant</th>
+                    <th>Tender Information</th>
+                    <th>Bid Amount</th>
+                    <th>Documents</th>
+                    <th>Action</th>
+                </tr>
+                {% else %}
+                <tr>
+                    <th>User</th>
+                    <th>Department Requested</th>
+                    <th>Category Requested</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% endif %}
+            </thead>
+            <tbody>
+                {% if type == 'users' %}
+                    {% for profile in pending_users %}
+                    <tr>
+                        <td>
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                {% if profile.profile_pic %}
+                                    <img src="{{ profile.profile_pic.url }}" style="width:36px; height:36px; border-radius:8px; object-fit:cover;">
+                                {% else %}
+                                    <div style="width:36px; height:36px; border-radius:8px; background:var(--bg1); display:flex; align-items:center; justify-content:center;">
+                                        <i class="fas fa-user" style="color:var(--muted); font-size:0.8rem;"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div style="font-weight:600; font-size:0.85rem;">{{ profile.full_name|default:profile.user.username }}</div>
+                                    <div style="font-size:0.7rem; color:var(--muted);">@{{ profile.user.username }} • {{ profile.user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:0.8rem; font-weight:500;">{{ profile.get_gov_id_type_display }}</div>
+                            <div style="font-size:0.7rem; color:var(--muted); margin-bottom:4px;">{{ profile.masked_id }}</div>
+                            {% if profile.gov_id_upload %}
+                                <a href="{{ profile.gov_id_upload.url }}" target="_blank" class="text-blue" style="font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
+                                    <i class="fas fa-file-pdf"></i> View Document
+                                </a>
+                            {% else %}
+                                <span style="font-size:0.7rem; color:var(--danger);">No Document</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if profile.role == 'creator' %}badge-purple{% else %}badge-blue{% endif %}">
+                                {{ profile.get_role_display }}
+                            </span>
+                            <div style="font-size:0.65rem; color:var(--muted); margin-top:4px;">
+                                <i class="fas fa-location-dot"></i> {{ profile.address|default:"No Address" }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:0.75rem;">{{ profile.created_at|date:"d M Y" }}</div>
+                            <div style="font-size:0.65rem; color:var(--muted);">{{ profile.created_at|timesince }} ago</div>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('user', '{{ profile.id }}', '{{ profile.user.username }}', '{{ profile.role }}')">Check</button>
+                                <button class="btn btn-danger btn-sm" onclick="openRejectModal('user', '{{ profile.id }}')">Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted);">No pending profile registrations.</td></tr>
+                    {% endfor %}
+                {% elif type == 'applications' %}
+                    {% for app in pending_apps %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600; font-size:0.85rem;">{{ app.company_name }}</div>
+                            <div style="font-size:0.7rem; color:var(--muted); mb-1">{{ app.user.username }} • {{ app.user.email }}</div>
+                            <span class="badge badge-dot badge-blue" style="font-size:0.6rem;">BIDDER</span>
+                        </td>
+                        <td>
+                            <div style="font-weight:600; font-size:0.8rem; color:var(--primary);">{{ app.tender.title|truncatechars:40 }}</div>
+                            <div style="font-size:0.7rem; color:var(--muted);">ID: {{ app.tender.tender_id }} • {{ app.tender.category }}</div>
+                        </td>
+                        <td>
+                            <div style="font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--navy);">₹{{ app.bid_amount }}</div>
+                            <div style="font-size:0.65rem; color:var(--muted); text-decoration:line-through;">Est: ₹{{ app.tender.estimated_value }}</div>
+                        </td>
+                        <td>
+                            {% if app.technical_bid %}
+                                <a href="{{ app.technical_bid.url }}" target="_blank" class="text-blue" style="font-size:0.7rem; display:block; margin-bottom:4px;">
+                                    <i class="fas fa-file-pdf"></i> Technical Doc
+                                </a>
+                            {% endif %}
+                            {% if app.financial_bid %}
+                                <a href="{{ app.financial_bid.url }}" target="_blank" class="text-blue" style="font-size:0.7rem;">
+                                    <i class="fas fa-file-invoice-dollar"></i> Financial Doc
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('app', '{{ app.id }}', '{{ app.company_name }} Bid')">Approve</button>
+                                <button class="btn btn-danger btn-sm" onclick="openRejectModal('app', '{{ app.id }}')">Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted);">No pending tender applications.</td></tr>
+                    {% endfor %}
+                {% else %}
+                    {% for req in pending_requests %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ req.user.username }}</div>
+                            <div style="font-size:0.7rem; color:var(--muted);">{{ req.user.email }}</div>
+                        </td>
+                        <td><span class="badge badge-blue">{{ req.department_name }}</span></td>
+                        <td><span class="badge badge-purple">{{ req.category_name }}</span></td>
+                        <td><span class="badge badge-orange badge-dot">Pending Approval</span></td>
+                        <td>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('request', '{{ req.id }}', '{{ req.user.username }} Request')">Approve</button>
+                                <button class="btn btn-danger btn-sm" onclick="openRejectModal('request', '{{ req.id }}')">Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted);">No pending requests.</td></tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Overlay (Generic) -->
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div class="card" style="width:100%; max-width:450px; background:var(--bg2);">
+        <div class="card-head">
+            <div class="card-title" id="modalTitle">Approval Action</div>
+            <button class="btn btn-icon btn-ghost" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="card-body">
+            <form id="approvalForm" method="POST">
+                {% csrf_token %}
+                <div id="userRoleField" style="display:none; margin-bottom:16px;">
+                    <label style="display:block; font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Assign Role Permission</label>
+                    <select name="role" class="input-field">
+                        <option value="bidder">Bidder / Vendor</option>
+                        <option value="creator">Tender Creator / Department</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Admin Remark / Comment</label>
+                    <textarea name="remark" class="input-field" rows="3" placeholder="Add a reason or instructions..."></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary">Confirm Action</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openApprovalModal(type, id, name, currentRole) {
+        const overlay = document.getElementById('modalOverlay');
+        const form = document.getElementById('approvalForm');
+        const title = document.getElementById('modalTitle');
+        const roleField = document.getElementById('userRoleField');
+        const submitBtn = document.getElementById('submitBtn');
+
+        title.innerText = "Approve " + name;
+        submitBtn.className = "btn btn-primary";
+        submitBtn.innerText = "Approve Now";
+
+        if (type === 'user') {
+            form.action = "{% url 'coreadmin:approve_user' 0 %}".replace('0', id);
+            roleField.style.display = 'block';
+            if (currentRole) form.role.value = currentRole;
+        } else if (type === 'app') {
+            form.action = "{% url 'coreadmin:approve_application' 0 %}".replace('0', id);
+            roleField.style.display = 'none';
+        } else {
+            form.action = "{% url 'coreadmin:approve_admin_request' 0 %}".replace('0', id);
+            roleField.style.display = 'none';
+        }
+
+        overlay.style.display = 'flex';
+    }
+
+    function openRejectModal(type, id) {
+        const overlay = document.getElementById('modalOverlay');
+        const form = document.getElementById('approvalForm');
+        const title = document.getElementById('modalTitle');
+        const roleField = document.getElementById('userRoleField');
+        const submitBtn = document.getElementById('submitBtn');
+
+        title.innerText = "Reject Request";
+        submitBtn.className = "btn btn-danger";
+        submitBtn.innerText = "Confirm Rejection";
+        roleField.style.display = 'none';
+
+        if (type === 'user') {
+            form.action = "{% url 'coreadmin:reject_user' 0 %}".replace('0', id);
+        } else if (type === 'app') {
+            form.action = "{% url 'coreadmin:reject_application' 0 %}".replace('0', id);
+        } else {
+            form.action = "{% url 'coreadmin:reject_admin_request' 0 %}".replace('0', id);
+        }
+
+        overlay.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('approvalForm').reset();
+    }
+</script>
+{% endblock %}

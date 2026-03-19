@@ -99,6 +99,12 @@ def logout_view(request):
 @login_required
 def my_profile(request):
     profile = request.user.userprofile
+    
+    # 🚩 Mandatory Onboarding Check (skip for superusers)
+    if not request.user.is_superuser:
+        if not profile.mobile or not profile.address or not profile.role:
+            return redirect('accounts:complete_profile')
+
     if request.method == "POST":
         profile.full_name = request.POST.get('full_name')
         profile.mobile = request.POST.get('mobile')
@@ -129,6 +135,36 @@ def my_profile(request):
             return redirect("bids:bids_dashboard")
 
     return render(request, "myprofile.html", {"profile": profile})
+
+@login_required
+def complete_profile(request):
+    if request.user.is_superuser:
+        return redirect('coreadmin:base')
+        
+    profile = request.user.userprofile
+    
+    # If already completed, don't show this page again
+    if profile.mobile and profile.address and profile.role:
+        return redirect('accounts:myprofile')
+        
+    if request.method == "POST":
+        profile.full_name = request.POST.get('full_name')
+        profile.role = request.POST.get('role')
+        profile.mobile = request.POST.get('mobile')
+        profile.address = request.POST.get('address')
+        profile.gov_id_type = request.POST.get('gov_id_type')
+        profile.gov_id_number = request.POST.get('gov_id_number')
+        
+        if request.FILES.get('gov_id_upload'):
+            profile.gov_id_upload = request.FILES.get('gov_id_upload')
+            
+        profile.status = 'pending'
+        profile.save()
+        
+        messages.success(request, "Profile submitted for verification!")
+        return redirect('accounts:myprofile')
+        
+    return render(request, "complete_profile.html", {"profile": profile})
 
 # ==============================================================================
 # REGISTRATION VIEWS
@@ -165,6 +201,12 @@ def register(request):
             password=password,
             first_name=full_name
         )
+
+        # 🔹 Update auto-created profile with registration data
+        profile = user.userprofile
+        profile.full_name = full_name
+        profile.mobile = mobile
+        profile.save()
 
         user.save()
         return redirect("accounts:login")

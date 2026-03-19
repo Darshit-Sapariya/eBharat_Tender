@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Ultra-Compact Layout */
+    body { background-color: #f8fafc !important; }
+    
+    .view-container {
+        height: calc(100vh - 66px); /* Full screen minus Navbar */
+        overflow: hidden; display: flex;
+    }
+    
+    .context-aside {
+        width: 300px; background: #f1f5f9; border-right: 1px solid #e2e8f0;
+        padding: 40px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    
+    .form-wrapper {
+        flex: 1; padding: 40px 60px; overflow-y: auto; background: white;
+    }
+
+    .mini-card {
+        background: #f8fafc; border: 1.5px solid #f1f5f9;
+        border-radius: 16px; padding: 16px; transition: all 0.2s;
+    }
+    .role-input:checked + .mini-card {
+        border-color: #3b82f6; background: #eff6ff;
+    }
+    
+    .compact-field {
+        margin-bottom: 20px;
+    }
+    .label-text {
+        font-size: 0.65rem; font-weight: 800; color: #94a3b8;
+        text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block;
+    }
+    
+    .input-sm {
+        width: 100%; padding: 10px 14px; border-radius: 10px;
+        background: #f8fafc; border: 1.5px solid #f1f5f9;
+        font-size: 0.85rem; transition: 0.2s;
+    }
+    .input-sm:focus { background: white; border-color: #3b82f6; outline: none; }
+    .input-sm[readonly] { background: #f1f5f9; color: #64748b; border-style: dashed; }
+
+    .lock-tag {
+        font-size: 10px; color: #10b981; background: #ecfdf5;
+        padding: 2px 8px; border-radius: 4px; font-weight: 700;
+    }
+
+    .submit-bar {
+        margin-top: 32px; padding-top: 24px; border-top: 1px solid #f1f5f9;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .btn-finalize {
+        background: #1a56db; color: white; padding: 12px 32px;
+        border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+    }
+</style>
+
+<div class="view-container">
+    <!-- Aside Status -->
+    <div class="context-aside">
+        <div>
+            <img src="{% static 'images/logo/logo-icon.png' %}" class="h-10 mb-8">
+            <h2 class="font-sora text-2xl font-extrabold text-navy leading-tight mb-3">Setup Your Workspace</h2>
+            <p class="text-muted text-xs leading-relaxed">Complete your profile to access biddings and procurement features.</p>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+                    <i class="fas fa-shield"></i>
+                </div>
+                <span class="text-[10px] font-bold text-navy uppercase">Secure Enrollment</span>
+            </div>
+            <p class="text-[10px] text-muted">Verification usually takes 24h.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="form-wrapper">
+        <div class="max-w-[900px]">
+            {% if profile.admin_remark %}
+            <div class="mb-8 p-5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-4 anim-up">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-comment-dots text-amber-600"></i>
+                </div>
+                <div>
+                    <h4 class="font-sora text-sm font-bold text-amber-900 mb-1">Feedback from Verification Team</h4>
+                    <p class="font-dmSans text-[0.8rem] text-amber-800 leading-relaxed italic">"{{ profile.admin_remark }}"</p>
+                    <p class="font-dmSans text-[9px] text-amber-600 mt-2 uppercase font-bold tracking-wider">Please address the above before resubmitting.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
+                    
+                    <!-- Left: Purpose & Identity -->
+                    <div class="space-y-8">
+                        <div>
+                            <span class="label-text">01. Choose Your Role</span>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="role" value="bidder" class="sr-only role-input" required {% if profile.role == 'bidder' %}checked{% endif %}>
+                                    <div class="mini-card text-center">
+                                        <i class="fas fa-user-tag text-blue-500 mb-2"></i>
+                                        <div class="text-[11px] font-bold text-navy">Bidder</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="role" value="creator" class="sr-only role-input" required {% if profile.role == 'creator' %}checked{% endif %}>
+                                    <div class="mini-card text-center">
+                                        <i class="fas fa-pen-nib text-blue-500 mb-2"></i>
+                                        <div class="text-[11px] font-bold text-navy">Creator</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5">
+                            <span class="label-text">02. Identity Profiles</span>
+                            <div class="compact-field">
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
+                                    <span class="lock-tag">Verified</span>
+                                </div>
+                                <input type="text" class="input-sm" value="{{ user.username }}" readonly>
+                            </div>
+                            <div class="compact-field">
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase">Legal Name</label>
+                                    <span class="lock-tag">Verified</span>
+                                </div>
+                                <input type="text" name="full_name" class="input-sm" value="{{ user.first_name }}" readonly>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="compact-field">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Mobile</label>
+                                    <input type="text" name="mobile" class="input-sm" value="{{ profile.mobile }}" >
+                                </div>
+                                <div class="compact-field">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">City/Base</label>
+                                    <input type="text" name="address" class="input-sm" value="{{ profile.address|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Compliance -->
+                    <div class="space-y-8">
+                        <div>
+                            <span class="label-text">03. KYC Compliance</span>
+                            <div class="space-y-5">
+                                <div class="compact-field">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">ID Type</label>
+                                    <select name="gov_id_type" class="input-sm cursor-pointer">
+                                        <option value="aadhaar" {% if profile.gov_id_type == 'aadhaar' %}selected{% endif %}>Aadhaar Card</option>
+                                        <option value="pan"     {% if profile.gov_id_type == 'pan' %}selected{% endif %}>PAN Card</option>
+                                        <option value="gstin"   {% if profile.gov_id_type == 'gstin' %}selected{% endif %}>GST Certificate</option>
+                                    </select>
+                                </div>
+                                <div class="compact-field">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">ID Number</label>
+                                    <input type="text" name="gov_id_number" class="input-sm" value="{{ profile.gov_id_number|default:'' }}" required>
+                                </div>
+                                <div class="compact-field">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Upload Document (PDF/JPG)</label>
+                                    <input type="file" name="gov_id_upload" class="input-sm !p-1.5" required>
+                                    <p class="text-[9px] text-muted mt-2 italic px-1">Ensure file size is below 5MB.</p>
+                                </div>
+                                
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
+                                    <div class="flex gap-3">
+                                        <i class="fas fa-info-circle text-blue-500 text-xs mt-0.5"></i>
+                                        <p class="text-[10px] text-blue-800 leading-relaxed font-medium">Please ensure the document uploaded matches the ID Number above for instant processing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="submit-bar">
+                    <div class="flex items-center gap-2 text-emerald-600">
+                        <i class="fas fa-lock text-[10px]"></i>
+                        <span class="text-[10px] font-bold uppercase">SSL Secured Submit</span>
+                    </div>
+                    <button type="submit" class="btn-finalize hover:bg-navy transition-colors">
+                        Finalize & Submit Account <i class="fas fa-chevron-right ml-2 text-[10px]"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

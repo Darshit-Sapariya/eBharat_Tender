@@ -1,0 +1,121 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+
+{% block title %}User Management · Super Admin{% endblock %}
+
+{% block nav_users %}active{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'coreadmin:deshbord' %}">Dashboard</a>
+<i class="fas fa-chevron-right"></i>
+<span>User List</span>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">User Directory</div>
+        <div class="page-subtitle">Manage all registered vendors, creators, and administrators.</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <div class="input-wrap" style="width:200px;">
+            <i class="fas fa-search input-icon"></i>
+            <input type="text" class="input-field" placeholder="Search users..." id="userSearch">
+        </div>
+        <div style="display:flex; background:var(--bg3); border-radius:8px; padding:2px; border:1px solid var(--border);">
+            <a href="?role=all" class="btn btn-sm {% if current_role == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">All</a>
+            <a href="?role=vendor" class="btn btn-sm {% if current_role == 'vendor' %}btn-primary{% else %}btn-ghost{% endif %}">Vendors</a>
+            <a href="?role=creator" class="btn btn-sm {% if current_role == 'creator' %}btn-primary{% else %}btn-ghost{% endif %}">Creators</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div class="card-title">System Users</div>
+        <span class="badge badge-gray">{{ profiles.count }} Active Entries</span>
+    </div>
+    <div class="card-body" style="padding:0;">
+        <table class="data-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>User / Full Name</th>
+                    <th>Email & Mobile</th>
+                    <th>Designation</th>
+                    <th>Role Permission</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            {% if profile.profile_pic %}
+                                <img src="{{ profile.profile_pic.url }}" style="width:32px; height:32px; border-radius:8px; object-fit:cover;">
+                            {% else %}
+                                <div class="admin-avatar" style="width:32px; height:32px; font-size:0.7rem;">{{ profile.full_name|default:profile.user.username|slice:":2"|upper }}</div>
+                            {% endif %}
+                            <div>
+                                <div style="font-weight:600; font-size:0.85rem;">{{ profile.full_name|default:profile.user.username }}</div>
+                                <div style="font-size:0.7rem; color:var(--muted);">@{{ profile.user.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size:0.8rem;">{{ profile.user.email }}</div>
+                        <div style="font-size:0.75rem; color:var(--muted);">{{ profile.mobile }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size:0.8rem;">{{ profile.get_gov_id_type_display|default:"―" }}</div>
+                        {% if profile.gov_id_upload %}
+                            <a href="{{ profile.gov_id_upload.url }}" target="_blank" class="text-blue" style="font-size:0.7rem;">
+                                <i class="fas fa-file-pdf"></i> View KYC
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.role == 'bidder' %}
+                        <span class="badge badge-blue">Bidder</span>
+                        {% elif profile.role == 'creator' %}
+                        <span class="badge badge-purple">Creator</span>
+                        {% else %}
+                        <span class="badge badge-gray">None</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.status == 'approved' %}
+                        <span class="badge badge-green badge-dot">Active</span>
+                        {% elif profile.status == 'pending' %}
+                        <span class="badge badge-orange badge-dot">Pending</span>
+                        {% else %}
+                        <span class="badge badge-red badge-dot">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td><span style="font-family:'Space Mono',monospace; font-size:0.75rem;">{{ profile.created_at|date:"M d, Y" }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted);">No users found for this filter.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.getElementById('userSearch').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let rows = document.querySelector("#usersTable tbody").rows;
+        for (let i = 0; i < rows.length; i++) {
+            let name = rows[i].cells[0].textContent.toUpperCase();
+            let email = rows[i].cells[1].textContent.toUpperCase();
+            if (name.indexOf(filter) > -1 || email.indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+</script>
+{% endblock %}
