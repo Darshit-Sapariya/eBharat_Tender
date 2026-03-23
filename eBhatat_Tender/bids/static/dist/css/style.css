@@ -16,7 +16,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 :root {
-  --blue: #5f76e8;
+  --orange: #5f76e8;
   --indigo: #6610f2;
   --purple: #5f76e8;
   --pink: #e83e8c;
@@ -29,7 +29,7 @@
   --white: #fff;
   --gray: #6c757d;
   --gray-dark: #1c2d41;
-  --blue: #5f76e8;
+  --orange: #5f76e8;
   --indigo: #6610f2;
   --purple: #5f76e8;
   --pink: #e83e8c;
@@ -4924,12 +4924,12 @@ button.bg-cyan:hover,
 button.bg-cyan:focus {
   background-color: #019fbe !important; }
 
-.bg-orange {
+.bg-indigo {
   background-color: #fb8c00 !important; }
 
-a.bg-orange:hover, a.bg-orange:focus,
-button.bg-orange:hover,
-button.bg-orange:focus {
+a.bg-indigo:hover, a.bg-indigo:focus,
+button.bg-indigo:hover,
+button.bg-indigo:focus {
   background-color: #c87000 !important; }
 
 .bg-purple {
@@ -5003,7 +5003,7 @@ button.bg-purple:focus {
 .border-cyan {
   border-color: #01caf1 !important; }
 
-.border-orange {
+.border-indigo {
   border-color: #fb8c00 !important; }
 
 .border-purple {
@@ -7419,10 +7419,10 @@ a.text-dark:hover, a.text-dark:focus {
 a.text-cyan:hover, a.text-cyan:focus {
   color: #018aa5 !important; }
 
-.text-orange {
+.text-indigo {
   color: #fb8c00 !important; }
 
-a.text-orange:hover, a.text-orange:focus {
+a.text-indigo:hover, a.text-indigo:focus {
   color: #af6100 !important; }
 
 .text-purple {

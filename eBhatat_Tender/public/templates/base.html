@@ -696,17 +696,27 @@
 <script>
   // Django Messages as SweetAlerts
   document.addEventListener('DOMContentLoaded', function() {
-    {% if messages %}
-      {% for message in messages %}
+    // Global Logout Confirmation
+    const logoutUrl = "{% url 'accounts:logout' %}";
+    const logoutLinks = document.querySelectorAll('a[href="' + logoutUrl + '"]');
+    logoutLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
         Swal.fire({
-          icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
-          title: "{{ message.tags|capfirst }}",
-          text: "{{ message }}",
-          confirmButtonColor: '#1a56db',
-          timer: 4000
+          title: 'Ready to Leave?',
+          text: "You will be signed out of your session.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ea580c',
+          cancelButtonColor: '#64748b',
+          confirmButtonText: 'Yes, Sign Out'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = logoutUrl;
+          }
         });
-      {% endfor %}
-    {% endif %}
+      });
+    });
   });
 </script>
 </body>

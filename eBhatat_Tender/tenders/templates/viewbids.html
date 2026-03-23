@@ -28,7 +28,7 @@
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: var(--di-accent, #e2e8f0);
   }
-  .date-item.publish { --di-accent: #1a56db; }
+  .date-item.publish { --di-accent: #ea580c; }
   .date-item.closing { --di-accent: #ef4444; }
   .date-item.prebid  { --di-accent: #f59e0b; }
 
@@ -43,7 +43,7 @@
   }
 
   /* Panel left accent border */
-  .ph-blue  .panel-head { border-left: 3px solid #1a56db; }
+  .ph-indigo  .panel-head { border-left: 3px solid #ea580c; }
   .ph-green .panel-head { border-left: 3px solid #10b981; }
   .ph-amber .panel-head { border-left: 3px solid #f59e0b; }
 </style>
@@ -53,7 +53,7 @@
 
   <!-- ══════ HERO HEADER ══════ -->
   <div class="td-hero relative rounded-2xl overflow-hidden px-6 sm:px-8 py-7"
-       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 45%, #94a3b8 100%);">
 
     <!-- Second decorative ring -->
     <div class="absolute w-[160px] h-[160px] rounded-full pointer-events-none
@@ -167,15 +167,15 @@
     <div class="flex flex-col gap-4">
 
       <!-- Description Panel -->
-      <div class="ph-blue bg-white border border-slate-200 rounded-2xl overflow-hidden
+      <div class="ph-indigo bg-white border border-slate-200 rounded-2xl overflow-hidden
                   shadow-[0_2px_12px_rgba(15,42,94,0.05)]">
         <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
           <div class="w-8 h-8 rounded-[9px] flex items-center justify-center text-[0.82rem] flex-shrink-0
-                      bg-blue-50 text-blue-600">
+                      bg-indigo-50 text-indigo-600">
             <i class="fas fa-align-left"></i>
           </div>
           <div>
-            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Tender Description</p>
+            <p class="font-sora text-[0.88rem] font-bold text-slate-700">Tender Description</p>
             <p class="text-[0.7rem] text-slate-400 mt-px">Scope, objectives and requirements</p>
           </div>
         </div>
@@ -193,7 +193,7 @@
             <i class="fas fa-rupee-sign"></i>
           </div>
           <div>
-            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Financial Details</p>
+            <p class="font-sora text-[0.88rem] font-bold text-slate-700">Financial Details</p>
             <p class="text-[0.7rem] text-slate-400 mt-px">Budget and deposit information</p>
           </div>
         </div>
@@ -214,7 +214,7 @@
               <p class="text-[0.67rem] font-bold uppercase tracking-[0.08em] text-slate-400 mb-[0.3rem]">
                 EMD Amount
               </p>
-              <p class="font-sora text-[1.25rem] font-extrabold text-[#0f2a5e]">
+              <p class="font-sora text-[1.25rem] font-extrabold text-slate-700">
                 ₹{{ tender.emd_amount }}
               </p>
               <p class="text-[0.68rem] text-slate-400 mt-[2px]">Earnest money deposit</p>
@@ -233,7 +233,7 @@
             <i class="fas fa-calendar-alt"></i>
           </div>
           <div>
-            <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Important Dates</p>
+            <p class="font-sora text-[0.88rem] font-bold text-slate-700">Important Dates</p>
             <p class="text-[0.7rem] text-slate-400 mt-px">Timeline and key milestones</p>
           </div>
         </div>
@@ -247,7 +247,7 @@
                         tracking-[0.08em] text-slate-400 mb-[0.35rem]">
                 <i class="fas fa-calendar-plus text-[0.6rem]"></i> Publish Date
               </p>
-              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+              <p class="font-sora text-[0.9rem] font-bold text-slate-700">
                 {{ tender.publish_date|date:"d M Y"|default:"—" }}
               </p>
             </div>
@@ -259,7 +259,7 @@
                         tracking-[0.08em] text-slate-400 mb-[0.35rem]">
                 <i class="fas fa-calendar-times text-[0.6rem]"></i> Closing Date
               </p>
-              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+              <p class="font-sora text-[0.9rem] font-bold text-slate-700">
                 {{ tender.closing_date|date:"d M Y" }}
               </p>
             </div>
@@ -271,7 +271,7 @@
                         tracking-[0.08em] text-slate-400 mb-[0.35rem]">
                 <i class="fas fa-handshake text-[0.6rem]"></i> Pre-Bid Meeting
               </p>
-              <p class="font-sora text-[0.9rem] font-bold text-[#0f2a5e]">
+              <p class="font-sora text-[0.9rem] font-bold text-slate-700">
                 {{ tender.pre_bid_meeting|date:"d M Y, H:i"|default:"Not scheduled" }}
               </p>
             </div>
@@ -290,7 +290,7 @@
 
       <!-- Count hero -->
       <div class="bid-count-hero relative text-center px-[1.35rem] py-6 overflow-hidden"
-           style="background: linear-gradient(135deg, #0a1745, #1a56db);">
+           style="background: linear-gradient(135deg, #475569, #94a3b8);">
         <p class="relative z-[1] text-[0.65rem] font-semibold tracking-[0.1em] uppercase
                   text-white/40 mb-2">
           Bid Activity
@@ -305,9 +305,9 @@
 
       <!-- Recent bids header -->
       <div class="flex items-center justify-between px-5 py-[0.9rem] pb-[0.65rem] border-b border-slate-200">
-        <span class="font-sora text-[0.78rem] font-bold text-[#0f2a5e]">Recent Applications</span>
-        <span class="text-[0.65rem] font-bold bg-blue-50 text-blue-600
-                     border border-blue-200 rounded-full px-2 py-[2px]">
+        <span class="font-sora text-[0.78rem] font-bold text-slate-700">Recent Applications</span>
+        <span class="text-[0.65rem] font-bold bg-indigo-50 text-indigo-600
+                     border border-indigo-200 rounded-full px-2 py-[2px]">
           Latest 3
         </span>
       </div>
@@ -323,13 +323,13 @@
           <!-- Avatar initials -->
           <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
                       font-sora text-[0.7rem] font-extrabold text-white"
-               style="background: linear-gradient(135deg, #1a56db, #163472);">
+               style="background: linear-gradient(135deg, #94a3b8, #475569);">
             {{ app.company_name|slice:":2"|upper }}
           </div>
 
           <!-- Info -->
           <div class="flex-1 min-w-0">
-            <p class="font-sora text-[0.78rem] font-bold text-[#0f2a5e]
+            <p class="font-sora text-[0.78rem] font-bold text-slate-700
                       whitespace-nowrap overflow-hidden text-ellipsis">
               {{ app.company_name|truncatechars:22 }}
             </p>
@@ -390,7 +390,7 @@
                     rounded-[10px] no-underline text-white font-sora text-[0.83rem] font-bold
                     shadow-[0_2px_8px_rgba(26,86,219,0.3)] transition-all duration-200
                     hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(26,86,219,0.4)]"
-             style="background: linear-gradient(135deg, #1a56db, #163472);">
+             style="background: linear-gradient(135deg, #5884e9, #4f47e6);">
             <i class="fas fa-paper-plane"></i> View All Applications
           </a>
         {% endif %}
@@ -398,7 +398,7 @@
         
 
       </div>
-    </div><!-- /bid-panel -->
+    </div><!-- /bid-panel -->  
 
   </div><!-- /td-grid -->
 

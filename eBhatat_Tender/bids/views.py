@@ -4,9 +4,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.urls import reverse
+from django.conf import settings
+import razorpay
 from .models import TenderApplication
 from tenders.models import Tenderss
 from accounts.models import UserProfile, Notification, Watchlist
+from funding.models import Funding, FundingApplication
+from funding.models import Funding, FundingApplication
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
@@ -59,8 +63,13 @@ def bids_dashboard(request):
     # Watchlist Count
     watchlist_count = Watchlist.objects.filter(user=request.user).count()
 
+    # Funding Application Count
+    from funding.models import FundingApplication as FA
+    funding_count = FA.objects.filter(bidder=request.user).count()
+
     # User Profile for status
     profile = getattr(request.user, 'userprofile', None)
+
 
     context = {
         "open_tenders": open_tenders,
@@ -82,6 +91,7 @@ def bids_dashboard(request):
         "approved_count": approved_tenders.count(),
         "rejected_count": rejected_tenders.count(),
         "watchlist_count": watchlist_count,
+        "funding_count": funding_count,
     }
 
     return render(request, 'bids_dashboard.html', context)
@@ -127,6 +137,7 @@ def vendor_profile_update(request):
 @login_required
 def applybid(request, tender_id):
     tender = get_object_or_404(Tenderss, id=tender_id)
+    fundings = Funding.objects.filter(tender=tender)
 
     # Prevent owner from bidding
     if tender.created_by == request.user:
@@ -157,6 +168,10 @@ def applybid(request, tender_id):
             if not bid_amount:
                 raise ValueError("Bid amount is required.")
 
+            razorpay_payment_id = request.POST.get("razorpay_payment_id")
+            if tender.emd_amount > 0 and not razorpay_payment_id:
+                raise ValueError("EMD Payment is required to apply for this tender.")
+
             application = TenderApplication.objects.create(
                 tender=tender,
                 applicant=request.user,
@@ -184,7 +199,29 @@ def applybid(request, tender_id):
                 technical_document=request.FILES.get("technical_document"),
                 financial_document=request.FILES.get("financial_document"),
                 other_document=request.FILES.get("other_document"),
+                
+                # Payment Details
+                payment_status='paid' if tender.emd_amount > 0 else 'pending',
+                razorpay_payment_id=razorpay_payment_id,
             )
+            
+            # Handle Funding Application if selected
+            if request.POST.get("apply_funding") == "on":
+                funding_id = request.POST.get("funding_id")
+                amount_requested = request.POST.get("amount_requested")
+                purpose = request.POST.get("purpose")
+                supporting_doc = request.FILES.get("funding_document")
+                
+                if funding_id and amount_requested and purpose:
+                    funding_obj = get_object_or_404(Funding, id=funding_id)
+                    FundingApplication.objects.create(
+                        bidder=request.user,
+                        funding=funding_obj,
+                        tender=tender,
+                        amount_requested=amount_requested,
+                        purpose=purpose,
+                        supporting_document=supporting_doc
+                    )
             
             # 📌 Notify the Tender Creator about the new bid
             Notification.objects.create(
@@ -198,9 +235,18 @@ def applybid(request, tender_id):
             
         except Exception as e:
             messages.error(request, f"Error submitting application: {str(e)}")
-            return render(request, "applybid.html", {"tender": tender, "error": str(e)})
+            return render(request, "applybid.html", {
+                "tender": tender, 
+                "fundings": fundings,
+                "error": str(e), 
+                "razorpay_key": settings.RAZORPAY_KEY_ID
+            })
 
-    return render(request, "applybid.html", {"tender": tender})
+    return render(request, "applybid.html", {
+        "tender": tender,
+        "fundings": fundings,
+        "razorpay_key": settings.RAZORPAY_KEY_ID
+    })
 
 
 # View applications for tender
@@ -214,10 +260,12 @@ def tender_applications(request, tender_id):
         return redirect("dashboard")
 
     applications = tender.applications.all().order_by('-id')
+    total_emd = sum(app.tender.emd_amount for app in applications if app.payment_status == 'paid')
 
     return render(request, "tender_applications.html", {
         "tender": tender,
-        "applications": applications
+        "applications": applications,
+        "total_emd": total_emd
     })
 
 # List user submitted bids

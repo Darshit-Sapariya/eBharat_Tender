@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.urls import reverse
+from django.conf import settings
+import razorpay
 
 from bids.models import TenderApplication
 from accounts.models import UserProfile, Notification, AdminRequest, Department, Category
@@ -316,15 +318,32 @@ def tenderDetails(request, tender_id):
     if awarded_bid:
         awarded_bid.masked_gst = mask_id(awarded_bid.gst_number)
 
+    # Fetch available funding for this tender (or general funding)
+    from funding.models import Funding
+    from django.db.models import Q
+    available_fundings = Funding.objects.filter(Q(tender=tender) | Q(tender__isnull=True))
+    
+    # Check if user has applied for any of these fundings for THIS tender
+    user_funding_apps = []
+    applied_funding_ids = []
+    if request.user.is_authenticated:
+        from funding.models import FundingApplication
+        user_funding_apps = FundingApplication.objects.filter(bidder=request.user, tender=tender)
+        applied_funding_ids = list(user_funding_apps.values_list('funding_id', flat=True))
+
     context = {
         "tender": tender,
         "is_expired": is_expired,
         "has_applied": has_applied,
         "applications": applications,
         "awarded_bid": awarded_bid,
+        "available_fundings": available_fundings,
+        "applied_funding_ids": applied_funding_ids,
         "page_title": "Tender Details",
     }
+
     return render(request, 'tenderDetails.html', context)
+
 
 # List vendor submitted bids
 def bids(request):
@@ -363,14 +382,26 @@ def view_tender_bids(request, tender_id):
 
     for bid in bids:
         bid.masked_gst = mask_id(bid.gst_number)
+        
+        # Transparency: Attach approved funding details
+        from funding.models import FundingApplication
+        bid.approved_funding = FundingApplication.objects.filter(
+            bidder=bid.applicant,
+            tender=tender,
+            status='approved'
+        ).first()
+
+    total_emd = sum(bid.tender.emd_amount for bid in bids if bid.payment_status == 'paid')
 
     context = {
         "tender": tender,
         "bids": bids,
         "has_awarded_bid": bids.filter(status='awarded').exists(),
+        "total_emd": total_emd,
         "page_title": "Tender Bids",
     }
     return render(request, "tender_bids.html", context)
+
 
 # Update bid evaluation status
 @login_required
@@ -393,10 +424,21 @@ def update_bid_status(request, bid_id):
 
         if action == "award":
             bid.status = "awarded"
-            # Auto-reject all other bids for this tender
-            TenderApplication.objects.filter(
-                tender=bid.tender
-            ).exclude(id=bid.id).update(status="rejected")
+            
+            # Auto-reject and refund all other bids for this tender
+            losing_bids = TenderApplication.objects.filter(tender=bid.tender).exclude(id=bid.id)
+            for l_bid in losing_bids:
+                l_bid.status = "rejected"
+                if l_bid.payment_status == 'paid' and l_bid.razorpay_payment_id:
+                    try:
+                        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+                        refund = client.payment.refund(l_bid.razorpay_payment_id, {
+                            "amount": int(l_bid.tender.emd_amount * 100)
+                        })
+                        l_bid.payment_status = "refunded"
+                    except Exception as e:
+                        print(f"Refund failed for application {l_bid.id}: {e}")
+                l_bid.save()
             
             # Close/Award the tender
             bid.tender.status = "awarded"

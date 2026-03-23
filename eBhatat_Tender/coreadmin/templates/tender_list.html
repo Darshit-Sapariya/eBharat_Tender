@@ -1,106 +1,99 @@
 {% extends 'coreadmin_base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Tender Directory · Super Admin{% endblock %}
-
+{% block title %}All Tenders{% endblock %}
 {% block nav_tenders %}active{% endblock %}
 
-{% block breadcrumb %}
-<a href="{% url 'coreadmin:deshbord' %}">Dashboard</a>
-<i class="fas fa-chevron-right"></i>
-<span>All Tenders</span>
-{% endblock %}
-
 {% block content %}
-<div class="page-header">
-    <div>
-        <div class="page-title">Procurement Inventory</div>
-        <div class="page-subtitle">Detailed tracking of all tenders, bid counts, publishers, and awards.</div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Procurement Tracking</div>
+    <div class="ph-title">Tender Directory</div>
+    <div class="ph-sub">Comprehensive view of all tenders, bidding details, and awardees</div>
+  </div>
+  <div class="ph-actions">
+    <div class="topbar-search" style="width: 300px;">
+        <i class="fas fa-search"></i>
+        <input type="text" id="tenderSearch" placeholder="Search title or publisher...">
     </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-        <div class="input-wrap" style="width:250px;">
-            <i class="fas fa-search input-icon"></i>
-            <input type="text" class="input-field" placeholder="Search by title, ID or publisher..." id="tenderSearch">
-        </div>
-        <button class="btn btn-primary"><i class="fas fa-filter"></i> Advanced Filter</button>
-    </div>
+  </div>
 </div>
 
-<div class="card">
-    <div class="card-head">
-        <div class="card-title">Tender Lifecycle Tracking</div>
-        <span class="badge badge-blue">{{ tenders|length }} Tenders Total</span>
+<div class="card" style="margin-bottom:22px;">
+  <div class="ch">
+    <div>
+      <div class="ct">Tender Lifecycle Tracking</div>
+      <div class="cs">Click on a tender to view all related information</div>
     </div>
-    <div class="card-body" style="padding:0;">
-        <table class="data-table" id="tendersTable">
-            <thead>
-                <tr>
-                    <th>Tender / ID</th>
-                    <th>Published By</th>
-                    <th>Bid Volume</th>
-                    <th>Estimated Value</th>
-                    <th>Award Status</th>
-                    <th>Winner / Awardee</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tender in tenders %}
-                <tr>
-                    <td>
-                        <div style="font-weight:600; font-size:0.85rem;">{{ tender.obj.title }}</div>
-                        <div style="font-size:0.75rem; color:var(--muted);">ID: {{ tender.obj.tender_id }} | Category: {{ tender.obj.category }}</div>
-                    </td>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <i class="fas fa-user-circle" style="color:var(--muted);"></i>
-                            <span style="font-size:0.8rem;">{{ tender.publisher }}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="font-family:'Space Mono',monospace; font-weight:700;">{{ tender.bid_count }}</span>
-                            <span style="font-size:0.7rem; color:var(--muted);">Received</span>
-                        </div>
-                    </td>
-                    <td><span style="font-family:'Space Mono',monospace; color:var(--text);">₹{{ tender.obj.estimated_value|floatformat:2 }}</span></td>
-                    <td>
-                        {% if tender.obj.status == 'awarded' %}
-                        <span class="badge badge-green">Awarded</span>
-                        {% elif tender.obj.status == 'closed' %}
-                        <span class="badge badge-red">Closed</span>
-                        {% else %}
-                        <span class="badge badge-blue">{{ tender.obj.status|capfirst }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if tender.awardee != "None" %}
-                        <div style="font-weight:600; color:var(--green); font-size:0.8rem;">{{ tender.awardee }}</div>
-                        {% else %}
-                        <div style="font-style:italic; color:var(--muted2); font-size:0.8rem;">Not Awarded</div>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted);">No tenders found in the system.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <span class="badge bg-blue">{{ tenders|length }} Tenders Total</span>
+  </div>
+  
+  <div style="padding: 0;">
+    <table style="width: 100%; border-collapse: collapse; background: var(--surface);" id="tendersTable">
+      <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+        <tr style="text-align: left; font-size: 11px; color: var(--text); text-transform: uppercase; font-family: 'Roboto', sans-serif;">
+          <th style="padding: 16px 20px;">Sr No</th>
+          <th style="padding: 16px 20px;">Tender ID</th>
+          <th style="padding: 16px 20px;">Tender Name</th>
+          <th style="padding: 16px 20px; text-align: right;">Est. Value</th>
+          <th style="padding: 16px 20px; text-align: center;">Bidders</th>
+          <th style="padding: 16px 20px;">Status</th>
+          <th style="padding: 16px 20px; width:40px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tender in tenders %}
+        
+        <!-- Accordion Row -->
+        <tr class="tender-header" onclick="window.location.href='{% url 'coreadmin:tender_bidders' tender.obj.id %}'" style="border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s;">
+            <td style="padding: 16px 20px; font-weight: 600; color: var(--text);">{{ forloop.counter }}</td>
+            <td style="padding: 16px 20px; font-family: monospace; font-size: 13px; color: var(--text); opacity: 0.8;">TND-{{ tender.obj.id|stringformat:"04d" }}</td>
+            <td style="padding: 16px 20px; font-weight: 600; font-size: 14px; color: var(--text);">{{ tender.obj.title }}</td>
+            <td style="padding: 16px 20px; text-align: right; font-weight: 700; font-family: monospace; font-size: 14px; color: var(--text);">₹{{ tender.obj.estimated_value|intcomma }}</td>
+            <td style="padding: 16px 20px; text-align: center; font-weight: 700; font-size: 14px; color: var(--accent);">{{ tender.bid_count }}</td>
+            <td style="padding: 16px 20px;">
+                {% if tender.obj.status == 'open' %}
+                    <span class="badge bg-green">Open</span>
+                {% elif tender.obj.status == 'awarded' %}
+                    <span class="badge bg-blue">Awarded</span>
+                {% elif tender.obj.status == 'closed' or tender.obj.status == 'expired' %}
+                    <span class="badge bg-red">{{ tender.obj.status|title }}</span>
+                {% else %}
+                    <span class="badge bg-amber">{{ tender.obj.status|title }}</span>
+                {% endif %}
+            </td>
+            <td style="padding: 16px 20px; text-align: center;">
+                <div class="expand-icon" style="color: var(--text); opacity:0.5; transition: transform 0.3s; transform: rotate(-90deg);">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: var(--text); opacity:0.6;">
+                No tenders found in the system.
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
     document.getElementById('tenderSearch').addEventListener('keyup', function() {
         let filter = this.value.toUpperCase();
-        let rows = document.querySelector("#tendersTable tbody").rows;
-        for (let i = 0; i < rows.length; i++) {
-            let title = rows[i].cells[0].textContent.toUpperCase();
-            let publisher = rows[i].cells[1].textContent.toUpperCase();
-            if (title.indexOf(filter) > -1 || publisher.indexOf(filter) > -1) {
-                rows[i].style.display = "";
+        let items = document.querySelectorAll('.tender-header');
+        
+        items.forEach(function(item) {
+            let title = item.textContent.toUpperCase();
+            if (title.indexOf(filter) > -1) {
+                item.style.display = "";
             } else {
-                rows[i].style.display = "none";
+                item.style.display = "none";
             }
-        }
+        });
     });
 </script>
 {% endblock %}

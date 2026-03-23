@@ -1,0 +1,115 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+
+{% block title %}Audit Log · Super Admin{% endblock %}
+
+{% block nav_audit %}active{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'coreadmin:deshbord' %}">Dashboard</a>
+<i class="fas fa-chevron-right"></i>
+<span>System Audit Log</span>
+{% endblock %}
+
+{% block content %}
+<div class="ph" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <div class="ph-eye">Platform Administration</div>
+        <div class="ph-title">System Audit Log</div>
+        <div class="ph-sub">Immutable audit trail of administrator and system activities.</div>
+    </div>
+    <div style="display:flex; gap:16px; align-items:center;">
+        <div style="position:relative; width:250px;">
+            <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text); opacity:0.5; font-size:13px;"></i>
+            <input type="text" placeholder="Search logs..." id="logSearch" style="width:100%; box-sizing:border-box; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; transition:box-shadow 0.2s;">
+        </div>
+        <button class="btn btn-outline" style="border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600;"><i class="fas fa-filter mr-1"></i> Filter</button>
+        <button class="btn btn-primary" style="border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600;"><i class="fas fa-download mr-1"></i> Export Log</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
+        <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Audit Trail</div>
+        <span class="badge badge-gray" style="font-family:monospace; font-weight:700;">{{ logs.count }} RECORDED EVENTS</span>
+    </div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table style="width: 100%; border-collapse: collapse;" id="logsTable">
+            <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+                <tr style="text-align: left; font-size: 11px; color: var(--text); text-transform: uppercase;">
+                    <th style="padding: 16px 20px; width: 15%;">Timestamp</th>
+                    <th style="padding: 16px 20px; width: 20%;">Administrator</th>
+                    <th style="padding: 16px 20px; width: 15%;">Action Type</th>
+                    <th style="padding: 16px 20px; width: 20%;">Target / Entity</th>
+                    <th style="padding: 16px 20px; width: 30%;">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;">
+                    <td style="padding: 18px 20px; font-family:'Space Mono', monospace; font-size:12px; color:var(--text); opacity:0.7;">
+                        <i class="fas fa-clock" style="margin-right:6px; font-size:10px;"></i>{{ log.timestamp|date:"Y-m-d H:i" }}
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:32px; height:32px; border-radius:6px; background:linear-gradient(135deg, var(--bg3), var(--bg1)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; color:var(--text);">
+                                {{ log.admin_user.username|slice:":2"|upper }}
+                            </div>
+                            <span style="font-weight:600; font-size:13px; color:var(--text);">{{ log.admin_user.username }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        {% if 'APPROVAL' in log.action_type %}
+                            <span class="badge bg-green">{{ log.action_type }}</span>
+                        {% elif 'REJECTION' in log.action_type %}
+                            <span class="badge bg-red">{{ log.action_type }}</span>
+                        {% elif 'ALLOCATION' in log.action_type %}
+                            <span class="badge bg-purple">{{ log.action_type }}</span>
+                        {% else %}
+                            <span class="badge bg-blue">{{ log.action_type }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        {% if log.target_user %}
+                            <span style="font-weight:600; font-size:13px; color:var(--text);">@{{ log.target_user.username }}</span>
+                        {% elif log.target_department %}
+                            <span style="font-weight:600; font-size:13px; color:var(--accent);"><i class="fas fa-building" style="margin-right:6px; opacity:0.7;"></i>{{ log.target_department }}</span>
+                        {% else %}
+                            <span style="color:var(--text); opacity:0.5; font-style:italic; font-size:13px;">System Core</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-size:13px; line-height:1.5; color:var(--text); opacity:0.9;">{{ log.description }}</div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:60px; color:var(--text); opacity:0.5;">
+                        <i class="fas fa-history mb-3" style="font-size: 24px;"></i>
+                        <div style="font-size: 14px;">No actions recorded in the audit log yet.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.getElementById('logSearch').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let rows = document.querySelector("#logsTable tbody").rows;
+        for (let i = 0; i < rows.length; i++) {
+            let admin = rows[i].cells[1].textContent.toUpperCase();
+            let action = rows[i].cells[2].textContent.toUpperCase();
+            let target = rows[i].cells[3].textContent.toUpperCase();
+            let desc = rows[i].cells[4].textContent.toUpperCase();
+            if (admin.indexOf(filter) > -1 || action.indexOf(filter) > -1 || target.indexOf(filter) > -1 || desc.indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+</script>
+{% endblock %}

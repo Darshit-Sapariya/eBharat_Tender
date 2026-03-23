@@ -12,91 +12,121 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <div class="page-title">User Directory</div>
-        <div class="page-subtitle">Manage all registered vendors, creators, and administrators.</div>
-    </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-        <div class="input-wrap" style="width:200px;">
-            <i class="fas fa-search input-icon"></i>
-            <input type="text" class="input-field" placeholder="Search users..." id="userSearch">
-        </div>
-        <div style="display:flex; background:var(--bg3); border-radius:8px; padding:2px; border:1px solid var(--border);">
-            <a href="?role=all" class="btn btn-sm {% if current_role == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">All</a>
-            <a href="?role=vendor" class="btn btn-sm {% if current_role == 'vendor' %}btn-primary{% else %}btn-ghost{% endif %}">Vendors</a>
-            <a href="?role=creator" class="btn btn-sm {% if current_role == 'creator' %}btn-primary{% else %}btn-ghost{% endif %}">Creators</a>
-        </div>
-    </div>
+<div class="ph" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+  <div>
+    <div class="ph-eye">Platform Administration</div>
+    <div class="ph-title">User Directory</div>
+    <div class="ph-sub">Manage all registered vendors, departmental creators, and administrators.</div>
+  </div>
+  <div style="display:flex; gap:16px; align-items:center;">
+      <div style="position:relative; width:220px;">
+          <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text); opacity:0.5; font-size:13px;"></i>
+          <input type="text" placeholder="Search profiles..." id="userSearch" style="width:100%; box-sizing:border-box; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; transition:box-shadow 0.2s;">
+      </div>
+      <div style="display:flex; background:var(--bg3); border-radius:8px; padding:4px; border:1px solid var(--border);">
+          <a href="?role=all" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'all' or not current_role %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">All</a>
+          <a href="?role=bidder" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'bidder' %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">Bidders</a>
+          <a href="?role=creator" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'creator' %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">Creators</a>
+      </div>
+  </div>
 </div>
 
 <div class="card">
-    <div class="card-head">
-        <div class="card-title">System Users</div>
-        <span class="badge badge-gray">{{ profiles.count }} Active Entries</span>
+    <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
+        <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Registered Platform Entities</div>
+        <span class="badge badge-blue" style="font-family:monospace; font-weight:700;">{{ profiles|length }} TOTAL USERS</span>
     </div>
-    <div class="card-body" style="padding:0;">
-        <table class="data-table" id="usersTable">
-            <thead>
-                <tr>
-                    <th>User / Full Name</th>
-                    <th>Email & Mobile</th>
-                    <th>Designation</th>
-                    <th>Role Permission</th>
-                    <th>Status</th>
-                    <th>Registered</th>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table style="width: 100%; border-collapse: collapse;" id="usersTable">
+            <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+                <tr style="text-align: left; font-size: 11px; color: var(--text); text-transform: uppercase;">
+                    <th style="padding: 16px 20px; width: 22%;">User / Full Name</th>
+                    <th style="padding: 16px 20px; width: 18%;">Contact Details</th>
+                    <th style="padding: 16px 20px; width: 12%;">KYC Verification</th>
+                    <th style="padding: 16px 20px; width: 18%;">Role Assignment</th>
+                    <th style="padding: 16px 20px; width: 10%;">Account State</th>
+                    <th style="padding: 16px 20px; width: 10%;">Registered</th>
+                    <th style="padding: 16px 20px; width: 10%; text-align: right;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for profile in profiles %}
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
+                <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;">
+                    <td style="padding: 18px 20px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
                             {% if profile.profile_pic %}
-                                <img src="{{ profile.profile_pic.url }}" style="width:32px; height:32px; border-radius:8px; object-fit:cover;">
+                                <img src="{{ profile.profile_pic.url }}" style="width:38px; height:38px; border-radius:8px; object-fit:cover; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
                             {% else %}
-                                <div class="admin-avatar" style="width:32px; height:32px; font-size:0.7rem;">{{ profile.full_name|default:profile.user.username|slice:":2"|upper }}</div>
+                                <div style="width:38px; height:38px; border-radius:8px; font-size:12px; font-weight:bold; color:var(--text); background:linear-gradient(135deg, var(--bg3), var(--bg1)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;">
+                                    {{ profile.full_name|default:profile.user.username|slice:":2"|upper }}
+                                </div>
                             {% endif %}
                             <div>
-                                <div style="font-weight:600; font-size:0.85rem;">{{ profile.full_name|default:profile.user.username }}</div>
-                                <div style="font-size:0.7rem; color:var(--muted);">@{{ profile.user.username }}</div>
+                                <div style="font-weight:600; font-size:14px; color:var(--text);">{{ profile.full_name|default:profile.user.username }}</div>
+                                <div style="font-size:12px; color:var(--text); opacity:0.6;">@{{ profile.user.username }}</div>
                             </div>
                         </div>
                     </td>
-                    <td>
-                        <div style="font-size:0.8rem;">{{ profile.user.email }}</div>
-                        <div style="font-size:0.75rem; color:var(--muted);">{{ profile.mobile }}</div>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-size:13px; color:var(--text); font-weight:500;">{{ profile.user.email }}</div>
+                        <div style="font-size:12px; color:var(--text); opacity:0.6; margin-top:4px;"><i class="fas fa-phone mr-1"></i> {{ profile.mobile|default:"No Mobile" }}</div>
                     </td>
-                    <td>
-                        <div style="font-size:0.8rem;">{{ profile.get_gov_id_type_display|default:"―" }}</div>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-size:13px; font-weight:500; color:var(--text);">{{ profile.get_gov_id_type_display|default:"―" }}</div>
                         {% if profile.gov_id_upload %}
-                            <a href="{{ profile.gov_id_upload.url }}" target="_blank" class="text-blue" style="font-size:0.7rem;">
-                                <i class="fas fa-file-pdf"></i> View KYC
+                            <a href="{{ profile.gov_id_upload.url }}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px; font-weight:600;">
+                                <i class="fas fa-file-pdf"></i> VIEW KYC RECORD
                             </a>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.role == 'bidder' %}
-                        <span class="badge badge-blue">Bidder</span>
-                        {% elif profile.role == 'creator' %}
-                        <span class="badge badge-purple">Creator</span>
                         {% else %}
-                        <span class="badge badge-gray">None</span>
+                            <div style="font-size:11px; color:var(--text); opacity:0.4; margin-top:4px;">No doc provided</div>
                         {% endif %}
                     </td>
-                    <td>
+                    <td style="padding: 18px 20px;">
+                        <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
+                            {% if profile.role == 'bidder' %}
+                            <span class="badge bg-blue">Bidder</span>
+                            {% elif profile.role == 'creator' %}
+                            <span class="badge bg-amber">Tender Creator</span>
+                            {% else %}
+                            <span class="badge bg-gray">No Role</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="padding: 18px 20px;">
                         {% if profile.status == 'approved' %}
-                        <span class="badge badge-green badge-dot">Active</span>
+                        <span class="badge bg-green badge-dot">Active</span>
                         {% elif profile.status == 'pending' %}
-                        <span class="badge badge-orange badge-dot">Pending</span>
+                        <span class="badge bg-orange badge-dot">Pending</span>
                         {% else %}
-                        <span class="badge badge-red badge-dot">Rejected</span>
+                        <span class="badge bg-red badge-dot">Rejected</span>
                         {% endif %}
                     </td>
-                    <td><span style="font-family:'Space Mono',monospace; font-size:0.75rem;">{{ profile.created_at|date:"M d, Y" }}</span></td>
+                    <td style="padding: 18px 20px;">
+                        <span style="font-family:monospace; font-size:12px; color:var(--text); opacity:0.7;">{{ profile.created_at|date:"M d, Y" }}</span>
+                    </td>
+                    <td style="padding: 18px 20px; text-align: right;">
+                        <button id="manageBtn-{{ profile.id }}" type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('roleForm-{{ profile.id }}').style.display='inline-flex'; this.style.display='none';" style="padding:6px 12px; font-size:11px; border-color:var(--border);">Manage</button>
+                        
+                        <form id="roleForm-{{ profile.id }}" method="POST" action="{% url 'coreadmin:allocate_user_role' profile.id %}" style="display:none; background:var(--bg1); border:1px solid var(--border); border-radius:6px; overflow:hidden;">
+                            {% csrf_token %}
+                            <select name="role" style="padding:6px 8px; border:none; background:transparent; color:var(--text); font-size:11px; outline:none; cursor:pointer;-webkit-appearance:none; -moz-appearance:none; appearance:none;">
+                                <option value="" disabled selected>Assign Role ▾</option>
+                                <option value="bidder">Bidder</option>
+                                <option value="creator">Creator</option>
+                            </select>
+                            <button type="submit" style="background:var(--bg3); border:none; border-left:1px solid var(--border); padding:6px 12px; font-size:11px; color:var(--text); cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg3)'; this.style.color='var(--text)';">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted);">No users found for this filter.</td></tr>
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:60px; color:var(--text); opacity:0.5;">
+                        <i class="fas fa-users mb-3" style="font-size: 24px;"></i>
+                        <div style="font-size: 14px;">No users found for this filter.</div>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

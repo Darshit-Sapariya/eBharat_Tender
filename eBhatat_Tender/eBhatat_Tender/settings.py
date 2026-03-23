@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'accounts',
     'tenders',
     'bids',
     'public',
     'coreadmin',
+    'funding',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +126,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Razorpay Integration
+RAZORPAY_KEY_ID = "rzp_test_bilBagOBVTi4lE"
+RAZORPAY_KEY_SECRET = "YOUR_RAZORPAY_SECRET_HERE" # Replace with actual secret key for backend tasks like refunds

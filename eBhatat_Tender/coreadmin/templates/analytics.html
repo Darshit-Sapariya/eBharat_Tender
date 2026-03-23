@@ -119,8 +119,8 @@
                 {
                     label: 'Tenders Published',
                     data: {{ tender_trend|safe }},
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59,130,246,0.1)',
+                    borderColor: '#ff9933', /* saffron */
+                    backgroundColor: 'rgba(255,153,51,0.1)',
                     fill: true,
                     tension: 0.4,
                     borderWidth: 3
@@ -128,8 +128,8 @@
                 {
                     label: 'Bids Submitted',
                     data: {{ bid_trend|safe }},
-                    borderColor: '#f97316',
-                    backgroundColor: 'rgba(249,115,22,0.1)',
+                    borderColor: '#38bdf8', /* blue */
+                    backgroundColor: 'rgba(56,189,248,0.1)',
                     fill: true,
                     tension: 0.4,
                     borderWidth: 3
@@ -161,7 +161,7 @@
             labels: {{ cat_labels|safe }},
             datasets: [{
                 data: {{ cat_counts|safe }},
-                backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4'],
+                backgroundColor: ['#ff9933', '#138808', '#38bdf8', '#fbbf24', '#818cf8', '#22d3ee'],
                 borderWidth: 0,
                 hoverOffset: 15
             }]
@@ -181,7 +181,7 @@
             labels: {{ status_labels|safe }},
             datasets: [{
                 data: {{ status_counts|safe }},
-                backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                backgroundColor: ['#10b981', '#fb923c', '#f59e0b', '#ef4444'],
                 borderWidth: 0
             }]
         },

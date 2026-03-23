@@ -67,7 +67,7 @@
 
   /* Form input focus */
   .field-input:focus, .field-select:focus, .field-textarea:focus {
-    border-color: #1a56db;
+    border-color: #ea580c;
     background: white;
     box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
     outline: none;
@@ -75,10 +75,10 @@
   .field-input::placeholder, .field-textarea::placeholder { color: #b0bec5; font-size: 0.82rem; }
 
   /* File zone hover */
-  .file-zone:hover, .file-zone:focus-within { border-color: #1a56db; background: #f0f5ff; }
+  .file-zone:hover, .file-zone:focus-within { border-color: #ea580c; background: #f0f5ff; }
 
   /* Panel color accents */
-  .ph-blue  .panel-head { border-left: 3px solid #1a56db; }
+  .ph-indigo  .panel-head { border-left: 3px solid #ea580c; }
   .ph-green .panel-head { border-left: 3px solid #10b981; }
   .ph-amber .panel-head { border-left: 3px solid #f59e0b; }
   .ph-teal  .panel-head { border-left: 3px solid #0d9488; }
@@ -91,7 +91,7 @@
   <!-- ══════ HEADER ══════ -->
   <div class="tc-header relative rounded-2xl overflow-hidden flex items-center justify-between gap-4 flex-wrap
               px-6 sm:px-8 py-6"
-       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 45%, #94a3b8 100%);">
     <div class="relative z-[1]">
       <p class="text-[0.7rem] font-semibold tracking-[0.1em] uppercase text-white/40 mb-1">Procurement Management</p>
       <h1 class="font-sora text-[1.35rem] font-extrabold text-white leading-tight mb-[0.2rem] flex items-center gap-[0.6rem]">
@@ -134,20 +134,20 @@
       <div class="flex flex-col gap-4">
 
         <!-- Basic Information -->
-        <div class="form-panel ph-blue bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(15,42,94,0.05)] transition-[box-shadow,border-color] duration-200">
+        <div class="form-panel ph-indigo bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(15,42,94,0.05)] transition-[box-shadow,border-color] duration-200">
           <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
-            <div class="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[0.85rem] flex-shrink-0 bg-blue-50 text-blue-600">
+            <div class="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[0.85rem] flex-shrink-0 bg-indigo-50 text-indigo-600">
               <i class="fas fa-file-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Basic Information</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Basic Information</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Core tender identification details</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
 
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                 Tender Title <span class="text-red-500 text-[0.7rem]">*</span>
               </label>
               <div class="input-icon-wrap relative">
@@ -160,7 +160,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                   Department <span class="text-red-500 text-[0.7rem]">*</span>
                 </label>
                 <div class="input-icon-wrap relative">
@@ -171,7 +171,7 @@
                 </div>
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                   Category <span class="text-red-500 text-[0.7rem]">*</span>
                 </label>
                 <div class="select-wrap relative">
@@ -193,7 +193,7 @@
             </div>
 
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Description</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Description</label>
               <textarea name="description" rows="4"
                         placeholder="Describe the scope, objectives, and requirements…"
                         class="field-textarea w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
@@ -209,14 +209,14 @@
               <i class="fas fa-rupee-sign"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Financial Details</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Financial Details</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Budget and earnest money deposit</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Estimated Value</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Estimated Value</label>
                 <div class="currency-wrap relative">
                   <span class="currency-prefix">₹</span>
                   <input type="number" name="estimated_value" value="{{ tender.estimated_value }}" min="0"
@@ -226,7 +226,7 @@
                 <span class="text-[0.68rem] text-slate-400 mt-px">Total project estimated cost</span>
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">EMD Amount</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">EMD Amount</label>
                 <div class="currency-wrap relative">
                   <span class="currency-prefix">₹</span>
                   <input type="number" name="emd_amount" value="{{ tender.emd_amount }}" min="0"
@@ -250,26 +250,26 @@
               <i class="fas fa-calendar-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Important Dates</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Important Dates</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Timeline and meeting schedule</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Publish Date</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Publish Date</label>
                 <input type="date" name="publish_date" value="{{ tender.publish_date|date:'Y-m-d' }}"
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Closing Date <span class="text-red-500 text-[0.7rem]">*</span></label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Closing Date <span class="text-red-500 text-[0.7rem]">*</span></label>
                 <input type="date" name="closing_date" value="{{ tender.closing_date|date:'Y-m-d' }}" required
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Pre-Bid Meeting</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Pre-Bid Meeting</label>
                 <input type="datetime-local" name="pre_bid_meeting" value="{{ tender.pre_bid_meeting }}"
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
@@ -285,13 +285,13 @@
               <i class="fas fa-map-marker-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Project Details</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Project Details</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Location and publication status</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Location</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Location</label>
               <div class="input-icon-wrap relative">
                 <i class="fas fa-map-marker-alt input-icon"></i>
                 <input type="text" name="location" value="{{ tender.location }}" placeholder="City, State or full address"
@@ -300,7 +300,7 @@
               </div>
             </div>
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Status</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Status</label>
               <div class="status-select-wrap relative">
                 <div class="status-dot-wrap"></div>
                 <select name="status" id="statusSelect"
@@ -323,7 +323,7 @@
               <i class="fas fa-paperclip"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Supporting Documents</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Supporting Documents</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Replace or keep existing attachment</p>
             </div>
           </div>
@@ -334,14 +334,14 @@
                 <i class="fas fa-file-pdf"></i>
               </div>
               <div>
-                <span class="font-sora text-[0.78rem] font-bold text-[#0f2a5e] block">Tender Document</span>
+                <span class="font-sora text-[0.78rem] font-bold text-slate-700 block">Tender Document</span>
                 <span class="text-[0.68rem] text-slate-400 block mt-px">Will be replaced if you upload a new file</span>
               </div>
               <a href="{{ tender.document.url }}" target="_blank"
                  class="ml-auto inline-flex items-center gap-[0.35rem] px-3 py-[0.35rem]
-                        bg-white border-[1.5px] border-slate-200 rounded-lg text-blue-600
+                        bg-white border-[1.5px] border-slate-200 rounded-lg text-indigo-600
                         font-sora text-[0.72rem] font-bold no-underline flex-shrink-0
-                        transition-all duration-[0.18s] hover:bg-blue-50 hover:border-blue-200">
+                        transition-all duration-[0.18s] hover:bg-indigo-50 hover:border-indigo-200">
                 <i class="fas fa-external-link-alt"></i> View
               </a>
             </div>
@@ -351,10 +351,10 @@
                         text-center cursor-pointer bg-slate-50 transition-all duration-200">
               <input type="file" name="document" accept=".pdf,.docx,.xlsx,.zip"
                      class="absolute inset-0 opacity-0 cursor-pointer z-[2]">
-              <div class="w-9 h-9 bg-blue-50 rounded-[9px] flex items-center justify-center text-blue-600 text-[0.9rem] mx-auto mb-2">
+              <div class="w-9 h-9 bg-indigo-50 rounded-[9px] flex items-center justify-center text-indigo-600 text-[0.9rem] mx-auto mb-2">
                 <i class="fas fa-cloud-upload-alt"></i>
               </div>
-              <span class="font-sora text-[0.8rem] font-bold text-[#0f2a5e] block mb-[0.15rem]">
+              <span class="font-sora text-[0.8rem] font-bold text-slate-700 block mb-[0.15rem]">
                 {% if tender.document %}Upload replacement file{% else %}Click to upload or drag &amp; drop{% endif %}
               </span>
               <span class="text-[0.69rem] text-slate-400">Max 20 MB · Leave empty to keep current file</span>
@@ -377,7 +377,7 @@
                 shadow-[0_2px_12px_rgba(15,42,94,0.05)]">
       <p class="text-[0.75rem] text-slate-400 flex items-center gap-[0.4rem]">
         <i class="fas fa-clock text-amber-400 text-[0.72rem]"></i>
-        Editing tender <strong class="font-sora text-[#0f2a5e] font-bold">#{{ tender.id }} — {{ tender.title|truncatechars:40 }}</strong>
+        Editing tender <strong class="font-sora text-slate-700 font-bold">#{{ tender.id }} — {{ tender.title|truncatechars:40 }}</strong>
       </p>
       <div class="flex items-center gap-[0.6rem]">
         <a href="{% url 'public:tenders' %}"
@@ -392,7 +392,7 @@
                        rounded-[10px] text-white font-sora text-[0.85rem] font-bold cursor-pointer
                        shadow-[0_2px_8px_rgba(26,86,219,0.3)] transition-all duration-200
                        hover:shadow-[0_4px_16px_rgba(26,86,219,0.4)] hover:-translate-y-px active:translate-y-0"
-                style="background: linear-gradient(135deg,#1a56db,#163472);">
+                style="background: linear-gradient(135deg,#94a3b8,#475569);">
           <i class="fas fa-check"></i> Update Tender
         </button>
       </div>

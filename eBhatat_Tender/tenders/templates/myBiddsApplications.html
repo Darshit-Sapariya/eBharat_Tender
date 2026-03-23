@@ -34,16 +34,16 @@
   }
   .table-remark:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #fb923c;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     background: #fff;
   }
 
   /* Status pulse */
-  .pulse-blue {
+  .pulse-indigo {
     display: inline-block;
     width: 6px; height: 6px;
-    background: #3b82f6;
+    background: #fb923c;
     border-radius: 50%;
     animation: pulse 2s infinite;
   }
@@ -58,23 +58,23 @@
 <div class="flex flex-col min-h-screen bg-slate-50/50">
 
   <!-- ══════ HERO SECTION ══════ -->
-  <div class="relative overflow-hidden px-6 lg:px-10 pt-12 pb-16"
-       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+  <div class="relative overflow-hidden px-6 lg:px-10 py-5"
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 45%, #94a3b8 100%);">
     
     <!-- Grid overlay -->
     <div class="absolute inset-0 opacity-10 pointer-events-none"
          style="background-image: radial-gradient(#fff 1px, transparent 0); background-size: 24px 24px;"></div>
 
     <div class="relative z-10">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="px-2.5 py-1 rounded-md bg-white/10 border border-white/20 text-[0.65rem] font-bold text-blue-100 uppercase tracking-widest">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2.5 py-1 rounded-md bg-white/10 border border-white/20 text-[0.65rem] font-bold text-indigo-100 uppercase tracking-widest">
             Registry Control
         </span>
       </div>
-      <h1 class="font-sora text-[2rem] font-extrabold text-white leading-tight mb-3">
+      <h1 class="font-sora text-[1.4rem] font-bold text-white leading-tight mb-1">
         Bid Application Registry
       </h1>
-      <p class="text-[0.9rem] text-white/60 max-w-2xl leading-relaxed">
+      <p class="text-[0.78rem] text-white/60 max-w-2xl leading-snug">
         Manage and evaluate all incoming proposals across your tenders in a high-density, action-oriented table view.
       </p>
     </div>
@@ -85,12 +85,12 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-6 px-6 lg:px-10  relative z-20 mb-10">
       <!-- Total -->
       <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4 transition-transform hover:-translate-y-1">
-          <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shadow-inner">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shadow-inner">
               <i class="fas fa-layer-group"></i>
           </div>
           <div>
               <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Total Bids</p>
-              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ total_bids }}</p>
+              <p class="font-sora text-[1.5rem] font-black text-slate-700 leading-none">{{ total_bids }}</p>
           </div>
       </div>
       <!-- Pending -->
@@ -100,7 +100,7 @@
           </div>
           <div>
               <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Pending</p>
-              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ pending_count }}</p>
+              <p class="font-sora text-[1.5rem] font-black text-slate-700 leading-none">{{ pending_count }}</p>
           </div>
       </div>
       <!-- Approved -->
@@ -110,7 +110,7 @@
           </div>
           <div>
               <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Approved</p>
-              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ approved_count }}</p>
+              <p class="font-sora text-[1.5rem] font-black text-slate-700 leading-none">{{ approved_count }}</p>
           </div>
       </div>
       <!-- Rejected -->
@@ -120,7 +120,7 @@
           </div>
           <div>
               <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-wider mb-0.5">Rejected</p>
-              <p class="font-sora text-[1.5rem] font-black text-navy leading-none">{{ rejected_count }}</p>
+              <p class="font-sora text-[1.5rem] font-black text-slate-700 leading-none">{{ rejected_count }}</p>
           </div>
       </div>
   </div>
@@ -154,11 +154,11 @@
               <!-- Vendor & Company -->
               <td>
                 <div class="flex flex-col">
-                  <span class="font-sora text-[0.9rem] font-bold text-navy mb-0.5">
+                  <span class="font-sora text-[0.9rem] font-bold text-slate-700 mb-0.5">
                     {{ bid.company_name }}
                   </span>
                   <div class="flex items-center gap-2">
-                    <span class="text-[0.72rem] text-blue-500 font-bold">@{{ bid.applicant.username }}</span>
+                    <span class="text-[0.72rem] text-indigo-500 font-bold">@{{ bid.applicant.username }}</span>
                     <span class="text-slate-200">|</span>
                     <span class="text-[0.68rem] text-slate-400 font-medium">{{ bid.city }}</span>
                   </div>
@@ -170,7 +170,7 @@
                 <span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-[0.58rem] font-black text-slate-500 uppercase tracking-tighter mb-1 border border-slate-200">
                   {{ bid.tender.tender_id }}
                 </span>
-                <p class="text-[0.75rem] font-bold text-navy truncate block">{{ bid.tender.title }}</p>
+                <p class="text-[0.75rem] font-bold text-slate-700 truncate block">{{ bid.tender.title }}</p>
               </td>
 
               <!-- Amount -->
@@ -198,8 +198,8 @@
               <!-- Status -->
               <td>
                 {% if bid.status == "pending" %}
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
-                    <span class="pulse-blue"></span> Pending
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
+                    <span class="pulse-indigo"></span> Pending
                   </span>
                 {% elif bid.status == "awarded" %}
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[0.65rem] font-extrabold uppercase tracking-wider">
@@ -229,8 +229,9 @@
                             <button type="button"
                                     onclick="confirmTableAction(this, 'award', 'AWARD TENDER?', 'Award to {{ bid.company_name }}?')"
                                     title="Award Tender"
-                                    class="w-9 h-9 flex items-center justify-center rounded-lg bg-navy text-white hover:bg-navy-dark transition-all shadow-md shadow-navy/10">
-                                <i class="fas fa-award text-[0.9rem]"></i>
+                                    class="w-9 h-9 flex items-center justify-center rounded-lg text-white transition-all shadow-[0_4px_10px_rgba(26,86,219,0.25)] hover:shadow-[0_6px_14px_rgba(26,86,219,0.35)] hover:-translate-y-px"
+                                    style="background: linear-gradient(135deg, #5884e9, #4f47e6);">
+                                <i class="fas fa-award text-[0.9rem] text-amber-300"></i>
                             </button>
                             <button type="button"
                                     onclick="confirmTableAction(this, 'reject', 'REJECT BID?', 'Confirm rejection of {{ bid.company_name }}?')"
@@ -256,7 +257,7 @@
             <tr>
               <td colspan="7" class="py-24 text-center">
                 <i class="fas fa-folder-open text-slate-200 text-[4rem] mb-4"></i>
-                <h3 class="font-sora text-[1.2rem] font-black text-navy mb-1">Registry Empty</h3>
+                <h3 class="font-sora text-[1.2rem] font-black text-slate-700 mb-1">Registry Empty</h3>
                 <p class="text-slate-400">No applications have been submitted across your tenders yet.</p>
               </td>
             </tr>
@@ -283,13 +284,13 @@
       html: htmlContent,
       icon: actionValue === 'award' ? 'question' : 'warning',
       showCancelButton: true,
-      confirmButtonColor: actionValue === 'award' ? '#0f2a5e' : '#ef4444',
+      confirmButtonColor: actionValue === 'award' ? '#4f46e5' : '#ef4444',
       cancelButtonColor: '#64748b',
       confirmButtonText: actionValue === 'award' ? 'Award Tender' : 'Reject Bid',
       cancelButtonText: 'Cancel',
       reverseButtons: true,
       customClass: {
-        title: 'font-sora text-[1.1rem] font-bold text-navy',
+        title: 'font-sora text-[1.1rem] font-bold text-slate-700',
         htmlContainer: 'font-dmSans text-[0.85rem] text-slate-600',
         confirmButton: 'font-sora text-[0.78rem] font-bold px-6 py-2.5 rounded-xl',
         cancelButton: 'font-sora text-[0.78rem] font-bold px-6 py-2.5 rounded-xl'

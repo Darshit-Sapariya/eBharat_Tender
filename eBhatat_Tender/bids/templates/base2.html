@@ -16,584 +16,291 @@
       theme: {
         extend: {
           colors: {
-            navy:        '#0f2a5e',
-            'navy-mid':  '#163472',
-            'navy-dark': '#0a1745',
-            blue:        '#1a56db',
-            'blue-light':'#3b82f6',
-            accent:      '#f59e0b',
-            surface:     '#f8faff',
-            'surface-2': '#f1f5f9',
-            text:        '#1e293b',
-            muted:       '#64748b',
-            border:      '#e2e8f0',
+            navy:           '#7b1c2e',
+            'navy-mid':     '#8f2135',
+            'navy-dark':    '#5a1220',
+            orange:         '#ea580c',
+            'orange-light': '#fb923c',
+            accent:         '#f59e0b',
+            surface:        '#f8faff',
+            'surface-2':    '#f1f5f9',
+            text:           '#1e293b',
+            muted:          '#64748b',
+            border:         '#e2e8f0',
           },
           fontFamily: {
             sora:   ['Sora', 'sans-serif'],
             dmSans: ['"DM Sans"', 'sans-serif'],
+          },
+          width: {
+            sidebar: '240px',
+          },
+          height: {
+            topbar: '62px',
+          },
+          spacing: {
+            sidebar: '240px',
+            topbar:  '62px',
           },
         }
       }
     }
   </script>
 
-  <!-- Bootstrap 5 CSS for grid/buttons in children (since bidsdeshboard uses bootstrap) -->
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    /* ── TOKENS ── */
+    /* CSS custom properties still needed for dynamic sidebar/topbar spacing */
     :root {
-      --navy:        #0f2a5e;
-      --navy-mid:    #163472;
-      --navy-dark:   #0a1745;
-      --blue:        #1a56db;
-      --blue-light:  #3b82f6;
-      --accent:      #f59e0b;
-      --surface:     #f8faff;
-      --surface-2:   #f1f5f9;
-      --text:        #1e293b;
-      --muted:       #64748b;
-      --border:      #e2e8f0;
-      --sidebar-w:   240px;
-      --topbar-h:    62px;
+      --sidebar-w: 240px;
+      --topbar-h:  62px;
     }
 
-    /* Reset some boostrap defaults that might conflict */
+    /* Base resets */
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--surface);
-      color: var(--text);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      margin: 0;
     }
     h1,h2,h3,h4,h5,h6 { font-family: 'Sora', sans-serif; }
     a { text-decoration: none; }
 
-    /* ═══════════════════════════════
-       SIDEBAR
-    ═══════════════════════════════ */
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: var(--sidebar-w);
-      height: 100vh;
-      background: var(--navy-dark);
-      display: flex;
-      flex-direction: column;
-      z-index: 2000;
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      overflow: hidden;
-    }
-
-    /* subtle grid texture */
+    /* Sidebar grid texture pseudo-element */
     .sidebar::before {
       content: '';
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
       background-size: 32px 32px;
       pointer-events: none;
     }
 
-    /* ── Sidebar Brand ── */
-    .sidebar-brand {
-      padding: 1.1rem 1.25rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      text-decoration: none;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
-    }
-    .sidebar-brand-logo {
-      width: 38px; height: 38px;
-      object-fit: contain;
-      flex-shrink: 0;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
-    }
-    .sidebar-brand-text {
-      font-family: 'Sora', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: white;
-      line-height: 1.2;
-    }
-    .sidebar-brand-sub {
-      display: block;
-      font-size: 0.58rem;
-      font-weight: 400;
-      color: rgba(255,255,255,0.38);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 1px;
-    }
-
-    /* ── Nav section label ── */
-    .sidebar-label {
-      padding: 1.1rem 1.25rem 0.4rem;
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── Nav links ── */
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0.25rem 0.75rem 1rem;
-      position: relative;
-      z-index: 1;
-    }
-    .sidebar-nav::-webkit-scrollbar { width: 3px; }
-    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.62rem 0.85rem;
-      border-radius: 10px;
-      color: rgba(255,255,255,0.55);
-      text-decoration: none;
-      font-size: 0.865rem;
-      font-weight: 500;
-      transition: all 0.18s;
-      margin-bottom: 2px;
-      position: relative;
-    }
-    .nav-item i {
-      width: 18px;
-      text-align: center;
-      font-size: 0.9rem;
-      flex-shrink: 0;
-      transition: color 0.18s;
-    }
-    .nav-item:hover {
-      background: rgba(255,255,255,0.08);
-      color: white;
-    }
-    .nav-item:hover i { color: white; }
-    .nav-item.active {
-      background: linear-gradient(135deg, rgba(26,86,219,0.5), rgba(26,86,219,0.25));
-      color: white;
-      font-weight: 600;
-      border: 1px solid rgba(59,130,246,0.25);
-    }
-    .nav-item.active i { color: #93c5fd; }
-    /* active left accent */
-    .nav-item.active::before {
+    /* Active left accent bar */
+    .nav-item-active::before {
       content: '';
       position: absolute;
-      left: 0; top: 20%; bottom: 20%;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
       width: 3px;
-      background: var(--blue-light);
+      background: #6366f1;
       border-radius: 0 3px 3px 0;
     }
 
-    .nav-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.07);
-      margin: 0.65rem 0;
-    }
+    /* Sidebar dimensions using CSS var (Tailwind can't use CSS vars in margin/left) */
+    .sidebar        { width: var(--sidebar-w); }
+    .topbar         { left: var(--sidebar-w); height: var(--topbar-h); }
+    .main-wrap      { margin-left: var(--sidebar-w); padding-top: var(--topbar-h); }
 
-    /* Logout special */
-    .nav-item.logout {
-      color: rgba(248,113,113,0.7);
-    }
-    .nav-item.logout:hover {
-      background: rgba(239,68,68,0.12);
-      color: #fca5a5;
-    }
-    .nav-item.logout i { color: rgba(248,113,113,0.7); }
-    .nav-item.logout:hover i { color: #fca5a5; }
-
-    /* ── Sidebar Footer (user info) ── */
-    .sidebar-footer {
-      padding: 0.85rem 1.1rem;
-      border-top: 1px solid rgba(255,255,255,0.07);
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
-    }
-    .sf-avatar {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255,255,255,0.15);
-      flex-shrink: 0;
-    }
-    .sf-name {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.85);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .sf-role {
-      font-size: 0.67rem;
-      color: rgba(255,255,255,0.35);
-      text-transform: capitalize;
-    }
-
-    /* Mobile: hide sidebar off-screen */
     @media (max-width: 991px) {
-      .sidebar { transform: translateX(-100%); }
+      .sidebar    { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
+      .topbar     { left: 0; }
+      .main-wrap  { margin-left: 0; }
     }
 
-    /* ── Mobile overlay ── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(9,25,58,0.55);
-      backdrop-filter: blur(3px);
-      z-index: 1999;
-    }
-    .sidebar-overlay.show { display: block; }
+    /* Sidebar scrollbar */
+    .sidebar-nav::-webkit-scrollbar       { width: 3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
 
-    /* ═══════════════════════════════
-       TOPBAR
-    ═══════════════════════════════ */
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: var(--sidebar-w);
-      right: 0;
-      height: var(--topbar-h);
-      background: rgba(255,255,255,0.98);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      gap: 0.75rem;
-      z-index: 1000;
-      box-shadow: 0 1px 0 rgba(15,42,94,0.06);
-      transition: left 0.3s;
+    /* Profile dropdown transition */
+    .profile-wrap.show .profile-chevron   { transform: rotate(180deg); }
+    .profile-wrap.show .profile-dropdown  {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
     }
-    @media (max-width: 991px) { .topbar { left: 0; } }
-
-    /* Hamburger */
-    .topbar-toggle {
-      display: none;
-      width: 36px; height: 36px;
-      border-radius: 9px;
-      border: 1.5px solid var(--border);
-      background: white;
-      align-items: center; justify-content: center;
-      cursor: pointer; color: var(--muted); font-size: 0.95rem;
-      flex-shrink: 0; transition: all 0.18s;
-    }
-    .topbar-toggle:hover { border-color: var(--blue-light); color: var(--blue); background: #eff6ff; }
-    @media (max-width: 991px) { .topbar-toggle { display: flex; } }
-
-    /* Breadcrumb / page title area */
-    .topbar-title {
-      flex: 1;
-      min-width: 0;
-    }
-    .topbar-page {
-      font-family: 'Sora', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--navy);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 0;
-    }
-    .topbar-breadcrumb {
-      font-size: 0.72rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 1px;
-    }
-    .topbar-breadcrumb i { font-size: 0.6rem; }
-
-    /* Welcome chip */
-    .welcome-chip {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.3rem 0.85rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: var(--text);
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    @media (min-width: 640px) { .welcome-chip { display: flex; } }
-    .welcome-chip .wave { font-size: 0.85rem; }
-
-    /* Role badge */
-    .role-badge {
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      background: #eff6ff;
-      color: var(--blue);
-      border: 1px solid #bfdbfe;
-      flex-shrink: 0;
-    }
-
-    /* Profile button */
-    .profile-wrap {
-      position: relative;
-    }
-    .profile-btn {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.28rem 0.65rem 0.28rem 0.28rem;
-      border-radius: 50px;
-      border: 1.5px solid var(--border);
-      background: white; cursor: pointer;
-      transition: all 0.18s; flex-shrink: 0;
-    }
-    .profile-btn:hover { border-color: var(--blue-light); background: var(--surface); }
-    .profile-avatar {
-      width: 28px; height: 28px;
-      border-radius: 50%; object-fit: cover;
-      border: 1.5px solid var(--border);
-    }
-    .profile-name {
-      font-size: 0.82rem; font-weight: 600;
-      color: var(--text); max-width: 100px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      display: none;
-    }
-    @media (min-width: 640px) { .profile-name { display: block; } }
-    .profile-chevron { font-size: 0.62rem; color: var(--muted); transition: transform 0.2s; }
-    
-    .profile-wrap.show .profile-chevron {
-      transform: rotate(180deg);
-    }
-    .profile-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 0.5rem;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(15,42,94,0.1);
-      min-width: 160px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-8px);
-      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-      z-index: 2000;
-      overflow: hidden;
-    }
-    .profile-wrap.show .profile-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.65rem 1.1rem;
-      color: var(--text);
-      font-size: 0.85rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background 0.15s, color 0.15s;
-    }
-    .dropdown-item:hover {
-      background: var(--surface);
-      color: var(--blue);
-    }
-    .dropdown-item i {
-      font-size: 0.9rem;
-      color: var(--muted);
-      transition: color 0.15s;
-    }
-    .dropdown-item:hover i {
-      color: var(--blue);
-    }
-    .dropdown-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 0.25rem 0;
-    }
-    .dropdown-item.text-danger {
-      color: #ef4444;
-    }
-    .dropdown-item.text-danger i {
-      color: #ef4444;
-    }
-    .dropdown-item.text-danger:hover {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    /* ═══════════════════════════════
-       MAIN CONTENT
-    ═══════════════════════════════ */
-    .main-wrap {
-      margin-left: var(--sidebar-w);
-      padding-top: var(--topbar-h);
-      min-height: 100vh;
-      transition: margin-left 0.3s;
-    }
-    @media (max-width: 991px) { .main-wrap { margin-left: 0; } }
-
-    .main-content {
-      padding: 1.75rem;
-    }
-    @media (max-width: 640px) { .main-content { padding: 1rem; } }
-
   </style>
 </head>
-<body>
+
+<body class="bg-surface text-text antialiased overflow-x-hidden">
 
 <!-- ═══════ SIDEBAR OVERLAY (mobile) ═══════ -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div id="sidebarOverlay"
+     onclick="closeSidebar()"
+     class="sidebar-overlay hidden fixed inset-0 bg-slate-800/55 backdrop-blur-sm z-[1999]"></div>
 
 <!-- ═══════ SIDEBAR ═══════ -->
-<aside class="sidebar" id="sidebar">
+<aside id="sidebar"
+       class="sidebar fixed top-0 left-0 h-screen bg-white border-r border-slate-200 flex flex-col z-[2000] overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
   <!-- Brand -->
-  <a href="{% url 'public:home' %}" class="sidebar-brand">
-    <img src="{% static 'assets/images/logo/gov-logo.png' %}"
-         class="sidebar-brand-logo" alt="eBharat Tender">
-    <div>
-      <span class="sidebar-brand-text">eBharat Tender
-        <span class="sidebar-brand-sub">Vendor Dashboard</span>
-      </span>
-    </div>
-  </a>
+  <div class="px-4 py-3 border-b border-slate-100 flex-shrink-0 relative z-[1]">
+    <a href="{% url 'public:home' %}"
+       class="flex items-center gap-[10px] no-underline rounded-[10px] px-3 py-[0.6rem] border border-[#f1e8eb]"
+       style="background: linear-gradient(90deg, rgba(123,28,46,0.04), rgba(234,88,12,0.05));">
+      <!-- Bar-chart icon -->
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white border-[1.5px] border-[#f1e8eb] flex items-center justify-center flex-shrink-0">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="8" width="5" height="10" rx="1.5" fill="#7b1c2e"/>
+          <rect x="7.5" y="4" width="5" height="14" rx="1.5" fill="#ea580c" opacity="0.85"/>
+          <rect x="13" y="6" width="5" height="12" rx="1.5" fill="#f59e0b" opacity="0.8"/>
+        </svg>
+      </div>
+      <div class="leading-snug">
+        <div class="font-sora font-bold text-[0.9rem] text-slate-800 tracking-[-0.01em]">eBharat Tender</div>
+        <div class="text-[0.59rem] font-medium uppercase tracking-[0.07em] mt-px" style="color:#b45309;">Vendor Dashboard</div>
+      </div>
+    </a>
+  </div>
 
   <!-- Nav -->
-  <div class="sidebar-nav">
+  <div class="sidebar-nav flex-1 overflow-y-auto px-3 pb-4 pt-1 relative z-[1]">
 
-    <div class="sidebar-label">Main Menu</div>
+    <p class="px-2 pt-[1.1rem] pb-[0.4rem] text-[0.62rem] font-bold text-slate-400 tracking-[0.1em] uppercase">
+      Main Menu
+    </p>
 
     <a href="{% url 'bids:bids_dashboard' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'bids_dashboard' %}active{% endif %}">
-      <i class="fas fa-chart-pie"></i> Dashboard
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px] text-slate-800 no-underline text-[0.865rem] font-medium transition-all duration-[180ms] mb-[2px]
+              {% if request.resolver_match.url_name == 'bids_dashboard' %}nav-item-active bg-indigo-100 font-semibold border border-blue-200/50{% else %}hover:bg-slate-50{% endif %}">
+      <i class="fas fa-chart-pie w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'bids_dashboard' %}text-indigo-500{% endif %}"></i>
+      Dashboard
     </a>
 
-    <a href="{% url 'public:tenders' %}"
-       class="nav-item">
-      <i class="fas fa-search"></i> Find Tenders
-    </a>
 
     <a href="{% url 'bids:mybids' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'mybids' %}active{% endif %}">
-      <i class="fas fa-clipboard-list"></i> My Bids
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px] text-slate-800 no-underline text-[0.865rem] font-medium transition-all duration-[180ms] mb-[2px]
+              {% if request.resolver_match.url_name == 'mybids' %}nav-item-active bg-indigo-100 font-semibold border border-blue-200/50{% else %}hover:bg-slate-50{% endif %}">
+      <i class="fas fa-clipboard-list w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'mybids' %}text-indigo-500{% endif %}"></i>
+      My Bids
     </a>
 
     <a href="{% url 'bids:my_watchlist' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'my_watchlist' %}active{% endif %}">
-      <i class="fas fa-star"></i> Watchlist
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px] text-slate-800 no-underline text-[0.865rem] font-medium transition-all duration-[180ms] mb-[2px]
+              {% if request.resolver_match.url_name == 'my_watchlist' %}nav-item-active bg-indigo-100 font-semibold border border-blue-200/50{% else %}hover:bg-slate-50{% endif %}">
+      <i class="fas fa-star w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'my_watchlist' %}text-indigo-500{% endif %}"></i>
+      Watchlist
     </a>
 
-    <div class="nav-divider"></div>
-    <div class="sidebar-label">Account</div>
+    <a href="{% url 'funding:my_funding_requests' %}"
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px] text-slate-800 no-underline text-[0.865rem] font-medium transition-all duration-[180ms] mb-[2px]
+              {% if request.resolver_match.url_name == 'my_funding_requests' %}nav-item-active bg-indigo-100 font-semibold border border-blue-200/50{% else %}hover:bg-slate-50{% endif %}">
+      <i class="fas fa-hand-holding-usd w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'my_funding_requests' %}text-indigo-500{% endif %}"></i>
+      My Funding
+    </a>
+
+    <div class="h-px bg-slate-100 my-[0.65rem]"></div>
+    <p class="px-2 pt-[1.1rem] pb-[0.4rem] text-[0.62rem] font-bold text-slate-400 tracking-[0.1em] uppercase">
+      Account
+    </p>
 
     <a href="{% url 'bids:vendor_profile_update' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'vendor_profile_update' %}active{% endif %}">
-      <i class="fas fa-user-cog"></i> Profile Settings
+       class="nav-item relative flex items-center gap-[0.7rem] px-[0.85rem] py-[0.62rem] rounded-[10px] text-slate-800 no-underline text-[0.865rem] font-medium transition-all duration-[180ms] mb-[2px]
+              {% if request.resolver_match.url_name == 'vendor_profile_update' %}nav-item-active bg-indigo-100 font-semibold border border-blue-200/50{% else %}hover:bg-slate-50{% endif %}">
+      <i class="fas fa-user-cog w-[18px] text-center text-[0.9rem] flex-shrink-0
+                {% if request.resolver_match.url_name == 'vendor_profile_update' %}text-indigo-500{% endif %}"></i>
+      Profile Settings
     </a>
 
-    <div class="nav-divider"></div>
-
-    <a href="{% url 'accounts:logout' %}" class="nav-item logout">
-      <i class="fas fa-sign-out-alt"></i> Sign Out
-    </a>
+    <div class="h-px bg-slate-100 my-[0.65rem]"></div>
 
   </div>
 
   <!-- Footer -->
-  <div class="sidebar-footer">
+  <div class="flex items-center gap-[0.65rem] px-[1.1rem] py-[0.85rem] border-t border-slate-100 flex-shrink-0 relative z-[1]">
     {% if user.userprofile.profile_pic %}
-      <img src="{{ user.userprofile.profile_pic.url }}" class="sf-avatar" alt="Profile">
+      <img src="{{ user.userprofile.profile_pic.url }}"
+           class="w-[34px] h-[34px] rounded-full object-cover border-2 border-slate-200 flex-shrink-0"
+           alt="Profile">
     {% else %}
-      <img src="{% static 'images/Logo/default-profile.png' %}" class="sf-avatar" alt="Profile">
+      <img src="{% static 'images/Logo/default-profile.png' %}"
+           class="w-[34px] h-[34px] rounded-full object-cover border-2 border-slate-200 flex-shrink-0"
+           alt="Profile">
     {% endif %}
-    <div style="min-width:0;">
-      <p class="sf-name">{{ user.username }}</p>
+    <div class="min-w-0 flex-1">
+      <p class="text-[0.82rem] font-bold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis m-0">
+        {{ user.username }}
+      </p>
       {% if user.userprofile.role %}
-        <p class="sf-role">{{ user.userprofile.role }}</p>
+        <p class="text-[0.67rem] text-slate-400 capitalize m-0">{{ user.userprofile.role }}</p>
       {% endif %}
     </div>
+    <a href="{% url 'accounts:logout' %}" 
+       class="flex items-center justify-center w-[34px] h-[34px] rounded-[10px] bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200 flex-shrink-0 shadow-sm" title="Sign Out">
+      <i class="fas fa-sign-out-alt text-[0.85rem]"></i>
+    </a>
   </div>
 
 </aside>
 
 
 <!-- ═══════ TOPBAR ═══════ -->
-<header class="topbar">
+<header class="topbar fixed top-0 right-0 bg-white/98 backdrop-blur-[12px] border-b border-slate-200 flex items-center px-6 gap-3 z-[1000] shadow-[0_1px_0_rgba(15,42,94,0.06)] transition-[left] duration-300">
 
   <!-- Mobile toggle -->
-  <button class="topbar-toggle" id="sidebarToggle" onclick="openSidebar()" aria-label="Open menu">
+  <button id="sidebarToggle"
+          onclick="openSidebar()"
+          aria-label="Open menu"
+          class="lg:hidden flex items-center justify-center w-9 h-9 rounded-[9px] border-[1.5px] border-slate-200 bg-white text-slate-500 text-[0.95rem] flex-shrink-0 cursor-pointer transition-all duration-[180ms] hover:border-blue-200 hover:text-orange hover:bg-blue-50">
     <i class="fas fa-bars"></i>
   </button>
 
   <!-- Page title -->
-  <div class="topbar-title">
-    <p class="topbar-page">Dashboard</p>
-    <div class="topbar-breadcrumb">
+  <div class="flex-1 min-w-0">
+    <p class="font-sora text-[0.95rem] font-bold text-navy whitespace-nowrap overflow-hidden text-ellipsis m-0">
+      Dashboard
+    </p>
+    <div class="flex items-center gap-1 text-[0.72rem] text-muted mt-px">
       <span>Vendor Portal</span>
-      <i class="fas fa-chevron-right"></i>
-      <span style="color:var(--navy);font-weight:600;">Dashboard</span>
+      <i class="fas fa-chevron-right text-[0.6rem]"></i>
+      <span class="text-navy font-semibold">Dashboard</span>
     </div>
   </div>
 
   <!-- Welcome chip -->
-  <div class="welcome-chip">
-    <span class="wave">👋</span>
+  <div class="hidden sm:flex items-center gap-2 px-[0.85rem] py-[0.3rem] bg-surface border border-slate-200 rounded-[20px] text-[0.8rem] text-text font-medium whitespace-nowrap">
+    <span class="text-[0.85rem]">👋</span>
     Welcome, <strong>{{ user.username }}</strong>
   </div>
 
   <!-- Role badge -->
   {% if user.userprofile.role %}
-  <span class="role-badge">{{ user.userprofile.role }}</span>
+  <span class="flex-shrink-0 px-2 py-[2px] rounded-[20px] text-[0.65rem] font-bold uppercase tracking-[0.04em] bg-blue-50 text-orange border border-blue-200">
+    {{ user.userprofile.role }}
+  </span>
   {% endif %}
 
   <!-- Profile -->
-  <div class="profile-wrap" id="profileWrap">
-    <div class="profile-btn" onclick="toggleProfileDropdown()">
+  <div id="profileWrap" class="profile-wrap relative">
+    <div onclick="toggleProfileDropdown()"
+         class="flex items-center gap-2 pl-[0.28rem] pr-[0.65rem] py-[0.28rem] rounded-[50px] border-[1.5px] border-slate-200 bg-white cursor-pointer flex-shrink-0 transition-all duration-[180ms] hover:border-blue-200 hover:bg-surface">
       {% if user.userprofile.profile_pic %}
-        <img src="{{ user.userprofile.profile_pic.url }}" class="profile-avatar" alt="Profile">
+        <img src="{{ user.userprofile.profile_pic.url }}"
+             class="w-7 h-7 rounded-full object-cover border-[1.5px] border-slate-200"
+             alt="Profile">
       {% else %}
-        <img src="{% static 'images/Logo/default-profile.png' %}" class="profile-avatar" alt="Profile">
+        <img src="{% static 'images/Logo/default-profile.png' %}"
+             class="w-7 h-7 rounded-full object-cover border-[1.5px] border-slate-200"
+             alt="Profile">
       {% endif %}
-      <span class="profile-name">{{ user.username }}</span>
-      <i class="fas fa-chevron-down profile-chevron"></i>
+      <span class="hidden sm:block text-[0.82rem] font-semibold text-text max-w-[100px] whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ user.username }}
+      </span>
+      <i class="profile-chevron fas fa-chevron-down text-[0.62rem] text-muted transition-transform duration-200"></i>
     </div>
-    
-    <!-- Dropdown Menu -->
-    <div class="profile-dropdown">
-      <a href="{% url 'public:home' %}" class="dropdown-item">
-        <i class="fas fa-home"></i> Home
+
+    <!-- Dropdown -->
+    <div class="profile-dropdown absolute top-full right-0 mt-2 bg-white border border-slate-200 rounded-[12px] shadow-[0_4px_16px_rgba(15,42,94,0.1)] min-w-[160px] opacity-0 invisible -translate-y-2 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] z-[2000] overflow-hidden">
+      <a href="{% url 'public:home' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem] text-text text-[0.85rem] font-medium no-underline transition-[background,color] duration-[150ms] hover:bg-surface hover:text-orange">
+        <i class="fas fa-home text-[0.9rem] text-muted"></i> Home
       </a>
-      <a href="{% url 'bids:vendor_profile_update' %}" class="dropdown-item">
-        <i class="fas fa-user-circle"></i> My Profile
+      <a href="{% url 'bids:vendor_profile_update' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem] text-text text-[0.85rem] font-medium no-underline transition-[background,color] duration-[150ms] hover:bg-surface hover:text-orange">
+        <i class="fas fa-user-circle text-[0.9rem] text-muted"></i> My Profile
       </a>
-      <div class="dropdown-divider"></div>
-      <a href="{% url 'accounts:logout' %}" class="dropdown-item text-danger">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
+      <div class="h-px bg-slate-200 my-1"></div>
+      <a href="{% url 'accounts:logout' %}"
+         class="flex items-center gap-[0.6rem] px-[1.1rem] py-[0.65rem] text-red-500 text-[0.85rem] font-medium no-underline transition-[background,color] duration-[150ms] hover:bg-red-50 hover:text-red-600">
+        <i class="fas fa-sign-out-alt text-[0.9rem] text-red-500"></i> Sign Out
       </a>
     </div>
   </div>
@@ -601,9 +308,14 @@
 </header>
 
 <!-- ═══════ MAIN ═══════ -->
-<div class="main-wrap">
-  <div class="main-content">
+<div class="main-wrap min-h-screen transition-[margin-left] duration-300">
+
+
+
+  <div class="p-7 max-sm:p-4">
+    <div class="mt-4">
       {% block content %}{% endblock %}
+    </div>
   </div>
 </div>
 
@@ -611,33 +323,29 @@
 <script>
   function openSidebar() {
     document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sidebarOverlay').classList.add('show');
+    document.getElementById('sidebarOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   }
   function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('show');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
     document.body.style.overflow = '';
   }
 
-  // Close sidebar on nav click (mobile)
   document.querySelectorAll('.nav-item').forEach(link => {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 991) closeSidebar();
     });
   });
 
-  // Close on resize > 991
   window.addEventListener('resize', () => {
     if (window.innerWidth > 991) closeSidebar();
   });
 
-  // Profile Dropdown Toggle
   function toggleProfileDropdown() {
     document.getElementById('profileWrap').classList.toggle('show');
   }
 
-  // Close profile dropdown when clicking outside
   window.addEventListener('click', function(e) {
     const profileWrap = document.getElementById('profileWrap');
     if (profileWrap && !profileWrap.contains(e.target)) {
@@ -647,19 +355,28 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  // Django Messages as SweetAlerts
   document.addEventListener('DOMContentLoaded', function() {
-    {% if messages %}
-      {% for message in messages %}
+    // Global Logout Confirmation
+    const logoutUrl = "{% url 'accounts:logout' %}";
+    const logoutLinks = document.querySelectorAll('a[href="' + logoutUrl + '"]');
+    logoutLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
         Swal.fire({
-          icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
-          title: "{{ message.tags|capfirst }}",
-          text: "{{ message }}",
-          confirmButtonColor: '#1a56db',
-          timer: 4000
+          title: 'Ready to Leave?',
+          text: "You will be signed out of your session.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ea580c',
+          cancelButtonColor: '#64748b',
+          confirmButtonText: 'Yes, Sign Out'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = logoutUrl;
+          }
         });
-      {% endfor %}
-    {% endif %}
+      });
+    });
   });
 </script>
 

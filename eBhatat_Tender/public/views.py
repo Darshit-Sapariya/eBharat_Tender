@@ -11,10 +11,13 @@ from django.db.models import Q
 
 
 from django.db.models import Sum
+from django.db.models import Sum
 from bids.models import TenderApplication
 from accounts.models import UserProfile
 from tenders.models import Tenderss
+from funding.models import Funding
 from datetime import date
+
 
 # ==============================================================================
 # HELPER FUNCTIONS
@@ -60,7 +63,9 @@ def index(request):
     return render(request, 'index.html', context)
 # Funding information page
 def funding(request):
-    return render(request, 'funding.html')
+    fundings = Funding.objects.all().order_by('-created_at')
+    active_count = fundings.count()
+    return render(request, 'funding.html', {'fundings': fundings, 'active_count': active_count})
 # Explain procurement workflow
 def workflow(request):
     return render(request, 'workflow.html')
@@ -185,9 +190,45 @@ def tenderDetails(request, tender_id):
     })
 
 
+from coreadmin.models import ActionLog, Notice
+
+# ...
+
 # Procurement news board
 def noticeboard(request):
-    return render(request, 'noticeboard.html')
+    notices = Notice.objects.filter(is_active=True).order_by('-is_pinned', '-created_at')
+    
+    # Optional: Categorize for sidebar
+    urgent_count = notices.filter(category='Urgent').count()
+    tender_count = notices.filter(category='Tender Notice').count()
+    policy_count = notices.filter(category='Policy Update').count()
+    training_count = notices.filter(category='Training').count()
+    system_count = notices.filter(category='System Notice').count()
+    award_count = notices.filter(category='Contract Award').count()
+    
+    recent_notices = notices[:4]
+    
+    from django.core.paginator import Paginator
+    paginator = Paginator(notices, 10) # Show 10 notices per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    from django.utils import timezone
+    today_date = timezone.now().date()
+    
+    context = {
+        'notices': page_obj,
+        'urgent_count': urgent_count,
+        'tender_count': tender_count,
+        'policy_count': policy_count,
+        'training_count': training_count,
+        'system_count': system_count,
+        'award_count': award_count,
+        'recent_notices': recent_notices,
+        'total_count': notices.count(),
+        'today_date': today_date,
+    }
+    return render(request, 'noticeboard.html', context)
 
 
 

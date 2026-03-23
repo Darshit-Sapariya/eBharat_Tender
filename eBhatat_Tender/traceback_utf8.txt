@@ -1,0 +1,232 @@
+﻿Operations to perform:
+  Apply all migrations: accounts, admin, auth, bids, contenttypes, funding, public, sessions, tenders
+Running migrations:
+python : Traceback (most 
+recent call last):
+At line:1 char:1
++ python manage.py migrate 
+2>&1 | Out-File -Encoding 
+utf8 traceback_utf ...
++ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: (Traceback  
+   (most recent call last):   
+ :String) [], RemoteExcept    
+ion
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+  File "C:\Users\Darshit\OneDr
+ive\Desktop\eBharat_Tender\eBh
+atat_Tender\manage.py", line 
+22, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\Darshit\OneDr
+ive\Desktop\eBharat_Tender\eBh
+atat_Tender\manage.py", line 
+18, in main
+    execute_from_command_line(
+sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\__init__.py", 
+line 443, in 
+execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\__init__.py", 
+line 437, in execute
+    self.fetch_command(subcomm
+and).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\base.py", 
+line 420, in run_from_argv
+    self.execute(*args, 
+**cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^
+^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\base.py", 
+line 464, in execute
+    output = 
+self.handle(*args, **options)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\base.py", 
+line 111, in wrapper
+    res = handle_func(*args, 
+**kwargs)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+core\management\commands\migra
+te.py", line 354, in handle
+    post_migrate_state = 
+executor.migrate(
+        targets,
+    ...<3 lines>...
+        
+fake_initial=fake_initial,
+    )
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\migrations\executor.py", 
+line 137, in migrate
+    state = 
+self._migrate_all_forwards(
+        state, plan, 
+full_plan, fake=fake, 
+fake_initial=fake_initial
+    )
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\migrations\executor.py", 
+line 169, in 
+_migrate_all_forwards
+    state = 
+self.apply_migration(
+        state, migration, 
+fake=fake, 
+fake_initial=fake_initial
+    )
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\migrations\executor.py", 
+line 257, in apply_migration
+    state = 
+migration.apply(state, 
+schema_editor)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\migrations\migration.py", 
+line 132, in apply
+    
+operation.database_forwards(
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.app_label, 
+schema_editor, old_state, 
+project_state
+        ^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+    )
+    ^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\migrations\operations\field
+s.py", line 118, in 
+database_forwards
+    schema_editor.add_field(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        from_model,
+        ^^^^^^^^^^^
+        field,
+        ^^^^^^
+    )
+    ^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\backends\sqlite3\schema.py"
+, line 325, in add_field
+    self._remake_table(model, 
+create_field=field)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\backends\sqlite3\schema.py"
+, line 151, in _remake_table
+    self.effective_default(cre
+ate_field)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^
+^^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\backends\base\schema.py", 
+line 491, in effective_default
+    return field.get_db_prep_s
+ave(self._effective_default(fi
+eld), self.connection)
+           ~~~~~~~~~~~~~~~~~~~
+~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\models\fields\__init__.py",
+ line 1011, in 
+get_db_prep_save
+    return 
+self.get_db_prep_value(value, 
+connection=connection, 
+prepared=False)
+           ~~~~~~~~~~~~~~~~~~~
+~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\models\fields\__init__.py",
+ line 1682, in 
+get_db_prep_value
+    value = 
+self.get_prep_value(value)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\models\fields\__init__.py",
+ line 1660, in get_prep_value
+    value = 
+super().get_prep_value(value)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\models\fields\__init__.py",
+ line 1536, in get_prep_value
+    return 
+self.to_python(value)
+           
+~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+db\models\fields\__init__.py",
+ line 1621, in to_python
+    parsed = 
+parse_datetime(value)
+  File "C:\Users\Darshit\AppDa
+ta\Local\Programs\Python\Pytho
+n313\Lib\site-packages\django\
+utils\dateparse.py", line 
+114, in parse_datetime
+    return datetime.datetime.f
+romisoformat(value)
+           ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~^^^^^^^
+TypeError: fromisoformat: 
+argument must be str
+  Applying bids.0002_tenderapplication_created_at...

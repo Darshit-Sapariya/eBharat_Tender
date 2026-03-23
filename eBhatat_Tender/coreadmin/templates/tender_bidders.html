@@ -1,0 +1,113 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Bidders for TND-{{ tender.id|stringformat:"04d" }}{% endblock %}
+{% block nav_tenders %}active{% endblock %}
+
+{% block content %}
+<div class="ph">
+  <div>
+    <div class="ph-eye">Procurement Tracking</div>
+    <div class="ph-title"><a href="{% url 'coreadmin:tender_list' %}" style="color:var(--t4);"><i class="fas fa-arrow-left"></i> Tenders</a> / {{ tender.title }}</div>
+    <div class="ph-sub">Reviewing all applications for TND-{{ tender.id|stringformat:"04d" }}</div>
+  </div>
+  <div class="ph-actions">
+    <a href="{% url 'tenders:tenderDetails' tender.id %}" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> View Public Listing</a>
+  </div>
+</div>
+
+<!-- Details Box -->
+<div class="card" style="margin-bottom: 22px;">
+    <div style="padding: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <div style="background: var(--surface-2); padding: 18px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text); opacity:0.6; text-transform: uppercase;">Est. Value</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; font-family: monospace;">₹{{ tender.estimated_value|intcomma }}</div>
+            </div>
+            <div style="background: var(--surface-2); padding: 18px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text); opacity:0.6; text-transform: uppercase;">Total Bidders</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--accent); margin-top: 6px; font-family: monospace;">{{ bid_count }}</div>
+            </div>
+            <div style="background: var(--surface-2); padding: 18px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text); opacity:0.6; text-transform: uppercase;">EMD Cost</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; font-family: monospace;">₹{{ tender.emd_amount|intcomma }}</div>
+            </div>
+            <div style="background: var(--surface-2); padding: 18px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text); opacity:0.6; text-transform: uppercase;">Status</div>
+                <div style="margin-top: 8px;">
+                    {% if tender.status == 'open' %}
+                        <span class="badge bg-green">Open</span>
+                    {% elif tender.status == 'awarded' %}
+                        <span class="badge bg-blue">Awarded to {{ awardee.company_name|truncatechars:18 }}</span>
+                    {% elif tender.status == 'closed' or tender.status == 'expired' %}
+                        <span class="badge bg-red">{{ tender.status|title }}</span>
+                    {% else %}
+                        <span class="badge bg-amber">{{ tender.status|title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bidders Full Table -->
+<div class="card" style="margin-bottom:22px;">
+    <div class="ch">
+        <div class="ct">Bidder Applications</div>
+    </div>
+    
+    <div class="tw" style="overflow-x: auto;">
+        <table class="dt" style="width: 100%; border-collapse: collapse;">
+            <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+                <tr>
+                    <th style="padding: 16px 20px; width: 25%; text-align: left; font-size: 11px; color: var(--text); text-transform:uppercase;">Company Name</th>
+                    <th style="padding: 16px 20px; width: 25%; text-align: left; font-size: 11px; color: var(--text); text-transform:uppercase;">Contact</th>
+                    <th style="padding: 16px 20px; width: 20%; text-align: right; font-size: 11px; color: var(--text); text-transform:uppercase;">Bid Value</th>
+                    <th style="padding: 16px 20px; width: 15%; text-align: center; font-size: 11px; color: var(--text); text-transform:uppercase;">Submitted</th>
+                    <th style="padding: 16px 20px; width: 15%; text-align: center; font-size: 11px; color: var(--text); text-transform:uppercase;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr style="border-bottom: 1px solid var(--border); {% if app.status == 'awarded' %}background: var(--green-bg);{% endif %} transition: background 0.2s;">
+                    <td style="padding: 18px 20px; text-align: left; font-size: 14px; font-weight: 600; color: var(--text);">
+                        {% if app.status == 'awarded' %}<i class="fas fa-trophy mr-2" style="color:var(--amber);"></i>{% endif %}
+                        {{ app.company_name }}
+                        <div style="font-size:11px; font-weight:500; color:var(--text); margin-top:4px; opacity: 0.6;">User: {{ app.applicant.username }}</div>
+                    </td>
+                    <td style="padding: 18px 20px; text-align: left; font-size: 13px; color: var(--text); opacity: 0.8;">
+                        {{ app.mobile_number }}<br>
+                        <span style="font-size:11px; opacity: 0.8;">{{ app.official_email }}</span>
+                    </td>
+                    <td style="padding: 18px 20px; text-align: right; font-size: 16px; font-weight:700; color:var(--text); font-family:monospace;">
+                        ₹{{ app.bid_amount|intcomma }}
+                    </td>
+                    <td style="padding: 18px 20px; text-align: center; font-size: 13px; color: var(--text); opacity:0.8;">
+                        {{ app.applied_at|date:"d M Y" }}
+                    </td>
+                    <td style="padding: 18px 20px; text-align: center;">
+                        {% if app.status == 'awarded' %}
+                            <span class="badge bg-green">Awarded</span>
+                        {% elif app.status == 'pending' %}
+                            <span class="badge bg-amber">Under Review</span>
+                        {% elif app.status == 'rejected' %}
+                            <span class="badge bg-red">Rejected</span>
+                        {% else %}
+                            <span class="badge bg-gray">{{ app.status|title }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 60px; color: var(--text); opacity:0.6; font-size: 14px;">
+                        <i class="fas fa-folder-open mb-3" style="font-size: 24px;"></i><br>
+                        No applications submitted yet for this tender.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -26,6 +26,8 @@ urlpatterns = [
     path('tenders/', include('tenders.urls')),
     path('bids/', include('bids.urls')),
     path('coreadmin/', include('coreadmin.urls')),
+    path('funding/', include('funding.urls')),
+
     
 ]
 if settings.DEBUG:

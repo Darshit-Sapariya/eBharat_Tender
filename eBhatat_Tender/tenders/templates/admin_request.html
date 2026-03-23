@@ -17,7 +17,7 @@
 
   <!-- Header -->
   <div class="ar-header relative rounded-2xl overflow-hidden px-8 py-7"
-       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 45%, #94a3b8 100%);">
     <div class="relative z-[1]">
       <p class="text-[0.7rem] font-semibold uppercase tracking-wider text-white/40 mb-1">Authorization</p>
       <h1 class="font-sora text-[1.5rem] font-extrabold text-white leading-tight">Request Admin Permission</h1>
@@ -30,22 +30,22 @@
     <!-- Request Form -->
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
       <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
-        <h3 class="font-sora text-[0.95rem] font-bold text-[#0f2a5e]">Submit New Request</h3>
+        <h3 class="font-sora text-[0.95rem] font-bold text-slate-700">Submit New Request</h3>
       </div>
       <form method="POST" class="p-6 flex flex-col gap-5">
         {% csrf_token %}
         <div class="flex flex-col gap-1.5">
           <label class="text-[0.8rem] font-bold text-slate-700">Department Name</label>
           <input type="text" name="department_name" required placeholder="e.g. Public Works Department"
-                 class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-[0.9rem] focus:border-blue-500 focus:bg-white outline-none transition-all">
+                 class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-[0.9rem] focus:border-indigo-500 focus:bg-white outline-none transition-all">
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-[0.8rem] font-bold text-slate-700">Category</label>
           <input type="text" name="category_name" required placeholder="e.g. Construction"
-                 class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-[0.9rem] focus:border-blue-500 focus:bg-white outline-none transition-all">
+                 class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-[0.9rem] focus:border-indigo-500 focus:bg-white outline-none transition-all">
         </div>
         <button type="submit" 
-                class="w-full mt-4 py-3.5 bg-[#1a56db] text-white font-sora font-bold rounded-xl hover:bg-[#163472] transition-all shadow-[0_4px_12px_rgba(26,86,219,0.25)] flex items-center justify-center gap-2">
+                class="w-full mt-4 py-3.5 bg-[#4f46e5] text-white font-sora font-bold rounded-xl hover:bg-indigo-400 transition-all shadow-[0_4px_12px_rgba(26,86,219,0.25)] flex items-center justify-center gap-2">
           <i class="fas fa-paper-plane text-[0.8rem]"></i>
           <span>Submit Request</span>
         </button>
@@ -53,19 +53,19 @@
     </div>
 
     <!-- Info/Notice -->
-    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-      <h4 class="font-sora text-[0.9rem] font-bold text-blue-900 mb-3 flex items-center gap-2">
-        <i class="fas fa-info-circle text-blue-500"></i> Why is this required?
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+      <h4 class="font-sora text-[0.9rem] font-bold text-indigo-900 mb-3 flex items-center gap-2">
+        <i class="fas fa-info-circle text-indigo-500"></i> Why is this required?
       </h4>
-      <p class="text-[0.82rem] text-blue-800/70 leading-relaxed">
+      <p class="text-[0.82rem] text-indigo-800/70 leading-relaxed">
         To maintain data integrity and professional standards, all departments and categories must be verified by administrators. 
         Once approved, these options will appear in your tender publication form.
       </p>
       <div class="mt-4 flex flex-col gap-2">
-        <div class="flex items-center gap-3 text-[0.75rem] text-blue-900/60">
+        <div class="flex items-center gap-3 text-[0.75rem] text-indigo-900/60">
           <i class="fas fa-clock w-4 text-center"></i> Approval usually takes 24-48 hours.
         </div>
-        <div class="flex items-center gap-3 text-[0.75rem] text-blue-900/60">
+        <div class="flex items-center gap-3 text-[0.75rem] text-indigo-900/60">
           <i class="fas fa-check-double w-4 text-center"></i> You'll receive a notification upon update.
         </div>
       </div>
@@ -76,7 +76,7 @@
   <!-- Request History -->
   <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
     <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
-      <h3 class="font-sora text-[0.95rem] font-bold text-[#0f2a5e]">Your Request History</h3>
+      <h3 class="font-sora text-[0.95rem] font-bold text-slate-700">Your Request History</h3>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">

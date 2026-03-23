@@ -122,17 +122,17 @@
         <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
                      font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
                      bg-red-500/15 border border-red-400/25 text-red-300">
-          <i class="fas fa-exclamation-circle text-[0.5rem]"></i> 3 Urgent
+          <i class="fas fa-exclamation-circle text-[0.5rem]"></i> {{ urgent_count }} Urgent
         </span>
         <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
                      font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
                      bg-[#1a56db]/22 border border-[#3b82f6]/28 text-blue-200">
-          <i class="fas fa-clipboard-list text-[0.5rem]"></i> 24 Active
+          <i class="fas fa-clipboard-list text-[0.5rem]"></i> {{ total_count }} Active
         </span>
         <span class="inline-flex items-center gap-[5px] px-3 py-[4px] rounded-full
                      font-sora text-[0.6rem] font-bold tracking-[0.06em] uppercase
                      bg-emerald-500/14 border border-emerald-400/22 text-emerald-300">
-          <i class="fas fa-plus text-[0.5rem]"></i> 3 New
+          <i class="fas fa-plus text-[0.5rem]"></i> {{ recent_notices.count }} New
         </span>
       </div>
     </div>
@@ -198,89 +198,65 @@
         <!-- Meta row -->
         <div class="flex items-center justify-between flex-wrap gap-2 mb-5">
           <p class="font-dmSans text-[0.84rem] text-slate-500">
-            Showing <span class="font-bold text-[#0f2a5e]">8</span> notices
+            Showing <span class="font-bold text-[#0f2a5e]">{{ notices.count }}</span> notices
           </p>
           <p class="font-dmSans text-[0.78rem] text-slate-400 flex items-center gap-1">
-            <i class="fas fa-clock text-[0.7rem]"></i> Last updated: 16 Mar 2026, 10:30 AM
+            <i class="fas fa-clock text-[0.7rem]"></i> Last updated: {% now "j M Y, H:i A" %}
           </p>
         </div>
 
         <div class="flex flex-col gap-4">
 
-          <!-- ── Notice 1: Urgent + Pinned ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-urgent pinned-bg
+          {% for notice in notices %}
+          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden 
+                      {% if notice.category == 'Urgent' %}border-l-urgent{% elif notice.category == 'Policy Update' %}border-l-high{% elif notice.category == 'Contract Award' %}border-l-info{% else %}border-l-normal{% endif %}
+                      {% if notice.is_pinned %}pinned-bg{% endif %}
                       shadow-[0_2px_12px_rgba(15,42,94,0.06)]
                       hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
+            {% if notice.is_pinned %}
             <div class="pin-flag"><i class="fas fa-thumbtack" style="font-size:0.55rem;"></i> Pinned</div>
+            {% endif %}
             <div class="px-5 sm:px-6 py-5">
 
               <!-- Top row -->
               <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full
-                               font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em]
-                               bg-red-50 text-red-700">
+                  {% if notice.category == 'Urgent' %}
+                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-red-50 text-red-700">
                     <i class="fas fa-exclamation-circle text-[0.52rem]"></i> Urgent
                   </span>
-                  <span class="inline-flex items-center px-[9px] py-[3px] rounded-full
-                               font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em]
-                               text-white"
-                       style="background: linear-gradient(90deg,#0f2a5e,#1a56db);">New</span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full
-                               font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em]
-                               bg-slate-100 text-slate-500">
+                  {% elif notice.category == 'Policy Update' %}
+                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-purple-50 text-purple-700">
                     <i class="fas fa-file-alt text-[0.52rem]"></i> Policy Update
                   </span>
+                  {% elif notice.category == 'Tender Notice' %}
+                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-blue-50 text-blue-700">
+                    <i class="fas fa-gavel text-[0.52rem]"></i> Tender Notice
+                  </span>
+                  {% elif notice.category == 'Contract Award' %}
+                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700">
+                    <i class="fas fa-check-circle text-[0.52rem]"></i> Award
+                  </span>
+                  {% else %}
+                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
+                    {{ notice.category }}
+                  </span>
+                  {% endif %}
+
+                  {% if notice.created_at|date:"Y-m-d" == today_date|date:"Y-m-d" %}
+                  <span class="inline-flex items-center px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] text-white" style="background: linear-gradient(90deg,#0f2a5e,#1a56db);">New</span>
+                  {% endif %}
                 </div>
                 <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0">
-                  <i class="fas fa-calendar-alt text-[0.62rem]"></i> 16 Mar 2026
+                  <i class="fas fa-calendar-alt text-[0.62rem]"></i> {{ notice.created_at|date:"d M Y" }}
                 </span>
               </div>
 
               <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Mandatory KYC Re-verification for All Registered Vendors — Deadline: 31 March 2026
+                {{ notice.title }}
               </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                All registered vendors are hereby instructed to complete KYC re-verification by 31st March 2026. Failure to comply will result in temporary suspension of bidding privileges. This is a one-time mandatory compliance requirement per the updated procurement policy circular dated 01 March 2026.
-              </p>
-
-              <!-- Instruction block -->
-              <div class="bg-[#f8faff] border border-slate-200 rounded-xl px-4 py-4 mb-4">
-                <p class="font-sora text-[0.7rem] font-bold uppercase tracking-[0.06em] text-[#0f2a5e]
-                           flex items-center gap-[5px] mb-3">
-                  <i class="fas fa-list-ul text-[#1a56db] text-[0.62rem]"></i> Instructions for Vendors
-                </p>
-                <ul class="flex flex-col gap-[0.38rem]">
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">
-                    Log in to your vendor portal → <strong>My Profile → KYC Verification</strong>
-                  </li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">
-                    Upload valid business certificate, GST certificate, and PAN (PDF/JPG, max 5MB each)
-                  </li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">
-                    Ensure all documents are self-attested and clearly legible
-                  </li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">
-                    Submit form and await approval within 3–5 working days
-                  </li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">
-                    Contact <strong>kyc@ebharattender.gov.in</strong> for any issues
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Attachments -->
-              <div class="flex flex-wrap gap-2 mb-4">
-                <a href="#" class="attach-chip inline-flex items-center gap-[5px] px-3 py-[5px]
-                                   bg-slate-100 border border-slate-200 rounded-lg
-                                   font-dmSans text-[0.74rem] font-medium text-[#0f2a5e] no-underline">
-                  <i class="fas fa-file-pdf text-red-500 text-[0.68rem]"></i> KYC_Policy_Circular.pdf
-                </a>
-                <a href="#" class="attach-chip inline-flex items-center gap-[5px] px-3 py-[5px]
-                                   bg-slate-100 border border-slate-200 rounded-lg
-                                   font-dmSans text-[0.74rem] font-medium text-[#0f2a5e] no-underline">
-                  <i class="fas fa-file-pdf text-red-500 text-[0.68rem]"></i> Vendor_Compliance_Form.pdf
-                </a>
+              <div class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
+                {{ notice.description|linebreaks }}
               </div>
 
               <!-- Footer -->
@@ -288,294 +264,60 @@
                 <div class="flex items-center gap-2">
                   <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center
                               text-white text-[0.58rem] font-bold flex-shrink-0"
-                       style="background: linear-gradient(135deg,#0f2a5e,#1a56db);">SA</div>
+                       style="background: linear-gradient(135deg,#0f2a5e,#1a56db);">
+                    {{ notice.created_by.username|slice:":2"|upper }}
+                  </div>
                   <span class="font-dmSans text-[0.73rem] text-slate-400">
-                    Posted by <strong class="text-slate-700 font-semibold">System Administrator</strong>
+                    Posted by <strong class="text-slate-700 font-semibold">{% if notice.created_by.get_full_name %}{{ notice.created_by.get_full_name }}{% else %}{{ notice.created_by.username }}{% endif %}</strong>
                   </span>
                 </div>
                 <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1">
-                  <i class="fas fa-eye text-[0.62rem]"></i> 3,241 views
+                  <i class="fas fa-eye text-[0.62rem]"></i> {{ notice.view_count }} views
                 </span>
               </div>
             </div>
           </div>
-
-
-          <!-- ── Notice 2: High ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-high
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-amber-50 text-amber-700">
-                    <i class="fas fa-arrow-up text-[0.52rem]"></i> High Priority
-                  </span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-gavel text-[0.52rem]"></i> Tender Notice
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0">
-                  <i class="fas fa-calendar-alt text-[0.62rem]"></i> 15 Mar 2026
-                </span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Corrigendum: Bid Submission Deadline Extended — Smart City IT Infrastructure Tender (TN/2026/045)
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                The bid submission deadline for Tender No. TN/2026/045 has been extended from <strong>20 March 2026</strong> to <strong>5 April 2026</strong> at 5:00 PM IST. All other terms remain unchanged. Bidders who already submitted may revise until the new deadline.
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <a href="#" class="attach-chip inline-flex items-center gap-[5px] px-3 py-[5px] bg-slate-100 border border-slate-200 rounded-lg font-dmSans text-[0.74rem] font-medium text-[#0f2a5e] no-underline">
-                  <i class="fas fa-file-pdf text-red-500 text-[0.68rem]"></i> Corrigendum_TN2026045.pdf
-                </a>
-              </div>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">PM</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">Procurement Manager</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 1,872 views</span>
-              </div>
-            </div>
+          {% empty %}
+          <div class="bg-white border border-slate-200 rounded-2xl py-12 px-6 text-center">
+            <i class="fas fa-bullhorn text-slate-200 text-5xl mb-4"></i>
+            <h3 class="font-sora text-lg font-bold text-slate-700 mb-2">No active notices</h3>
+            <p class="font-dmSans text-slate-500">There are no announcements or instructions at this time.</p>
           </div>
-
-
-          <!-- ── Notice 3: Training + Instructions ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-normal
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-blue-50 text-blue-700">General</span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-chalkboard-teacher text-[0.52rem]"></i> Training
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 14 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Free Vendor Onboarding Webinar — How to Submit Your First Bid Online (22 March 2026)
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                The Department of e-Procurement invites all newly registered and prospective vendors to attend a free online webinar covering the end-to-end process of submitting bids. Sessions will be in Hindi and English.
-              </p>
-              <div class="bg-[#f8faff] border border-slate-200 rounded-xl px-4 py-4 mb-4">
-                <p class="font-sora text-[0.7rem] font-bold uppercase tracking-[0.06em] text-[#0f2a5e] flex items-center gap-[5px] mb-3">
-                  <i class="fas fa-info-circle text-[#1a56db] text-[0.62rem]"></i> Webinar Details
-                </p>
-                <ul class="flex flex-col gap-[0.38rem]">
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]"><strong>Date:</strong> Saturday, 22 March 2026 &nbsp;|&nbsp; <strong>Time:</strong> 11:00 AM – 1:00 PM IST</li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]"><strong>Platform:</strong> Google Meet (link shared on registration)</li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">Register at <strong>webinar.ebharattender.gov.in</strong> before 21 March 2026</li>
-                  <li class="instr-li font-dmSans text-[0.82rem] text-slate-700 leading-[1.55]">Certificate of participation provided to all attendees</li>
-                </ul>
-              </div>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">TO</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">Training Officer</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 982 views</span>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ── Notice 4: Award ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-info
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700">
-                    <i class="fas fa-check-circle text-[0.52rem]"></i> Award
-                  </span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-trophy text-[0.52rem]"></i> Contract Award
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 12 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Contract Awarded: Solar Energy Installation Project — Rajasthan Region (TN/2026/031)
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                The contract for Solar Energy Installation (TN/2026/031, ₹7.2 Cr) has been awarded to <strong>GreenPower Solutions Pvt. Ltd.</strong> following transparent evaluation of 9 valid bids. Award made per L-1 (lowest compliant bidder) selection criteria.
-              </p>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">DG</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">Director General, Procurement</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 2,104 views</span>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ── Notice 5: System Maintenance ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-urgent
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-red-50 text-red-700">
-                    <i class="fas fa-exclamation-circle text-[0.52rem]"></i> Urgent
-                  </span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-server text-[0.52rem]"></i> System Notice
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 11 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Scheduled System Maintenance — Portal Unavailable on 18 March 2026 (12 AM – 6 AM IST)
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                The eBharat Tender portal will undergo maintenance on <strong>18 March 2026, 12:00 AM – 6:00 AM IST</strong>. All services including bid submission, document upload, and login will be unavailable. Vendors with upcoming deadlines should submit before <strong>11:59 PM on 17 March</strong>.
-              </p>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">IT</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">IT Infrastructure Team</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 5,617 views</span>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ── Notice 6: Holiday ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-normal
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-blue-50 text-blue-700">General</span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-calendar-times text-[0.52rem]"></i> Holiday
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 08 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Office Closure Notice — Holi Holiday on 25 &amp; 26 March 2026
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                Department offices will remain closed on <strong>25 and 26 March 2026</strong> on account of Holi. The portal will remain operational 24×7. Support queries will be addressed from 27 March 2026 onwards.
-              </p>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">SA</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">System Administrator</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 743 views</span>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ── Notice 7: EMD Rules ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-high
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-amber-50 text-amber-700">
-                    <i class="fas fa-arrow-up text-[0.52rem]"></i> High Priority
-                  </span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-balance-scale text-[0.52rem]"></i> Policy Update
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 05 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                Revised EMD Rules Effective 1 April 2026 — All Vendors Must Read
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                As per GoI circular No. F.12/2026-PPD, revised EMD rules come into effect from <strong>1 April 2026</strong>. EMD will now be mandatory for all tenders with estimated value above ₹50 Lakhs. Revised rates are outlined in the attached circular.
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <a href="#" class="attach-chip inline-flex items-center gap-[5px] px-3 py-[5px] bg-slate-100 border border-slate-200 rounded-lg font-dmSans text-[0.74rem] font-medium text-[#0f2a5e] no-underline">
-                  <i class="fas fa-file-pdf text-red-500 text-[0.68rem]"></i> Revised_EMD_Rules_2026.pdf
-                </a>
-                <a href="#" class="attach-chip inline-flex items-center gap-[5px] px-3 py-[5px] bg-slate-100 border border-slate-200 rounded-lg font-dmSans text-[0.74rem] font-medium text-[#0f2a5e] no-underline">
-                  <i class="fas fa-file-pdf text-red-500 text-[0.68rem]"></i> FAQ_EMD_Changes.pdf
-                </a>
-              </div>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">JS</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">Joint Secretary, Finance</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 4,388 views</span>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ── Notice 8: Milestone ── -->
-          <div class="notice-card relative bg-white border border-slate-200 rounded-2xl overflow-hidden border-l-info
-                      shadow-[0_2px_12px_rgba(15,42,94,0.06)]
-                      hover:border-slate-300 hover:shadow-[0_12px_36px_rgba(15,42,94,0.1)]">
-            <div class="px-5 sm:px-6 py-5">
-              <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700">Info</span>
-                  <span class="inline-flex items-center gap-1 px-[9px] py-[3px] rounded-full font-sora text-[0.62rem] font-semibold uppercase tracking-[0.04em] bg-slate-100 text-slate-500">
-                    <i class="fas fa-star text-[0.52rem]"></i> Achievement
-                  </span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1 flex-shrink-0"><i class="fas fa-calendar-alt text-[0.62rem]"></i> 01 Mar 2026</span>
-              </div>
-              <h3 class="notice-title font-sora text-[0.96rem] font-bold text-[#0f2a5e] leading-[1.4] mb-2">
-                eBharat Tender Portal Crosses 1,200 Registered Vendors Milestone
-              </h3>
-              <p class="font-dmSans text-[0.84rem] text-slate-500 leading-[1.7] mb-4">
-                We are pleased to announce that the eBharat Tender portal has onboarded over <strong>1,200 verified vendors</strong> across 28 states and 8 Union Territories, facilitating transparent awarding of tenders worth ₹50 Crore+ to date.
-              </p>
-              <div class="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                  <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white text-[0.58rem] font-bold flex-shrink-0" style="background:linear-gradient(135deg,#0f2a5e,#1a56db);">CE</div>
-                  <span class="font-dmSans text-[0.73rem] text-slate-400">Posted by <strong class="text-slate-700 font-semibold">Chief Executive, eBharat</strong></span>
-                </div>
-                <span class="font-dmSans text-[0.73rem] text-slate-400 flex items-center gap-1"><i class="fas fa-eye text-[0.62rem]"></i> 1,200 views</span>
-              </div>
-            </div>
-          </div>
+          {% endfor %}
 
         </div><!-- /notices -->
 
 
         <!-- Pagination -->
+        {% if notices.has_other_pages %}
         <div class="flex items-center justify-center gap-[6px] mt-8">
-          <button class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-400
+          {% if notices.has_previous %}
+          <a href="?page={{ notices.previous_page_number }}" class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-400
                          text-[0.7rem] flex items-center justify-center
-                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150">
+                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150 no-underline">
             <i class="fas fa-chevron-left"></i>
-          </button>
-          <button class="w-9 h-9 rounded-[9px] font-sora text-[0.84rem] font-bold
-                         bg-[#0f2a5e] text-white border border-[#0f2a5e]">1</button>
-          <button class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-500 font-sora text-[0.84rem] font-semibold
-                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150">2</button>
-          <button class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-500 font-sora text-[0.84rem] font-semibold
-                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150">3</button>
-          <span class="text-slate-400 font-dmSans text-[0.84rem] px-1">…</span>
-          <button class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-500 font-sora text-[0.84rem] font-semibold
-                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150">8</button>
-          <button class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-400
+          </a>
+          {% endif %}
+
+          {% for num in notices.paginator.page_range %}
+            {% if notices.number == num %}
+            <span class="w-9 h-9 rounded-[9px] font-sora text-[0.84rem] font-bold
+                           bg-[#0f2a5e] text-white border border-[#0f2a5e] flex items-center justify-center">{{ num }}</span>
+            {% elif num > notices.number|add:'-3' and num < notices.number|add:'3' %}
+            <a href="?page={{ num }}" class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-500 font-sora text-[0.84rem] font-semibold
+                           hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150 flex items-center justify-center no-underline">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if notices.has_next %}
+          <a href="?page={{ notices.next_page_number }}" class="w-9 h-9 rounded-[9px] border border-slate-200 bg-white text-slate-400
                          text-[0.7rem] flex items-center justify-center
-                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150">
+                         hover:border-blue-300 hover:text-[#1a56db] hover:bg-blue-50 transition-all duration-150 no-underline">
             <i class="fas fa-chevron-right"></i>
-          </button>
+          </a>
+          {% endif %}
         </div>
+        {% endif %}
 
       </div><!-- /notices col -->
 
@@ -592,35 +334,35 @@
             <p class="font-sora text-[0.85rem] font-bold text-[#0f2a5e]">Browse by Category</p>
           </div>
           <div class="px-3 py-3 flex flex-col gap-[2px]">
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl
+            <a href="?" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl
                                font-dmSans text-[0.82rem] font-semibold text-[#1a56db]
                                bg-blue-50 no-underline">
               All Notices
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-blue-100 text-[#1a56db]">24</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-blue-100 text-[#1a56db]">{{ total_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=Urgent" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-exclamation-triangle text-red-500 text-[0.7rem]"></i> Urgent</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">3</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ urgent_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=Tender Notice" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-file-alt text-slate-400 text-[0.7rem]"></i> Tender Notice</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">8</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ tender_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=Policy Update" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-balance-scale text-slate-400 text-[0.7rem]"></i> Policy Update</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">5</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ policy_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=Training" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-chalkboard-teacher text-slate-400 text-[0.7rem]"></i> Training</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">3</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ training_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=System Notice" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-server text-slate-400 text-[0.7rem]"></i> System Notice</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">2</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ system_count }}</span>
             </a>
-            <a href="#" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
+            <a href="?category=Contract Award" class="cat-item flex items-center justify-between px-3 py-[0.5rem] rounded-xl font-dmSans text-[0.82rem] text-slate-600 no-underline">
               <span class="flex items-center gap-[6px]"><i class="fas fa-trophy text-slate-400 text-[0.7rem]"></i> Contract Award</span>
-              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">3</span>
+              <span class="font-sora text-[0.68rem] font-bold px-[7px] py-[2px] rounded-full bg-slate-100 text-slate-400">{{ award_count }}</span>
             </a>
           </div>
         </div>
@@ -707,37 +449,21 @@
           </div>
           <div class="px-4 py-3 flex flex-col divide-y divide-slate-50">
 
+            {% for recent in recent_notices %}
             <a href="#" class="flex items-start gap-[0.7rem] py-[0.7rem] no-underline group">
-              <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-[5px]"></span>
+              <span class="w-2 h-2 rounded-full 
+                           {% if recent.category == 'Urgent' %}bg-red-500{% elif recent.category == 'Policy Update' %}bg-amber-500{% else %}bg-[#1a56db]{% endif %} 
+                           flex-shrink-0 mt-[5px]"></span>
               <div>
-                <p class="font-sora text-[0.79rem] font-semibold text-slate-700 group-hover:text-[#1a56db] leading-[1.4] transition-colors">Mandatory KYC Re-verification — Deadline 31 Mar</p>
-                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">16 Mar 2026</p>
+                <p class="font-sora text-[0.79rem] font-semibold text-slate-700 group-hover:text-[#1a56db] leading-[1.4] transition-colors line-clamp-2">
+                  {{ recent.title }}
+                </p>
+                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">{{ recent.created_at|date:"d M Y" }}</p>
               </div>
             </a>
-
-            <a href="#" class="flex items-start gap-[0.7rem] py-[0.7rem] no-underline group">
-              <span class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 mt-[5px]"></span>
-              <div>
-                <p class="font-sora text-[0.79rem] font-semibold text-slate-700 group-hover:text-[#1a56db] leading-[1.4] transition-colors">Corrigendum: TN/2026/045 Deadline Extended</p>
-                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">15 Mar 2026</p>
-              </div>
-            </a>
-
-            <a href="#" class="flex items-start gap-[0.7rem] py-[0.7rem] no-underline group">
-              <span class="w-2 h-2 rounded-full bg-[#1a56db] flex-shrink-0 mt-[5px]"></span>
-              <div>
-                <p class="font-sora text-[0.79rem] font-semibold text-slate-700 group-hover:text-[#1a56db] leading-[1.4] transition-colors">Free Vendor Onboarding Webinar — 22 March</p>
-                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">14 Mar 2026</p>
-              </div>
-            </a>
-
-            <a href="#" class="flex items-start gap-[0.7rem] py-[0.7rem] no-underline group">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 mt-[5px]"></span>
-              <div>
-                <p class="font-sora text-[0.79rem] font-semibold text-slate-700 group-hover:text-[#1a56db] leading-[1.4] transition-colors">Contract Awarded: Solar Energy TN/2026/031</p>
-                <p class="font-dmSans text-[0.7rem] text-slate-400 mt-px">12 Mar 2026</p>
-              </div>
-            </a>
+            {% empty %}
+            <p class="py-4 text-center text-slate-400 text-xs">No recent notices available.</p>
+            {% endfor %}
 
           </div>
         </div>

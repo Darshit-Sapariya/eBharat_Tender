@@ -3,7 +3,7 @@
 {% block content %}
 
 <style>
-  /* ── Pseudo-elements & focus rings ── */
+  /* Pseudo-elements & focus rings only — Tailwind can't do these */
 
   /* Hero decorative rings */
   .hero-banner::before,
@@ -14,84 +14,81 @@
   .hero-banner::before { width: 320px; height: 320px; right: -80px; top: -100px; }
   .hero-banner::after  { width: 180px; height: 180px; right: 60px; bottom: -70px; border-color: rgba(255,255,255,0.04); }
 
-  /* Input focus states */
   .field-input:focus,
   .field-select:focus,
   .field-textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+    border-color: #fb923c;
+    box-shadow: 0 0 0 3px rgba(251,146,60,0.12);
     background: white;
-    transform: translateY(-1px);
   }
-  .field-input::placeholder,
-  .field-textarea::placeholder { color: #b0bec5; }
 
-  /* Readonly input */
+  .field-input::placeholder,
+  .field-textarea::placeholder { color: #cbd5e1; }
+
   .field-input:read-only {
     background: #f8fafc;
-    color: #64748b;
+    color: #94a3b8;
     cursor: not-allowed;
   }
 
-  /* File input button */
   .file-input::file-selector-button {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 7px;
-    padding: 0.3rem 0.75rem;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    padding: 0.25rem 0.65rem;
     margin-right: 0.5rem;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #1a56db;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ea580c;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.15s;
   }
-  
-  /* Avatar ring pulse on hover */
-  .avatar-ring:hover { box-shadow: 0 0 0 4px rgba(59,130,246,0.15), 0 8px 32px rgba(15,42,94,0.18); }
+  .file-input::file-selector-button:hover { background: #ffedd5; }
 
+  .save-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(123,28,46,0.35);
+  }
 </style>
 
-
-<div class="p-4 sm:p-7 flex flex-col gap-5 sm:gap-7 bg-slate-50/50 min-h-screen">
+<div class="flex flex-col gap-0">
 
   <!-- ══════ HERO BANNER ══════ -->
-  <div class="hero-banner relative rounded-3xl overflow-hidden px-6 sm:px-10 py-10 flex flex-wrap items-center gap-6"
-       style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #3b82f6 100%);">
+  <div class="hero-banner relative rounded-2xl overflow-hidden px-6 sm:px-10 py-8 flex flex-wrap items-center gap-6 mb-5"
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 50%, #94a3b8 100%);">
 
     <!-- Grid texture -->
     <div class="absolute inset-0 pointer-events-none"
-         style="background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-                background-size: 24px 24px;"></div>
+         style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                                  linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+                background-size: 28px 28px;"></div>
 
     <!-- Icon blob -->
-    <div class="relative z-[1] w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0
-                bg-white/10 border border-white/15 backdrop-blur-sm shadow-xl">
-      <i class="fas fa-user-gear text-white text-2xl opacity-90"></i>
+    <div class="relative z-[1] w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0
+                bg-white/10 border border-white/15 backdrop-blur-sm">
+      <i class="fas fa-user-circle text-white text-2xl opacity-90"></i>
     </div>
 
     <div class="relative z-[1] min-w-0 flex-1">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="px-2 py-0.5 rounded-md bg-white/10 border border-white/20 text-[0.6rem] font-black text-blue-100 uppercase tracking-widest">
-            Vendor Portal
-        </span>
-      </div>
-      <h1 class="font-sora text-[1.8rem] font-extrabold text-white leading-tight mb-1">
+      <p class="text-[0.68rem] font-semibold tracking-[0.12em] uppercase text-white/45 mb-1">
+        Vendor Portal
+      </p>
+      <h1 class="font-sora text-[1.55rem] font-extrabold text-white leading-tight mb-1 m-0">
         Vendor Identity Settings
       </h1>
-      <p class="text-[0.88rem] text-white/60 max-w-md leading-relaxed">
-        Maintaining accurate profile and KYC data is essential for verified bid eligibility.
+      <p class="text-[0.83rem] text-white/60 max-w-md mt-0.5 m-0">
+        Keep your KYC and contact details up to date for verified bid eligibility.
       </p>
     </div>
 
     <!-- Status pills -->
     <div class="relative z-[1] flex flex-col gap-2 flex-shrink-0">
       <span class="inline-flex items-center gap-[6px] px-3 py-[5px] rounded-full
-                   bg-blue-500/20 text-blue-200 border border-blue-400/30
+                   bg-indigo-500/20 text-indigo-200 border border-indigo-400/30
                    text-[0.65rem] font-bold tracking-[0.05em] uppercase">
-        <i class="fas fa-check-circle text-[0.6rem]"></i> {{ profile.status|capfirst }} Account
+        <i class="fas fa-check-circle text-[0.6rem]"></i> {{ profile.status|capfirst }}
       </span>
       {% if profile.role %}
       <span class="inline-flex items-center gap-[6px] px-3 py-[5px] rounded-full
@@ -104,197 +101,226 @@
   </div>
 
 
-  <!-- ══════ MAIN LAYOUT ══════ -->
+  <!-- ══════ MAIN FORM ══════ -->
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <div class="flex flex-wrap lg:flex-nowrap gap-6 sm:gap-8">
+    <!-- 3-column layout: Avatar | Personal | KYC -->
+    <div class="grid gap-5" style="grid-template-columns: 220px 1fr 1fr;">
 
-      <!-- ════ SIDEBAR (AVATAR & STATUS) ════ -->
-      <div class="premium-card w-full lg:w-[280px] xl:w-[320px] flex-shrink-0">
-          <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm sticky top-8">
-            
-            <div class="flex flex-col items-center text-center px-8 pt-10 pb-8 border-b border-slate-100">
-              <div class="relative mb-6">
-                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-1 ring-slate-100">
-                  {% if profile.profile_pic %}
-                      <img src="{{ profile.profile_pic.url }}" class="w-full h-full object-cover">
-                  {% else %}
-                      <img src="{% static 'images/Logo/default-profile.png' %}" class="w-full h-full object-cover">
-                  {% endif %}
-                </div>
-                <label for="profilePic" class="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center cursor-pointer shadow-lg hover:bg-blue-700 transition-all">
-                  <i class="fas fa-camera text-[0.85rem]"></i>
-                </label>
-                <input type="file" id="profilePic" name="profile_pic" accept="image/*" class="hidden">
-              </div>
+      <!-- ── COL 1: AVATAR CARD ── -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col"
+           style="box-shadow: 0 2px 12px rgba(15,42,94,0.06);">
 
-              <h2 class="font-sora text-[1.2rem] font-extrabold text-navy mb-1 tracking-tight">{{ request.user.username|capfirst }}</h2>
-              <p class="text-[0.68rem] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Official Vendor</p>
-              
-              <div class="w-full pt-4 border-t border-slate-50 text-left space-y-3">
-                <div class="flex items-start gap-3">
-                  <i class="fas fa-circle-check text-blue-500 mt-0.5 text-[0.8rem]"></i>
-                  <p class="text-[0.72rem] text-slate-500 font-medium leading-relaxed">Verified to bid on all public and restricted tenders.</p>
-                </div>
-                <div class="flex items-start gap-3">
-                  <i class="fas fa-circle-check text-blue-500 mt-0.5 text-[0.8rem]"></i>
-                  <p class="text-[0.72rem] text-slate-500 font-medium leading-relaxed">Full access to E-Payment and digital award letters.</p>
-                </div>
-              </div>
+        <!-- Avatar section -->
+        <div class="flex flex-col items-center text-center px-6 pt-7 pb-5 border-b border-slate-100">
+          <div class="relative mb-4">
+            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white ring-1 ring-slate-100"
+                 style="box-shadow: 0 4px 20px rgba(15,42,94,0.15);">
+              {% if profile.profile_pic %}
+                <img src="{{ profile.profile_pic.url }}" class="w-full h-full object-cover">
+              {% else %}
+                <img src="{% static 'images/Logo/default-profile.png' %}" class="w-full h-full object-cover">
+              {% endif %}
             </div>
+            <label for="profilePic"
+                   class="absolute bottom-0.5 right-0.5 w-8 h-8 rounded-full bg-navy border-2 border-white text-white flex items-center justify-center cursor-pointer transition-all hover:bg-navy-mid"
+                   style="box-shadow: 0 2px 8px rgba(123,28,46,0.4);">
+              <i class="fas fa-camera text-[0.7rem]"></i>
+            </label>
+            <input type="file" id="profilePic" name="profile_pic" accept="image/*" class="hidden">
+          </div>
 
-            <!-- Metadata List -->
-            <div class="w-full space-y-3 pt-6 border-t border-slate-50">
-                <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl text-left">
-                    <i class="fas fa-envelope text-blue-500 text-[0.85rem]"></i>
-                    <div class="min-w-0">
-                        <p class="text-[0.6rem] font-black text-slate-400 uppercase tracking-tighter">Official Email</p>
-                        <p class="text-[0.78rem] font-bold text-navy truncate">{{ request.user.email }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl text-left">
-                    <i class="fas fa-user-tag text-emerald-500 text-[0.85rem]"></i>
-                    <div class="min-w-0">
-                        <p class="text-[0.6rem] font-black text-slate-400 uppercase tracking-tighter">Account Status</p>
-                        <p class="text-[0.78rem] font-bold text-navy uppercase">{{ profile.status }}</p>
-                    </div>
-                </div>
+          <h2 class="font-sora text-[1rem] font-extrabold text-slate-700 mb-0.5 tracking-tight">
+            {{ request.user.username|capfirst }}
+          </h2>
+          <p class="text-[0.58rem] font-black text-slate-400 uppercase tracking-[0.2em] m-0">Official Vendor</p>
+        </div>
+
+        <!-- Meta rows -->
+        <div class="flex flex-col gap-2 px-4 py-4">
+          <div class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 rounded-xl">
+            <i class="fas fa-envelope text-indigo-500 text-[0.75rem] flex-shrink-0"></i>
+            <div class="min-w-0">
+              <p class="text-[0.55rem] font-black text-slate-400 uppercase tracking-tight m-0">Email</p>
+              <p class="text-[0.7rem] font-bold text-slate-700 truncate m-0">{{ request.user.email }}</p>
             </div>
-
+          </div>
+          <div class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 rounded-xl">
+            <i class="fas fa-user-tag text-emerald-500 text-[0.75rem] flex-shrink-0"></i>
+            <div class="min-w-0">
+              <p class="text-[0.55rem] font-black text-slate-400 uppercase tracking-tight m-0">Status</p>
+              <p class="text-[0.7rem] font-bold text-slate-700 uppercase m-0">{{ profile.status }}</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2.5 px-3 py-2 bg-slate-50 rounded-xl mt-1">
+            <i class="fas fa-circle-check text-indigo-400 text-[0.7rem] mt-0.5 flex-shrink-0"></i>
+            <p class="text-[0.65rem] text-slate-400 font-medium leading-relaxed m-0">
+              Verified to bid on all public &amp; restricted tenders.
+            </p>
           </div>
         </div>
 
-      <!-- ════ MAIN FORM CONTENT ════ -->
-      <div class="flex-1 min-w-0 flex flex-col gap-6">
+        <!-- Save button at bottom of sidebar -->
+        <div class="px-4 pb-5 mt-auto">
+          <button type="submit"
+                  class="save-btn w-full py-2.5 rounded-xl text-white font-sora font-extrabold text-[0.85rem] border-none cursor-pointer transition-all duration-200"
+                  style="background: linear-gradient(135deg, #7b1c2e, #ea580c);
+                         box-shadow: 0 4px 14px rgba(123,28,46,0.3);">
+            <i class="fas fa-save mr-2"></i> Save Changes
+          </button>
+          <p class="text-center text-[0.58rem] text-slate-400 mt-2 m-0 flex items-center justify-center gap-1">
+            <i class="fas fa-lock text-[0.55rem]"></i> KYC data encrypted &amp; private
+          </p>
+        </div>
+      </div>
 
-        <!-- ── SECTION 1: PERSONAL & CONTACT ── -->
-        <div class="premium-card bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-          <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="font-sora text-[1rem] font-black text-navy flex items-center gap-3">
-              <i class="fas fa-address-card text-blue-500"></i>
-              Personal Information
-            </h3>
+
+      <!-- ── COL 2: PERSONAL & CONTACT ── -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col"
+           style="box-shadow: 0 2px 12px rgba(15,42,94,0.06);">
+
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-indigo-50">
+            <i class="fas fa-address-card text-indigo-500 text-[0.75rem]"></i>
           </div>
-          <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <!-- Full Name -->
-            <div class="space-y-1.5">
-              <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
-              <input type="text" name="full_name" value="{{ profile.full_name }}" placeholder="Your legal name"
-                     class="field-input w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/50 text-[0.88rem] font-bold text-navy">
-            </div>
-
-            <!-- Mobile -->
-            <div class="space-y-1.5">
-              <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest">Mobile Number</label>
-              <input type="tel" name="mobile" value="{{ profile.mobile }}" placeholder="Primary contact"
-                     class="field-input w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/50 text-[0.88rem] font-bold text-navy">
-            </div>
-
-            <!-- Address -->
-            <div class="space-y-1.5 md:col-span-2">
-              <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest">Business Address</label>
-              <textarea name="address" rows="3" placeholder="Full registered address"
-                        class="field-textarea w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/50 text-[0.88rem] font-bold text-navy resize-none">{{ profile.address }}</textarea>
-            </div>
-          </div>
+          <h3 class="font-sora text-[0.9rem] font-black text-slate-700 m-0">Personal Information</h3>
         </div>
 
+        <div class="p-6 flex flex-col gap-4 flex-1">
 
-        <!-- ── SECTION 2: GOVERNMENT VERIFICATION (KYC) ── -->
-        <div class="premium-card bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-          <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="font-sora text-[1rem] font-black text-navy flex items-center gap-3">
-              <i class="fas fa-shield-halved text-amber-500"></i>
-              Identity Verification
-            </h3>
-            <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-600 text-[0.62rem] font-black uppercase tracking-tight border border-amber-100">
-                KYC Required
-            </span>
+          <!-- Full Name -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
+            <input type="text" name="full_name" value="{{ profile.full_name }}" placeholder="Your legal name"
+                   class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 transition-all duration-200">
           </div>
-          <div class="p-8">
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- ID Type -->
-                <div class="space-y-1.5">
-                    <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest">ID Document Type</label>
-                    <select name="gov_id_type" class="field-select w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/50 text-[0.88rem] font-bold text-navy">
-                        <option value="Aadhaar" {% if profile.gov_id_type == "Aadhaar" %}selected{% endif %}>Aadhaar Card</option>
-                        <option value="PAN" {% if profile.gov_id_type == "PAN" %}selected{% endif %}>PAN Card</option>
-                        <option value="Passport" {% if profile.gov_id_type == "Passport" %}selected{% endif %}>Passport</option>
-                        <option value="Driving License" {% if profile.gov_id_type == "Driving License" %}selected{% endif %}>Driving License</option>
-                    </select>
-                </div>
 
-                <!-- ID Number -->
-                <div class="space-y-1.5 md:col-span-2 relative">
-                    <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
-                        Document / License Number
-                        <span id="toggleId" class="text-blue-600 cursor-pointer hover:underline lowercase font-bold tracking-normal transition-all" onclick="toggleSensitive()">View Full</span>
-                    </label>
-                    <div class="relative group">
-                        <input type="text" id="maskedValue" value="{{ profile.masked_id }}" readonly
-                               class="field-input w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 bg-slate-100/50 text-[0.88rem] font-bold text-navy font-mono transition-all">
-                        <input type="text" id="realValue" name="gov_id_number" value="{{ profile.gov_id_number }}" placeholder="e.g. 1234-5678-9012"
-                               class="hidden field-input w-full px-4 py-3 rounded-xl border-[1.5px] border-blue-200 bg-white text-[0.88rem] font-bold text-navy font-mono ring-4 ring-blue-50 transition-all">
-                    </div>
-                </div>
+          <!-- Mobile -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Mobile Number</label>
+            <input type="tel" name="mobile" value="{{ profile.mobile }}" placeholder="+91 XXXXX XXXXX"
+                   class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 transition-all duration-200">
+          </div>
 
-                <script>
-                  function toggleSensitive() {
-                    const masked = document.getElementById('maskedValue');
-                    const real = document.getElementById('realValue');
-                    const link = document.getElementById('toggleId');
-                    
-                    if (real.classList.contains('hidden')) {
-                      real.classList.remove('hidden');
-                      masked.classList.add('hidden');
-                      link.innerText = 'Hide Full';
-                    } else {
-                      real.classList.add('hidden');
-                      masked.classList.remove('hidden');
-                      link.innerText = 'View Full';
-                    }
-                  }
-                </script>
+          <!-- Username (readonly) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Username</label>
+            <input type="text" value="{{ request.user.username }}" readonly
+                   class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 text-[0.85rem] font-semibold">
+          </div>
 
-                <!-- File Upload -->
-                <div class="space-y-3 md:col-span-3">
-                    <label class="text-[0.72rem] font-black text-slate-400 uppercase tracking-widest">Upload Identity Proof (PDF/Image)</label>
-                    <div class="flex flex-wrap items-center gap-4">
-                        <input type="file" name="gov_id_upload" class="file-input flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.75rem]">
-                        {% if profile.gov_id_upload %}
-                            <a href="{{ profile.gov_id_upload.url }}" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 text-[0.75rem] font-bold flex items-center gap-2 border border-emerald-100 hover:bg-emerald-100 transition-colors">
-                                <i class="fas fa-file-shield text-[0.9rem]"></i> Current Document
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
+          <!-- Address -->
+          <div class="flex flex-col gap-1 flex-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Business Address</label>
+            <textarea name="address" rows="3" placeholder="Full registered address"
+                      class="field-textarea w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 resize-none transition-all duration-200 flex-1">{{ profile.address }}</textarea>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ── COL 3: KYC / IDENTITY ── -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col"
+           style="box-shadow: 0 2px 12px rgba(15,42,94,0.06);">
+
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50">
+              <i class="fas fa-shield-halved text-amber-500 text-[0.75rem]"></i>
             </div>
-
+            <h3 class="font-sora text-[0.9rem] font-black text-slate-700 m-0">Identity Verification</h3>
           </div>
+          <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[0.55rem] font-black uppercase tracking-tight border border-amber-100">
+            KYC Required
+          </span>
         </div>
 
-        <!-- ── FOOTER: SUBMIT ── -->
-        <div class="bg-white border border-slate-200 rounded-3xl p-6 flex items-center justify-between gap-4">
-            <div class="hidden sm:flex items-center gap-3 text-slate-400">
-                <i class="fas fa-lock text-[0.8rem]"></i>
-                <p class="text-[0.75rem] font-medium leading-tight">Your KYC data is encrypted and handled <br> under strict privacy protocols.</p>
-            </div>
-            
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <button type="submit" class="flex-1 sm:flex-none px-10 py-3 rounded-xl bg-blue-600 text-white font-sora font-extrabold text-[0.9rem] shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all"
-                style="background: linear-gradient(135deg, #1a56db, #163472);">
-                    Update Profile
-                </button>
-            </div>
-        </div>
+        <div class="p-6 flex flex-col gap-4 flex-1">
 
-      </div><!-- /form main -->
-    </div><!-- /layout -->
+          <!-- ID Type -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">ID Document Type</label>
+            <select name="gov_id_type"
+                    class="field-select w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 transition-all duration-200">
+              <option value="Aadhaar"          {% if profile.gov_id_type == "Aadhaar"          %}selected{% endif %}>Aadhaar Card</option>
+              <option value="PAN"              {% if profile.gov_id_type == "PAN"              %}selected{% endif %}>PAN Card</option>
+              <option value="Passport"         {% if profile.gov_id_type == "Passport"         %}selected{% endif %}>Passport</option>
+              <option value="Driving License"  {% if profile.gov_id_type == "Driving License"  %}selected{% endif %}>Driving License</option>
+            </select>
+          </div>
+
+          <!-- ID Number (masked/reveal) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
+              Document Number
+              <span id="toggleId"
+                    onclick="toggleSensitive()"
+                    class="text-[0.62rem] font-black text-orange cursor-pointer hover:underline normal-case tracking-normal transition-all">
+                View Full
+              </span>
+            </label>
+            <input type="text" id="maskedValue" value="{{ profile.masked_id }}" readonly
+                   class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-100/60 text-[0.85rem] font-bold text-slate-700 font-mono">
+            <input type="text" id="realValue" name="gov_id_number" value="{{ profile.gov_id_number }}" placeholder="e.g. 1234-5678-9012"
+                   class="hidden field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-orange-light bg-white text-[0.85rem] font-bold text-slate-700 font-mono">
+          </div>
+
+          <!-- Upload proof -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Upload Identity Proof</label>
+            <div class="flex flex-wrap items-center gap-3">
+              <input type="file" name="gov_id_upload"
+                     class="file-input flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[0.72rem] text-slate-500">
+              {% if profile.gov_id_upload %}
+              <a href="{{ profile.gov_id_upload.url }}" target="_blank"
+                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[0.7rem] font-bold border border-emerald-100 no-underline hover:bg-emerald-100 transition-colors flex-shrink-0">
+                <i class="fas fa-file-shield text-[0.8rem]"></i> Current Doc
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Role / Profile pic label info -->
+          <div class="mt-auto pt-3 border-t border-slate-100 flex flex-col gap-2">
+            <div class="flex items-start gap-2.5 px-3 py-2 rounded-xl bg-indigo-50/60 border border-indigo-100/60">
+              <i class="fas fa-circle-info text-indigo-400 text-[0.75rem] mt-0.5 flex-shrink-0"></i>
+              <p class="text-[0.65rem] text-indigo-700/70 font-medium leading-relaxed m-0">
+                Uploaded documents are encrypted and reviewed only by authorized eBharat personnel.
+              </p>
+            </div>
+            <div class="flex items-start gap-2.5 px-3 py-2 rounded-xl bg-amber-50/60 border border-amber-100/60">
+              <i class="fas fa-triangle-exclamation text-amber-400 text-[0.75rem] mt-0.5 flex-shrink-0"></i>
+              <p class="text-[0.65rem] text-amber-700/70 font-medium leading-relaxed m-0">
+                Incomplete KYC may restrict access to restricted or high-value tenders.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /3-col grid -->
   </form>
 
 </div>
+
+<script>
+  function toggleSensitive() {
+    const masked = document.getElementById('maskedValue');
+    const real   = document.getElementById('realValue');
+    const link   = document.getElementById('toggleId');
+    if (real.classList.contains('hidden')) {
+      real.classList.remove('hidden');
+      masked.classList.add('hidden');
+      link.innerText = 'Hide Full';
+    } else {
+      real.classList.add('hidden');
+      masked.classList.remove('hidden');
+      link.innerText = 'View Full';
+    }
+  }
+</script>
 
 {% endblock %}

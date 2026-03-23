@@ -38,17 +38,17 @@
   }
   .currency-wrap .field-input { padding-left: 2.6rem; border-radius: 0 10px 10px 0; }
   .field-input:focus, .field-select:focus, .field-textarea:focus {
-    border-color: #1a56db; background: white;
+    border-color: #ea580c; background: white;
     box-shadow: 0 0 0 3px rgba(26,86,219,0.1); outline: none;
   }
   .field-input::placeholder, .field-textarea::placeholder { color: #b0bec5; font-size: 0.82rem; }
-  .file-zone:hover, .file-zone:focus-within { border-color: #1a56db; background: #f0f5ff; }
-  .ph-blue  .panel-head { border-left: 3px solid #1a56db; }
+  .file-zone:hover, .file-zone:focus-within { border-color: #ea580c; background: #f0f5ff; }
+  .ph-indigo  .panel-head { border-left: 3px solid #ea580c; }
   .ph-green .panel-head { border-left: 3px solid #10b981; }
   .ph-amber .panel-head { border-left: 3px solid #f59e0b; }
   .ph-teal  .panel-head { border-left: 3px solid #0d9488; }
   .ph-red   .panel-head { border-left: 3px solid #ef4444; }
-  .step-dot.active { background: #1a56db; color: white; box-shadow: 0 0 0 4px #bfdbfe; }
+  .step-dot.active { background: #ea580c; color: white; box-shadow: 0 0 0 4px #bfdbfe; }
   .step-dot.done   { background: #10b981; color: white; }
   .step-dot.pending { background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0; }
   .step-connector.done { background: #10b981; }
@@ -59,7 +59,7 @@
 
   <!-- ══════ HEADER ══════ -->
   <div class="tc-header relative rounded-2xl overflow-hidden flex items-center justify-between gap-4 px-6 sm:px-8 py-6"
-       style="background: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);">
+       style="background: linear-gradient(135deg, #475569 0%, #64748b 45%, #94a3b8 100%);">
     <div class="relative z-[1]">
       <p class="text-[0.7rem] font-semibold tracking-[0.1em] uppercase text-white/40 mb-1">Official Procurement Publication</p>
       <h1 class="font-sora text-[1.35rem] font-extrabold text-white leading-tight mb-[0.2rem]">Create New Tender</h1>
@@ -82,7 +82,7 @@
     <!-- Step 1 — Active -->
     <div class="flex items-center gap-[0.55rem] flex-shrink-0">
       <div class="step-dot active w-[30px] h-[30px] rounded-full flex items-center justify-center font-sora text-[0.72rem] font-extrabold flex-shrink-0">1</div>
-      <span class="font-sora text-[0.75rem] font-semibold whitespace-nowrap text-[#0f2a5e]">Basic Info</span>
+      <span class="font-sora text-[0.75rem] font-semibold whitespace-nowrap text-slate-700">Basic Info</span>
     </div>
     <div class="step-connector h-[2px] flex-1 min-w-[24px] bg-slate-200 mx-2"></div>
 
@@ -126,19 +126,19 @@
       <div class="flex flex-col gap-4">
 
         <!-- Basic Information -->
-        <div class="form-panel ph-blue bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(15,42,94,0.05)] transition-[box-shadow,border-color] duration-200">
+        <div class="form-panel ph-indigo bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(15,42,94,0.05)] transition-[box-shadow,border-color] duration-200">
           <div class="panel-head flex items-center gap-[0.6rem] px-[1.35rem] py-4 border-b border-slate-200">
-            <div class="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[0.85rem] flex-shrink-0 bg-blue-50 text-blue-600">
+            <div class="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[0.85rem] flex-shrink-0 bg-indigo-50 text-indigo-600">
               <i class="fas fa-file-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Basic Information</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Basic Information</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Core tender identification details</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                 Tender Title <span class="text-red-500 text-[0.7rem]">*</span>
               </label>
               <div class="input-icon-wrap relative">
@@ -151,7 +151,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                   Department <span class="text-red-500 text-[0.7rem]">*</span>
                 </label>
                 <div class="select-wrap relative">
@@ -169,7 +169,7 @@
                 {% endif %}
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e] flex items-center gap-[0.3rem]">
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700 flex items-center gap-[0.3rem]">
                   Category <span class="text-red-500 text-[0.7rem]">*</span>
                 </label>
                 <div class="select-wrap relative">
@@ -189,7 +189,7 @@
             </div>
 
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Description</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Description</label>
               <textarea name="description" rows="4"
                         placeholder="Describe the scope, objectives, and requirements of this tender…"
                         class="field-textarea w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
@@ -206,14 +206,14 @@
               <i class="fas fa-rupee-sign"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Financial Details</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Financial Details</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Budget and earnest money deposit</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Estimated Value</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Estimated Value</label>
                 <div class="currency-wrap relative">
                   <span class="currency-prefix">₹</span>
                   <input type="number" name="estimated_value" placeholder="0.00" min="0"
@@ -223,7 +223,7 @@
                 <span class="text-[0.68rem] text-slate-400 mt-px">Total project estimated cost</span>
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">EMD Amount</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">EMD Amount</label>
                 <div class="currency-wrap relative">
                   <span class="currency-prefix">₹</span>
                   <input type="number" name="emd_amount" placeholder="0.00" min="0"
@@ -247,26 +247,26 @@
               <i class="fas fa-calendar-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Important Dates</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Important Dates</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Timeline and meeting schedule</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Publish Date</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Publish Date</label>
                 <input type="date" name="publish_date"
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Closing Date <span class="text-red-500 text-[0.7rem]">*</span></label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Closing Date <span class="text-red-500 text-[0.7rem]">*</span></label>
                 <input type="date" name="closing_date" required
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
               </div>
               <div class="flex flex-col gap-[0.3rem]">
-                <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Pre-Bid Meeting</label>
+                <label class="font-sora text-[0.75rem] font-bold text-slate-700">Pre-Bid Meeting</label>
                 <input type="datetime-local" name="pre_bid_meeting"
                        class="field-input w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
                               font-dmSans text-[0.85rem] text-slate-800 bg-slate-50 transition-all duration-[0.18s]">
@@ -282,13 +282,13 @@
               <i class="fas fa-map-marker-alt"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Project Details</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Project Details</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Location and publication status</p>
             </div>
           </div>
           <div class="flex flex-col gap-4 px-[1.35rem] py-5">
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Location</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Location</label>
               <div class="input-icon-wrap relative">
                 <i class="fas fa-map-marker-alt input-icon"></i>
                 <input type="text" name="location" placeholder="City, State or full address"
@@ -297,7 +297,7 @@
               </div>
             </div>
             <div class="flex flex-col gap-[0.3rem]">
-              <label class="font-sora text-[0.75rem] font-bold text-[#0f2a5e]">Status</label>
+              <label class="font-sora text-[0.75rem] font-bold text-slate-700">Status</label>
               <div class="select-wrap relative">
                 <select name="status"
                         class="field-select w-full px-[0.85rem] py-[0.6rem] border-[1.5px] border-slate-200 rounded-[10px]
@@ -319,7 +319,7 @@
               <i class="fas fa-paperclip"></i>
             </div>
             <div>
-              <p class="font-sora text-[0.88rem] font-bold text-[#0f2a5e]">Supporting Documents</p>
+              <p class="font-sora text-[0.88rem] font-bold text-slate-700">Supporting Documents</p>
               <p class="text-[0.7rem] text-slate-400 mt-px">Attach tender documents and drawings</p>
             </div>
           </div>
@@ -328,10 +328,10 @@
                         text-center cursor-pointer bg-slate-50 transition-all duration-200">
               <input type="file" name="document" multiple accept=".pdf,.docx,.xlsx,.zip"
                      class="absolute inset-0 opacity-0 cursor-pointer z-[2]">
-              <div class="w-10 h-10 bg-blue-50 rounded-[10px] flex items-center justify-center text-blue-600 text-[1rem] mx-auto mb-[0.6rem]">
+              <div class="w-10 h-10 bg-indigo-50 rounded-[10px] flex items-center justify-center text-indigo-600 text-[1rem] mx-auto mb-[0.6rem]">
                 <i class="fas fa-cloud-upload-alt"></i>
               </div>
-              <span class="font-sora text-[0.82rem] font-bold text-[#0f2a5e] block mb-[0.2rem]">Click to upload or drag &amp; drop</span>
+              <span class="font-sora text-[0.82rem] font-bold text-slate-700 block mb-[0.2rem]">Click to upload or drag &amp; drop</span>
               <span class="text-[0.7rem] text-slate-400">Multiple files supported · Max 20 MB each</span>
               <div class="flex flex-wrap gap-[0.35rem] justify-center mt-[0.6rem]">
                 <span class="px-2 py-[2px] bg-white border border-slate-200 rounded-[6px] text-[0.65rem] font-bold text-slate-400 tracking-[0.04em] uppercase">PDF</span>
@@ -365,7 +365,7 @@
         <button type="submit" name="save_draft"
                 class="inline-flex items-center gap-[0.4rem] px-[1.1rem] py-[0.55rem]
                        bg-slate-100 border-[1.5px] border-slate-200 rounded-[10px]
-                       text-[#0f2a5e] font-sora text-[0.82rem] font-semibold cursor-pointer
+                       text-slate-700 font-sora text-[0.82rem] font-semibold cursor-pointer
                        transition-all duration-[0.18s] hover:bg-slate-200 hover:border-slate-400">
           <i class="fas fa-save"></i> Save Draft
         </button>
@@ -375,7 +375,7 @@
                        rounded-[10px] text-white font-sora text-[0.85rem] font-bold cursor-pointer
                        shadow-[0_2px_8px_rgba(26,86,219,0.3)] transition-all duration-200
                        {% if not approved_depts or not approved_cats %}opacity-50 cursor-not-allowed{% else %}hover:shadow-[0_4px_16px_rgba(26,86,219,0.4)] hover:-translate-y-px active:translate-y-0{% endif %}"
-                style="background: linear-gradient(135deg,#1a56db,#163472);">
+                style="background: linear-gradient(135deg,#94a3b8,#475569);">
           <i class="fas fa-paper-plane"></i> Publish Tender
         </button>
       </div>

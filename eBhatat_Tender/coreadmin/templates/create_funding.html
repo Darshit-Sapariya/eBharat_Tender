@@ -1,0 +1,79 @@
+{% extends 'coreadmin_base.html' %}
+
+{% block title %}Create Funding Scheme{% endblock %}
+{% block nav_funding %}active{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'coreadmin:deshbord' %}" style="text-decoration:none; color:var(--muted);">Dashboard</a> 
+<i class="fas fa-chevron-right"></i> 
+<a href="{% url 'coreadmin:funding_list' %}" style="text-decoration:none; color:var(--muted);">Manage Funding</a> 
+<i class="fas fa-chevron-right"></i> 
+<span>Create Scheme</span>
+{% endblock %}
+
+{% block content %}
+<div class="ph" style="margin-bottom: 24px;">
+  <div>
+    <div class="ph-eye">Financial Administration</div>
+    <div class="ph-title">
+        <a href="{% url 'coreadmin:funding_list' %}" style="color:var(--text); opacity:0.5; text-decoration:none;"><i class="fas fa-arrow-left mr-2"></i> Schemes</a> / Create Scheme
+    </div>
+    <div class="ph-sub">Define a new financial support program and establish parameters for bidders.</div>
+  </div>
+</div>
+
+<div class="card" style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.2); border: 1px solid var(--border);">
+  <div class="card-head" style="background:var(--bg3); border-bottom: 1px solid var(--border); padding: 18px 24px;">
+    <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Scheme Configuration</div>
+  </div>
+  <div class="card-body" style="padding: 32px 24px;">
+    <form method="POST" action="{% url 'coreadmin:create_funding' %}" style="display: flex; flex-direction: column; gap: 24px;">
+      {% csrf_token %}
+      
+      <div class="input-wrap">
+        <label for="title" style="display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase;">Scheme Title <span style="color:var(--red);">*</span></label>
+        <input type="text" id="title" name="title" placeholder="e.g. Green Energy Grant 2026" required style="width:100%; box-sizing:border-box; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg1); color:var(--text); font-size:14px; outline:none; transition:border-color 0.2s;">
+      </div>
+      
+      <div class="input-wrap">
+        <label for="description" style="display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase;">Program Description <span style="color:var(--red);">*</span></label>
+        <textarea id="description" name="description" rows="4" placeholder="Detailed description of the funding scheme..." required style="width:100%; box-sizing:border-box; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg1); color:var(--text); font-size:14px; outline:none; transition:border-color 0.2s; resize: vertical; min-height: 100px;"></textarea>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="input-wrap">
+          <label for="max_amount" style="display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase;">Max Amount (₹) <span style="color:var(--red);">*</span></label>
+          <input type="number" step="0.01" id="max_amount" name="max_amount" placeholder="500000.00" required style="width:100%; box-sizing:border-box; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg1); color:var(--green); font-family: monospace; font-size:16px; font-weight:700; outline:none; transition:border-color 0.2s;">
+        </div>
+        
+        <div class="input-wrap">
+          <label for="interest_rate" style="display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase;">Interest Rate (%) <span style="color:var(--red);">*</span></label>
+          <input type="number" step="0.01" id="interest_rate" name="interest_rate" placeholder="8.5" required style="width:100%; box-sizing:border-box; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg1); color:var(--accent); font-family: monospace; font-size:16px; font-weight:700; outline:none; transition:border-color 0.2s;">
+        </div>
+      </div>
+      
+      <div class="input-wrap">
+        <label for="tender_id" style="display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase;">Linked Tender (Optional)</label>
+        <select id="tender_id" name="tender_id" style="width:100%; box-sizing:border-box; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg1); color:var(--text); font-size:14px; outline:none; transition:border-color 0.2s; cursor:pointer;">
+          <option value="">-- No Specific Tender (Global Scheme) --</option>
+          {% for tender in tenders %}
+            <option value="{{ tender.id }}">TND-{{ tender.id|stringformat:"04d" }} — {{ tender.title|truncatechars:60 }}</option>
+          {% endfor %}
+        </select>
+        <div style="font-size: 11px; color: var(--text); opacity:0.5; margin-top: 8px;">
+          <i class="fas fa-info-circle mr-1"></i> If linked to a specific tender, this funding will conditionally unlock only for valid bidders applying to that specific auction.
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 16px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <button type="submit" class="btn btn-primary" style="padding: 12px 24px; font-size: 14px;">
+          <i class="fas fa-check mr-2"></i> Deploy Funding Program
+        </button>
+        <a href="{% url 'coreadmin:funding_list' %}" class="btn btn-outline" style="padding: 12px 24px; font-size: 14px; border-color:var(--border);">
+          Cancel Action
+        </a>
+      </div>
+      
+    </form>
+  </div>
+</div>
+{% endblock %}

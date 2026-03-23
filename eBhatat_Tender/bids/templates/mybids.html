@@ -2,44 +2,25 @@
 {% block content %}
 
 <style>
-  /* ── Dashboard tokens ── */
-  :root {
-    --card-radius: 16px;
-    --card-shadow: 0 2px 16px rgba(15,42,94,0.07);
-    --gradient-hero: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);
+  /* Hero decorative circles */
+  .hero-banner::before,
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
   }
-
-  .db-wrap {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  .hero-banner::before {
+    width: 260px; height: 260px;
+    right: -60px; top: -80px;
+    border: 1.5px solid rgba(255,255,255,0.08);
   }
-  @media (max-width: 640px) { .db-wrap { gap: 1rem; } }
-
-  /* ══════════════════════════════════
-     HERO BANNER
-  ══════════════════════════════════ */
-  .hero-banner {
-    background: var(--gradient-hero);
-    border-radius: var(--card-radius);
-    padding: 1.75rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    position: relative;
-    overflow: hidden;
-    flex-wrap: wrap;
-    box-shadow: 0 8px 24px rgba(26,86,219,0.15);
+  .hero-banner::after {
+    width: 160px; height: 160px;
+    right: 40px; bottom: -60px;
+    border: 1.5px solid rgba(255,255,255,0.05);
   }
-  .hero-banner::before, .hero-banner::after {
-    content: ''; position: absolute; border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.08); pointer-events: none;
-  }
-  .hero-banner::before { width: 260px; height: 260px; right: -60px; top: -80px; }
-  .hero-banner::after { width: 160px; height: 160px; right: 40px; bottom: -60px; border-color: rgba(255,255,255,0.05); }
-  
+  /* Hero grid texture */
   .hero-grid {
     position: absolute; inset: 0; pointer-events: none;
     background-image:
@@ -47,240 +28,186 @@
       linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 28px 28px;
   }
-
-  .hero-text { position: relative; z-index: 1; flex: 1; min-width: 0; }
-  .hero-eyebrow { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.3rem; }
-  .hero-title { font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 0.35rem; }
-  .hero-sub { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0; }
-
-  /* ══════════════════════════════════
-     STAT CARDS
-  ══════════════════════════════════ */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem;
-  }
-  .stat-card {
-    background: white; border: 1px solid var(--border); border-radius: var(--card-radius);
-    padding: 1.5rem; box-shadow: var(--card-shadow);
-    display: flex; align-items: flex-start; gap: 1rem;
-    transition: all 0.2s;
-  }
-  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,42,94,0.12); border-color: #cbd5e1; }
-  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
-  .stat-icon.primary { background: #eff6ff; color: #3b82f6; }
-  .stat-icon.warning { background: #fffbeb; color: #f59e0b; }
-  .stat-icon.success { background: #f0fdf4; color: #10b981; }
-  .stat-icon.danger  { background: #fef2f2; color: #ef4444; }
-
-  .stat-info { flex: 1; min-width: 0; }
-  .stat-label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-  .stat-val { font-family: 'Sora', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--navy); line-height: 1; }
-
-  /* ══════════════════════════════════
-     PANEL & TABLE
-  ══════════════════════════════════ */
-  .panel {
-    background: white; border: 1px solid var(--border); border-radius: var(--card-radius);
-    box-shadow: var(--card-shadow); overflow: hidden;
-  }
-  .panel-header {
-    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
-    background: #fcfdfd;
-  }
-  .panel-title { font-family: 'Sora', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--navy); margin: 0; }
-
-  /* Filters */
-  .filter-bar {
-    display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
-  }
-  .filter-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.4rem; }
-  @media(max-width:768px) { .filter-group { min-width: 100%; } }
-  .filter-label { font-size: 0.8rem; font-weight: 600; color: var(--text); }
-  .filter-input {
-    padding: 0.65rem 1rem; border-radius: 10px; border: 1.5px solid var(--border);
-    font-size: 0.85rem; color: var(--text); transition: all 0.2s;
-  }
-  .filter-input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-  .btn-filter {
-    background: var(--navy); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 10px;
-    font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-filter:hover { background: var(--blue); transform: translateY(-1px); }
-
-  /* Table styles matching myBiddsApplications */
-  .bid-table { width: 100%; border-collapse: collapse; }
-  .bid-table th {
-    background: var(--surface-2); color: var(--muted);
-    font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.05em; padding: 1rem 1.5rem; text-align: left;
-    border-bottom: 1.5px solid var(--border);
-  }
-  .bid-table td {
-    padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
-    font-size: 0.88rem; color: var(--text); vertical-align: middle;
-  }
-  .bid-table tr:last-child td { border-bottom: none; }
-  .bid-table tr:hover td { background: #fafafa; }
-  
-  .td-title { font-weight: 600; color: var(--navy); display: block; margin-bottom: 2px; }
-  .td-company { font-size: 0.8rem; color: var(--muted); }
-  .td-amount { font-family: 'Sora', sans-serif; font-weight: 700; color: #10b981; }
-
-  .status-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;
-    letter-spacing: 0.04em; text-transform: uppercase;
-  }
-  .status-badge.pending { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-  .status-badge.approved { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
-  .status-badge.rejected { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-
-  .btn-action {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 0.4rem 1rem; border-radius: 8px; border: 1px solid var(--border);
-    background: white; color: var(--navy); font-size: 0.75rem; font-weight: 600;
-    text-decoration: none; transition: all 0.2s;
-  }
-  .btn-action:hover { background: #eff6ff; border-color: #bfdbfe; color: var(--blue); }
-
-  /* Mobile Responsive Table */
-  @media(max-width:900px) {
-    .table-overflow { overflow-x: auto; }
-  }
-
+  /* Hover transforms */
+  .stat-card:hover    { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,42,94,0.12); border-color: #cbd5e1; }
+  .btn-filter:hover   { background: #ea580c; transform: translateY(-1px); }
+  .btn-action:hover   { background: #eff6ff; border-color: #bfdbfe; color: #ea580c; }
+  .filter-input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  tr:hover td         { background: #fafafa; }
 </style>
 
-<div class="db-wrap">
+<!-- ══════ PAGE WRAPPER ══════ -->
+<div class="flex flex-col gap-6 max-sm:gap-4">
 
   <!-- ══════ HERO ══════ -->
-  <div class="hero-banner">
+  <div class="hero-banner relative flex items-center justify-between gap-6 flex-wrap px-8 py-7 rounded-2xl overflow-hidden"
+       style="background:linear-gradient(135deg,#475569 0%,#64748b 45%,#94a3b8 100%);
+              box-shadow:0 8px 24px rgba(26,86,219,0.15);">
     <div class="hero-grid"></div>
-    <div class="hero-text">
-      <p class="hero-eyebrow">Bid Management</p>
-      <h1 class="hero-title">My Bids History</h1>
-      <p class="hero-sub">Track all your submitted tender applications and their current evaluation status.</p>
+    <div class="relative z-[1] flex-1 min-w-0">
+      <p class="text-[0.72rem] font-medium tracking-[0.1em] uppercase mb-[0.3rem]" style="color:rgba(255,255,255,0.6);">Bid Management</p>
+      <h1 class="font-sora text-[1.6rem] font-extrabold text-white leading-[1.25] mb-[0.35rem]">My Bids History</h1>
+      <p class="text-[0.85rem] mb-0" style="color:rgba(255,255,255,0.7);">Track all your submitted tender applications and their current evaluation status.</p>
     </div>
   </div>
 
   <!-- ══════ STATS GRID ══════ -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon primary"><i class="fas fa-folder-open"></i></div>
-      <div class="stat-info">
-        <div class="stat-label">Total Submissions</div>
-        <div class="stat-val">{{ bids|length }}</div>
+  <div class="grid gap-5" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+
+    <div class="stat-card flex items-start gap-4 bg-white border border-slate-200 rounded-2xl p-6 transition-all duration-200"
+         style="box-shadow:0 2px 16px rgba(15,42,94,0.07);">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center text-[1.4rem] flex-shrink-0 bg-blue-50 text-orange-light">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[0.78rem] font-semibold text-muted uppercase tracking-[0.05em] mb-[0.3rem]">Total Submissions</div>
+        <div class="font-sora text-[1.7rem] font-extrabold text-navy leading-none">{{ bids|length }}</div>
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon warning"><i class="fas fa-clock"></i></div>
-      <div class="stat-info">
-        <div class="stat-label">Pending Review</div>
-        <div class="stat-val">{{ pending_count }}</div>
+    <div class="stat-card flex items-start gap-4 bg-white border border-slate-200 rounded-2xl p-6 transition-all duration-200"
+         style="box-shadow:0 2px 16px rgba(15,42,94,0.07);">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center text-[1.4rem] flex-shrink-0 bg-amber-50 text-accent">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[0.78rem] font-semibold text-muted uppercase tracking-[0.05em] mb-[0.3rem]">Pending Review</div>
+        <div class="font-sora text-[1.7rem] font-extrabold text-navy leading-none">{{ pending_count }}</div>
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
-      <div class="stat-info">
-        <div class="stat-label">Approved Bids</div>
-        <div class="stat-val">{{ approved_count }}</div>
+    <div class="stat-card flex items-start gap-4 bg-white border border-slate-200 rounded-2xl p-6 transition-all duration-200"
+         style="box-shadow:0 2px 16px rgba(15,42,94,0.07);">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center text-[1.4rem] flex-shrink-0 bg-green-50 text-emerald-500">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[0.78rem] font-semibold text-muted uppercase tracking-[0.05em] mb-[0.3rem]">Approved Bids</div>
+        <div class="font-sora text-[1.7rem] font-extrabold text-navy leading-none">{{ approved_count }}</div>
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon danger"><i class="fas fa-times-circle"></i></div>
-      <div class="stat-info">
-        <div class="stat-label">Rejected Bids</div>
-        <div class="stat-val">{{ rejected_count }}</div>
+    <div class="stat-card flex items-start gap-4 bg-white border border-slate-200 rounded-2xl p-6 transition-all duration-200"
+         style="box-shadow:0 2px 16px rgba(15,42,94,0.07);">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center text-[1.4rem] flex-shrink-0 bg-red-50 text-red-400">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[0.78rem] font-semibold text-muted uppercase tracking-[0.05em] mb-[0.3rem]">Rejected Bids</div>
+        <div class="font-sora text-[1.7rem] font-extrabold text-navy leading-none">{{ rejected_count }}</div>
       </div>
     </div>
+
   </div>
 
   <!-- ══════ FILTER & TABLE PANEL ══════ -->
-  <div class="panel">
-    
+  <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+       style="box-shadow:0 2px 16px rgba(15,42,94,0.07);">
+
     <!-- Filter Header -->
-    <div class="panel-header">
-      <form method="get" class="filter-bar w-100 m-0">
-        
-        <div class="filter-group">
-          <label class="filter-label">Search Tenders</label>
-          <input type="text" name="search" class="filter-input" placeholder="Search by tender title..." value="{{ request.GET.search }}">
+    <div class="px-6 py-5 border-b border-slate-200 bg-[#fcfdfd]">
+      <form method="get" class="flex flex-wrap gap-4 items-end w-full m-0">
+
+        <div class="flex flex-col gap-[0.4rem] flex-1 min-w-[200px] max-md:min-w-full">
+          <label class="text-[0.8rem] font-semibold text-text">Search Tenders</label>
+          <input type="text" name="search" placeholder="Search by tender title..."
+                 value="{{ request.GET.search }}"
+                 class="filter-input px-4 py-[0.65rem] rounded-[10px] border-[1.5px] border-slate-200 text-[0.85rem] text-text transition-all duration-200">
         </div>
 
-        <div class="filter-group" style="flex:0.5;">
-          <label class="filter-label">Status Filter</label>
-          <select name="status" class="filter-input" style="height: 40px; padding: 0.5rem 1rem;">
+        <div class="flex flex-col gap-[0.4rem] min-w-[200px] max-md:min-w-full" style="flex:0.5;">
+          <label class="text-[0.8rem] font-semibold text-text">Status Filter</label>
+          <select name="status"
+                  class="filter-input px-4 rounded-[10px] border-[1.5px] border-slate-200 text-[0.85rem] text-text transition-all duration-200"
+                  style="height:40px; padding:0.5rem 1rem;">
             <option value="">All Statuses</option>
-            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+            <option value="pending"  {% if request.GET.status == "pending"  %}selected{% endif %}>Pending</option>
             <option value="approved" {% if request.GET.status == "approved" %}selected{% endif %}>Approved</option>
             <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>Rejected</option>
           </select>
         </div>
 
-        <button type="submit" class="btn-filter" style="height: 40px;"><i class="fas fa-filter"></i> Apply</button>
+        <button type="submit"
+                class="btn-filter inline-flex items-center gap-2 px-6 py-[0.65rem] rounded-[10px] bg-navy text-white font-sora text-[0.85rem] font-bold border-none cursor-pointer transition-all duration-200"
+                style="height:40px;">
+          <i class="fas fa-filter"></i> Apply
+        </button>
       </form>
     </div>
 
-    <!-- Table Body -->
-    <div class="table-overflow">
-      <table class="bid-table">
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
         <thead>
           <tr>
-            <th style="width:50px;">#</th>
-            <th>Tender Details</th>
-            <th>Proposed Budget</th>
-            <th>Submission Date</th>
-            <th>Status</th>
-            <th>Official Remarks</th>
-            <th style="text-align:right;">Actions</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200" style="width:50px;">#</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Tender Details</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Proposed Budget</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Payment Details</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Submission Date</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Status</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-left border-b-[1.5px] border-slate-200">Official Remarks</th>
+            <th class="bg-slate-50 text-muted font-dmSans text-[0.75rem] font-bold uppercase tracking-[0.05em] px-6 py-4 text-right border-b-[1.5px] border-slate-200">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for bid in bids %}
-          <tr>
-            <td style="color:var(--muted); font-weight:600;">{{ forloop.counter }}</td>
-            <td>
-              <span class="td-title">{{ bid.tender.title }}</span>
-              <span class="td-company"><i class="fas fa-building text-muted pe-1"></i> {{ bid.company_name }}</span>
+          <tr class="transition-colors duration-150">
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle text-muted font-semibold">{{ forloop.counter }}</td>
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle">
+              <span class="block font-semibold text-navy mb-[2px]">{{ bid.tender.title }}</span>
+              <span class="text-[0.8rem] text-muted"><i class="fas fa-building pe-1"></i>{{ bid.company_name }}</span>
             </td>
-            <td class="td-amount">₹ {{ bid.bid_amount|floatformat:2 }}</td>
-            <td style="color:var(--muted);">{{ bid.applied_at|date:"d M Y" }}</td>
-            
-            <!-- STATUS -->
-            <td>
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle font-sora font-bold" style="color:#10b981;">
+              ₹ {{ bid.bid_amount|floatformat:2 }}
+            </td>
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle">
+              {% if bid.payment_status == 'paid' %}
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <i class="fas fa-check-circle"></i> Paid
+                </span><br>
+                <small class="text-muted" style="font-size:0.7rem;">Txn: {{ bid.razorpay_payment_id|default:"N/A" }}</small>
+              {% elif bid.payment_status == 'refunded' %}
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-slate-100 text-navy border border-slate-200">
+                  <i class="fas fa-undo"></i> Refunded
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-amber-50 text-amber-700 border border-amber-200">
+                  <i class="fas fa-hourglass-half"></i> Pending
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle text-muted">{{ bid.applied_at|date:"d M Y" }}</td>
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle">
               {% if bid.status == "pending" %}
-                <span class="status-badge pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-amber-50 text-amber-700 border border-amber-200">
+                  <i class="fas fa-hourglass-half"></i> Pending
+                </span>
               {% elif bid.status == "approved" %}
-                <span class="status-badge approved"><i class="fas fa-check-circle"></i> Approved</span>
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <i class="fas fa-check-circle"></i> Approved
+                </span>
               {% elif bid.status == "rejected" %}
-                <span class="status-badge rejected"><i class="fas fa-times-circle"></i> Rejected</span>
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-red-50 text-red-700 border border-red-200">
+                  <i class="fas fa-times-circle"></i> Rejected
+                </span>
               {% else %}
-                <span class="status-badge" style="background:var(--surface-2);border:1px solid var(--border);">{{ bid.status }}</span>
+                <span class="inline-flex items-center gap-1 px-3 py-[5px] rounded-[20px] text-[0.7rem] font-bold uppercase tracking-[0.04em] bg-slate-100 border border-slate-200">{{ bid.status }}</span>
               {% endif %}
             </td>
-
-            <!-- REMARK -->
-            <td style="color:var(--muted); max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-              {% if bid.remark %}
-                {{ bid.remark }}
-              {% else %}
-                —
-              {% endif %}
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle text-muted max-w-[180px] whitespace-nowrap overflow-hidden text-ellipsis">
+              {% if bid.remark %}{{ bid.remark }}{% else %}—{% endif %}
             </td>
-
-            <!-- ACTION -->
-            <td style="text-align:right;">
-              <a href="{% url 'bids:bid_detail' bid.id %}" class="btn-action">
+            <td class="px-6 py-[1.1rem] border-b border-slate-100 text-[0.88rem] align-middle text-right">
+              <a href="{% url 'bids:bid_detail' bid.id %}"
+                 class="btn-action inline-flex items-center justify-center gap-1 px-4 py-[0.4rem] rounded-lg border border-slate-200 bg-white text-navy text-[0.75rem] font-semibold no-underline transition-all duration-200 mr-1">
                 <i class="fas fa-eye pe-1"></i> View
               </a>
               {% if bid.status == 'pending' %}
-              <a href="{% url 'bids:withdraw_bid' bid.id %}" class="btn-action text-danger" 
+              <a href="{% url 'bids:withdraw_bid' bid.id %}"
                  onclick="return confirm('Are you sure you want to withdraw this bid?')"
-                 style="border-color: #fecaca;">
+                 class="inline-flex items-center justify-center gap-1 px-4 py-[0.4rem] rounded-lg border text-red-500 bg-white text-[0.75rem] font-semibold no-underline transition-all duration-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                 style="border-color:#fecaca;">
                 <i class="fas fa-trash-alt pe-1"></i> Withdraw
               </a>
               {% endif %}
@@ -288,9 +215,9 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" style="text-align:center; padding:3rem 1rem; color:var(--muted);">
-              <i class="fas fa-folder-open mb-3" style="font-size:2.5rem; opacity:0.3; display:block;"></i>
-              <p style="margin:0;">No bid applications found matching your criteria.</p>
+            <td colspan="7" class="text-center py-12 px-4 text-muted">
+              <i class="fas fa-folder-open mb-3 block text-[2.5rem] opacity-30"></i>
+              <p class="m-0">No bid applications found matching your criteria.</p>
             </td>
           </tr>
           {% endfor %}

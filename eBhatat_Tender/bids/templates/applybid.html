@@ -1,278 +1,233 @@
-{% extends "base2.html" %}
+{% extends "base.html" %}
 {% block content %}
 
-<style>
-  /* ── Dashboard tokens ── */
-  :root {
-    --card-radius: 16px;
-    --card-shadow: 0 2px 16px rgba(15,42,94,0.07);
-    --gradient-hero: linear-gradient(135deg, #0a1745 0%, #163472 45%, #1a56db 100%);
-  }
+<!-- ══════ PAGE WRAPPER ══════ -->
+<div class="flex flex-col gap-6 max-w-[1000px] mx-auto 
+            xs:pt-6 sm:pt-14 md:pt-16 lg:pt-20 xl:pt-24 mt-4
+            px-4 sm:px-6 md:px-8 mb-20 bg-slate-50 min-h-screen">
 
-  /* ── Page wrapper ── */
-  .db-wrap {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 1000px; /* Keep form contained */
-    margin: 0 auto;
-  }
-  @media (max-width: 640px) { .db-wrap { gap: 1rem; } }
+  <!-- ══════ HERO OVERVIEW ══════ -->
+  <div class="relative flex items-center justify-between gap-6 flex-wrap px-8 py-7 rounded-2xl overflow-hidden"
+       style="background: linear-gradient(135deg, #09193a 0%, #0f2a5e 52%, #163472 100%);"
+              box-shadow:0 8px 24px rgba(59,130,246,0.15);">
+              
+    <!-- Decorative overlapping circles -->
+    <div class="absolute rounded-full border-[1.5px] pointer-events-none"
+         style="width:260px; height:260px; right:-60px; top:-80px; border-color:rgba(255,255,255,0.08);"></div>
+    <div class="absolute rounded-full border-[1.5px] pointer-events-none"
+         style="width:160px; height:160px; right:40px; bottom:-60px; border-color:rgba(255,255,255,0.05);"></div>
 
-  /* ══════════════════════════════════
-     HERO BANNER
-  ══════════════════════════════════ */
-  .hero-banner {
-    background: var(--gradient-hero);
-    border-radius: var(--card-radius);
-    padding: 1.75rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    position: relative;
-    overflow: hidden;
-    flex-wrap: wrap;
-    box-shadow: 0 8px 24px rgba(26,86,219,0.15);
-  }
-  .hero-banner::before, .hero-banner::after {
-    content: ''; position: absolute; border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.08); pointer-events: none;
-  }
-  .hero-banner::before { width: 260px; height: 260px; right: -60px; top: -80px; }
-  .hero-banner::after { width: 160px; height: 160px; right: 40px; bottom: -60px; border-color: rgba(255,255,255,0.05); }
-  
-  .hero-grid {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 28px 28px;
-  }
+    <!-- Grid texture -->
+    <div class="absolute inset-0 pointer-events-none bg-[size:28px_28px]"
+         style="background-image:linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);"></div>
 
-  .hero-text { position: relative; z-index: 1; min-width: 0; flex: 1; }
-  .hero-eyebrow {
-    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: #a5b4fc; margin-bottom: 0.3rem; 
-    display: flex; align-items: center; gap: 6px;
-  }
-  .hero-title {
-    font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; 
-    color: #fff; line-height: 1.3; margin-bottom: 0.35rem;
-  }
-
-  /* ══════════════════════════════════
-     PROFILE PANEL & FORM
-  ══════════════════════════════════ */
-  .panel {
-    background: white; border: 1px solid var(--border);
-    border-radius: var(--card-radius); box-shadow: var(--card-shadow);
-    overflow: hidden; padding: 2.5rem 3rem;
-  }
-  @media(max-width: 768px) { .panel { padding: 1.5rem; } }
-
-  .form-section-title {
-    font-family: 'Sora', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--surface-2);
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem 1.5rem;
-    margin-bottom: 2.5rem;
-  }
-  @media(max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
-  .form-grid.single { grid-template-columns: 1fr; }
-
-  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-  
-  .form-label {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--navy);
-  }
-
-  .form-input, .form-textarea {
-    width: 100%;
-    padding: 0.75rem 1.1rem;
-    border-radius: 10px;
-    border: 1.5px solid var(--border);
-    background: #fcfdfd;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text);
-    transition: all 0.2s;
-  }
-  .form-textarea { resize: vertical; min-height: 80px; }
-  
-  .form-input:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--blue-light);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.12);
-  }
-
-  .form-control-file {
-    display: block; width: 100%; font-size: 0.8rem; color: var(--muted);
-    background: white; border: 1.5px dashed var(--border); border-radius: 10px;
-    padding: 0.5rem; cursor: pointer; transition: all 0.2s;
-  }
-  .form-control-file:hover { border-color: var(--blue-light); background: #f8fafc; }
-  .form-control-file::file-selector-button {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 0.4rem 0.8rem; margin-right: 0.75rem;
-    font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600;
-    color: var(--navy); cursor: pointer; transition: all 0.2s;
-  }
-  .form-control-file::file-selector-button:hover { background: #eff6ff; color: var(--blue); border-color: #bfdbfe; }
-
-  /* Submit Button */
-  .btn-submit {
-    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; padding: 1rem; border-radius: 12px;
-    background: var(--blue); color: white;
-    font-family: 'Sora', sans-serif; font-size: 1.05rem; font-weight: 700;
-    border: none; cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 4px 16px rgba(26,86,219,0.3);
-  }
-  .btn-submit:hover {
-    background: var(--navy-mid);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(26,86,219,0.4);
-  }
-
-</style>
-
-<div class="db-wrap">
-
-  <!-- ══════ HERO ══════ -->
-  <div class="hero-banner">
-    <div class="hero-grid"></div>
-    <div class="hero-text">
-      <p class="hero-eyebrow"><i class="fas fa-file-contract"></i> Official Tender Application</p>
-      <h1 class="hero-title">{{ tender.title }}</h1>
+    <div class="relative z-[1] flex-1 min-w-0">
+      <div class="flex items-center gap-2 text-[0.75rem] font-bold tracking-[0.08em] uppercase mb-[0.3rem]" style="color:#bfdbfe;">
+        <i class="fas fa-file-contract"></i> Official Tender Application
+      </div>
+      <h1 class="font-sora text-[1.6rem] font-extrabold text-white leading-[1.3] mb-0">
+        {{ tender.title }}
+      </h1>
     </div>
   </div>
 
   <!-- ══════ FORM PANEL ══════ -->
-  <div class="panel">
+  <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+       style="box-shadow:0 4px 20px rgba(15,42,94,0.06);">
     
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" class="p-8 max-sm:p-5">
       {% csrf_token %}
       
       <!-- Company Details -->
-      <div class="form-section-title">
-        <i class="fas fa-building" style="color:var(--blue-light);"></i> 1. Company Information
+      <div class="flex items-center gap-[10px] font-sora text-[1.1rem] font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-100">
+        <i class="fas fa-building text-blue-500"></i> 1. Company Information
       </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Company Name</label>
-          <input type="text" name="company_name" class="form-input" required placeholder="Registered Entity Name">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-[1.25rem] mb-[2rem]">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Company Name</label>
+          <input type="text" name="company_name" required placeholder="Registered Entity Name"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
-        <div class="form-group">
-          <label class="form-label">GST Number</label>
-          <input type="text" name="gst_number" class="form-input" required placeholder="22AAAAA0000A1Z5">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">GST Number</label>
+          <input type="text" name="gst_number" required placeholder="22AAAAA0000A1Z5"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
-      </div>
-      <div class="form-grid single" style="margin-bottom:1.25rem;">
-        <div class="form-group">
-          <label class="form-label">Registered Address</label>
-          <textarea name="registered_address" class="form-textarea" required placeholder="Full street address"></textarea>
-        </div>
-      </div>
-      <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-        <div class="form-group">
-          <label class="form-label">City</label>
-          <input type="text" name="city" class="form-input" required placeholder="City">
-        </div>
-        <div class="form-group">
-          <label class="form-label">State</label>
-          <input type="text" name="state" class="form-input" required placeholder="State">
-        </div>
-        <div class="form-group">
-          <label class="form-label">PIN Code</label>
-          <input type="text" name="pin_code" class="form-input" required placeholder="000000">
-        </div>
-      </div>
-      <div class="form-grid single">
-        <div class="form-group">
-          <label class="form-label">Upload GST Certificate (PDF)</label>
-          <input type="file" name="gst_document" class="form-control-file" accept=".pdf,.jpeg,.jpg,.png" required>
+        <div class="flex flex-col gap-[0.4rem] md:col-span-2">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Registered Address</label>
+          <textarea name="registered_address" required placeholder="Full street address"
+                    class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium min-h-[90px] resize-y"></textarea>
         </div>
       </div>
 
-      <!-- Bidder Details -->
-      <div class="form-section-title">
-        <i class="fas fa-user-tie" style="color:#f59e0b;"></i> 2. Authorized Representative
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-[1.25rem] mb-[2rem]">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">City</label>
+          <input type="text" name="city" required placeholder="City"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
+        </div>
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">State</label>
+          <input type="text" name="state" required placeholder="State"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
+        </div>
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">PIN Code</label>
+          <input type="text" name="pin_code" required placeholder="000000"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
+        </div>
       </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Bidder Name</label>
-          <input type="text" name="bidder_name" class="form-input" required placeholder="Full Name">
+
+      <div class="flex flex-col gap-[0.4rem] mb-[2.5rem]">
+        <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Upload GST Certificate (PDF)</label>
+        <input type="file" name="gst_document" accept=".pdf,.jpeg,.jpg,.png" required
+               class="block w-full text-[0.8rem] text-slate-500 bg-slate-50 border-[1.5px] border-dashed border-slate-300 rounded-xl p-[0.6rem] cursor-pointer transition-all duration-200 hover:border-blue-400 hover:bg-slate-100
+                      file:bg-white file:border-[1.5px] file:border-slate-200 file:rounded-md file:px-4 file:py-2 file:mr-3 file:text-[0.75rem] file:font-semibold file:text-slate-700 file:cursor-pointer file:transition-all file:duration-200 hover:file:border-blue-300 hover:file:text-blue-600 hover:file:bg-blue-50">
+      </div>
+
+      <!-- Bidder Details -->
+      <div class="flex items-center gap-[10px] font-sora text-[1.1rem] font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-100">
+        <i class="fas fa-user-tie text-amber-500"></i> 2. Authorized Representative
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-[1.25rem] mb-[2.5rem]">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Bidder Name</label>
+          <input type="text" name="bidder_name" required placeholder="Full Name"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
-        <div class="form-group">
-          <label class="form-label">Designation</label>
-          <input type="text" name="designation" class="form-input" required placeholder="e.g. Director / Manager">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Designation</label>
+          <input type="text" name="designation" required placeholder="e.g. Director / Manager"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
-        <div class="form-group">
-          <label class="form-label">Official Email</label>
-          <input type="email" name="email" class="form-input" required placeholder="email@company.com">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Official Email</label>
+          <input type="email" name="email" required placeholder="email@company.com"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
-        <div class="form-group">
-          <label class="form-label">Mobile Number</label>
-          <input type="tel" name="mobile" class="form-input" required placeholder="+91">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Mobile Number</label>
+          <input type="tel" name="mobile" required placeholder="+91"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-blue-400 focus:bg-white focus:ring-[3px] focus:ring-blue-100 placeholder-slate-400 font-medium">
         </div>
       </div>
 
       <!-- Financial Statements -->
-      <div class="form-section-title">
-        <i class="fas fa-file-invoice-dollar" style="color:#10b981;"></i> 3. Financial Statements
+      <div class="flex items-center gap-[10px] font-sora text-[1.1rem] font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-100">
+        <i class="fas fa-file-invoice-dollar text-emerald-500"></i> 3. Financial Statements
       </div>
-      <div class="form-grid single">
-        <div class="form-group">
-          <label class="form-label">CA Certified Financial Statement (Last 3 Years)</label>
-          <input type="file" name="financial_statement" class="form-control-file" accept=".pdf" required>
-        </div>
+      <div class="flex flex-col gap-[0.4rem] mb-[2.5rem]">
+        <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">CA Certified Financial Statement (Last 3 Years)</label>
+        <input type="file" name="financial_statement" accept=".pdf" required
+               class="block w-full text-[0.8rem] text-slate-500 bg-slate-50 border-[1.5px] border-dashed border-slate-300 rounded-xl p-[0.6rem] cursor-pointer transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-50
+                      file:bg-white file:border-[1.5px] file:border-slate-200 file:rounded-md file:px-4 file:py-2 file:mr-3 file:text-[0.75rem] file:font-semibold file:text-slate-700 file:cursor-pointer file:transition-all file:duration-200 hover:file:border-emerald-300 hover:file:text-emerald-700 hover:file:bg-emerald-100">
       </div>
 
       <!-- Bidding Details -->
-      <div class="form-section-title">
-        <i class="fas fa-gavel" style="color:#6366f1;"></i> 4. Proposal Documents & Core Bid
+      <div class="flex items-center gap-[10px] font-sora text-[1.1rem] font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-100">
+        <i class="fas fa-gavel text-indigo-500"></i> 4. Proposal Documents & Core Bid
       </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Proposed Bid Amount (₹)</label>
-          <input type="number" name="bid_amount" class="form-input" required placeholder="0.00">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-[1.25rem]">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Proposed Bid Amount (₹)</label>
+          <input type="number" name="bid_amount" required placeholder="0.00"
+                 class="w-full px-[1rem] py-[0.75rem] rounded-xl border-[1.5px] border-slate-300 bg-slate-50 font-dmSans text-[0.9rem] text-slate-800 transition-all duration-200 outline-none focus:border-indigo-400 focus:bg-white focus:ring-[3px] focus:ring-indigo-100 placeholder-slate-400 font-bold tracking-wide" style="color:#10b981;">
         </div>
-        <div class="form-group">
-          <label class="form-label">Technical Proposal</label>
-          <input type="file" name="technical_document" class="form-control-file" accept=".pdf" required>
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Technical Proposal</label>
+          <input type="file" name="technical_document" accept=".pdf" required
+                 class="block w-full text-[0.8rem] text-slate-500 bg-slate-50 border-[1.5px] border-dashed border-slate-300 rounded-xl p-[0.6rem] cursor-pointer transition-all duration-200 hover:border-indigo-400 hover:bg-slate-100
+                        file:bg-white file:border-[1.5px] file:border-slate-200 file:rounded-md file:px-3 file:py-[0.35rem] file:mr-2 file:text-[0.7rem] file:font-semibold file:text-slate-700 file:cursor-pointer file:transition-all file:duration-200 hover:file:border-indigo-300 hover:file:text-indigo-600 hover:file:bg-indigo-50">
         </div>
-        <div class="form-group">
-          <label class="form-label">Financial Proposal</label>
-          <input type="file" name="financial_document" class="form-control-file" accept=".pdf" required>
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Financial Proposal</label>
+          <input type="file" name="financial_document" accept=".pdf" required
+                 class="block w-full text-[0.8rem] text-slate-500 bg-slate-50 border-[1.5px] border-dashed border-slate-300 rounded-xl p-[0.6rem] cursor-pointer transition-all duration-200 hover:border-indigo-400 hover:bg-slate-100
+                        file:bg-white file:border-[1.5px] file:border-slate-200 file:rounded-md file:px-3 file:py-[0.35rem] file:mr-2 file:text-[0.7rem] file:font-semibold file:text-slate-700 file:cursor-pointer file:transition-all file:duration-200 hover:file:border-indigo-300 hover:file:text-indigo-600 hover:file:bg-indigo-50">
         </div>
-        <div class="form-group">
-          <label class="form-label">Supporting Documents (Experience / Portfolio)</label>
-          <input type="file" name="other_document" class="form-control-file" accept=".pdf,.zip">
+        <div class="flex flex-col gap-[0.4rem]">
+          <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Supporting Docs (Experience/Portfolio)</label>
+          <input type="file" name="other_document" accept=".pdf,.zip"
+                 class="block w-full text-[0.8rem] text-slate-500 bg-slate-50 border-[1.5px] border-dashed border-slate-300 rounded-xl p-[0.6rem] cursor-pointer transition-all duration-200 hover:border-indigo-400 hover:bg-slate-100
+                        file:bg-white file:border-[1.5px] file:border-slate-200 file:rounded-md file:px-3 file:py-[0.35rem] file:mr-2 file:text-[0.7rem] file:font-semibold file:text-slate-700 file:cursor-pointer file:transition-all file:duration-200 hover:file:border-indigo-300 hover:file:text-indigo-600 hover:file:bg-indigo-50">
         </div>
       </div>
 
+      <!-- Razorpay Hidden Fields -->
+      <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+
+      <!-- 5. Funding Assistance (Optional) -->
+      {% if fundings %}
+      <div class="flex items-center gap-[10px] font-sora text-[1.1rem] font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-100 mt-10">
+        <i class="fas fa-hand-holding-usd text-purple-500"></i> 5. Funding Assistance (Optional)
+      </div>
+      
+      <div class="bg-purple-50 border border-purple-100 rounded-2xl p-6 mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <input type="checkbox" name="apply_funding" id="apply_funding" class="w-5 h-5 text-purple-600 rounded cursor-pointer">
+          <label for="apply_funding" class="font-dmSans text-[0.95rem] font-bold text-slate-700 cursor-pointer">
+            I want to apply for funding assistance for this tender
+          </label>
+        </div>
+
+        <div id="funding_fields" class="hidden space-y-5 mt-6 pt-6 border-t border-purple-200">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+              <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Select Funding Scheme</label>
+              <select name="funding_id" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-300 bg-white font-dmSans text-[0.9rem]">
+                <option value="">-- Choose a Scheme --</option>
+                {% for f in fundings %}
+                  <option value="{{ f.id }}">{{ f.title }} (Max: ₹{{ f.max_amount }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Amount Requested (₹)</label>
+              <input type="number" name="amount_requested" placeholder="0.00" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-300 bg-white font-dmSans text-[0.9rem]">
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Purpose of Funding</label>
+            <textarea name="purpose" placeholder="Briefly explain why you need this funding..." class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-300 bg-white font-dmSans text-[0.9rem] min-h-[80px]"></textarea>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="font-dmSans text-[0.85rem] font-bold text-slate-700">Supporting Documents (Project Plan/Estimates)</label>
+            <input type="file" name="funding_document" accept=".pdf" class="block w-full text-[0.8rem] text-slate-500 bg-white border-[1.5px] border-dashed border-slate-300 rounded-xl p-3">
+          </div>
+        </div>
+      </div>
+      
+      <script>
+        document.getElementById('apply_funding').addEventListener('change', function() {
+          const fields = document.getElementById('funding_fields');
+          if (this.checked) {
+            fields.classList.remove('hidden');
+            // Make fields required if applying
+            fields.querySelectorAll('input, select, textarea').forEach(el => {
+              if (el.type !== 'file' || el.name === 'funding_document') el.required = true;
+            });
+          } else {
+            fields.classList.add('hidden');
+            fields.querySelectorAll('input, select, textarea').forEach(el => el.required = false);
+          }
+        });
+      </script>
+      {% endif %}
+
       <!-- Submit -->
-      <div style="margin-top:3rem;">
-        <button type="submit" class="btn-submit">
-          <i class="fas fa-paper-plane"></i> Submit Official Tender Application
+      <div class="mt-[3.5rem]">
+        <button type="button" id="pay-btn"
+                class="w-full inline-flex items-center justify-center gap-[10px] px-6 py-[1.1rem] rounded-[14px] bg-indigo-600 text-white font-sora text-[1.05rem] font-bold border-none cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(79,70,229,0.3)] shadow-[0_4px_16px_rgba(79,70,229,0.2)]">
+          <i class="fas fa-paper-plane"></i> 
+          {% if tender.emd_amount > 0 %}
+            Pay ₹{{ tender.emd_amount }} &amp; Submit Official Tender Application
+          {% else %}
+            Submit Official Tender Application
+          {% endif %}
         </button>
       </div>
       
@@ -280,5 +235,49 @@
   </div>
 
 </div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.getElementById('pay-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const form = document.querySelector('form');
+      
+      // Basic HTML5 validation trigger
+      if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+      }
+
+      {% if tender.emd_amount > 0 %}
+      const amountInPaise = Math.round(parseFloat("{{ tender.emd_amount }}") * 100);
+      const options = {
+          "key": "{{ razorpay_key }}",
+          "amount": amountInPaise, 
+          "currency": "INR",
+          "name": "eBharat Tenders",
+          "description": "EMD Payment for {{ tender.tender_id }}",
+          "handler": function (response){
+              document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+              form.submit();
+          },
+          "prefill": {
+              "name": document.querySelector('input[name="company_name"]').value,
+              "email": document.querySelector('input[name="email"]').value,
+              "contact": document.querySelector('input[name="mobile"]').value
+          },
+          "theme": {
+              "color": "#4f46e5"
+          }
+      };
+      
+      const rzp1 = new Razorpay(options);
+      rzp1.open();
+      {% else %}
+      form.submit();
+      {% endif %}
+  });
+</script>
 
 {% endblock %}
