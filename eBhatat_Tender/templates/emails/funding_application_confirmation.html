@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
+        .container { max-width: 650px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
+        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 25px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; }
+        .content { padding: 35px; line-height: 1.6; }
+        .section-title { font-weight: 800; text-transform: uppercase; font-size: 11px; color: #64748b; letter-spacing: 0.1em; margin: 25px 0 10px; }
+        .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .info-table td { padding: 12px; border: 1px solid #f1f5f9; font-size: 14px; }
+        .info-label { width: 40%; background-color: #f8faff; font-weight: 700; color: #64748b; }
+        .info-value { width: 60%; font-weight: 600; color: #0f2a5e; }
+        .status-badge { display: inline-block; padding: 4px 10px; background-color: #fef3c7; color: #92400e; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .footer { background-color: #09193a; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Funding Request Receipt</h1>
+            <p style="color:rgba(255,255,255,0.6); font-size:11px; margin-top:5px;">Financial Assistance Program · eBharat Tender</p>
+        </div>
+        <div class="content">
+            <p>Dear <b>{{ bidder_name }}</b>,</p>
+            <p>Your application for financial assistance under the <b>{{ funding_title }}</b> scheme has been successfully received.</p>
+            
+            <div class="section-title">1. Funding Scheme Details</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Scheme Name:</td>
+                    <td class="info-value">{{ funding_title }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Associated Tender:</td>
+                    <td class="info-value">{{ tender_title }}</td>
+                </tr>
+            </table>
+
+            <div class="section-title">2. Application Summary</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Amount Requested:</td>
+                    <td class="info-value" style="color: #1a56db;">₹ {{ amount_requested }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Purpose of Funding:</td>
+                    <td class="info-value">{{ purpose }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Application Status:</td>
+                    <td class="info-value"><span class="status-badge">UNDER REVIEW</span></td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 25px; font-size: 13px;">Our financial committee will review your documents and revert to you shortly. You can monitor the status of this request in your funding dashboard.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="http://{{ domain }}/funding/my-funding-requests/" style="display:inline-block; padding:12px 24px; background-color:#1a56db; color:#ffffff; text-decoration:none; border-radius:8px; font-weight:700;">View Funding Status</a>
+            </div>
+            
+            <p style="margin-top: 35px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 13px;">Regards,<br><b>Financial Support Team</b><br>eBharat Tender Portal</p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Government of India · e-Procurement Finance Division</p>
+            <p>This System is developed by Darshit Sapariya</p>
+        </div>
+    </div>
+</body>
+</html>

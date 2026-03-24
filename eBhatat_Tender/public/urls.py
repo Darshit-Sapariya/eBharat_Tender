@@ -11,6 +11,7 @@ urlpatterns = [
     path('guidelines/', views.guidelines, name='guidelines'),
     path('tenderDetails/<int:tender_id>/', views.tenderDetails, name='tenderDetails'),
     path('noticeboard/', views.noticeboard, name='noticeboard'),
+    path('fundingDetails/<int:funding_id>/', views.fundingDetails, name='fundingDetails'),
    
 
 ]

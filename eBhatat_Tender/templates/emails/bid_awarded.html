@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
+        .container { max-width: 650px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
+        .header { background: linear-gradient(135deg, #166534 0%, #15803d 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .content { padding: 35px; line-height: 1.6; }
+        .content h2 { color: #166534; font-size: 20px; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .success-banner { background-color: #dcfce7; border-left: 4px solid #166534; padding: 15px; margin-bottom: 25px; color: #166534; font-weight: 600; }
+        .section-title { font-weight: 800; text-transform: uppercase; font-size: 11px; color: #64748b; letter-spacing: 0.1em; margin: 25px 0 10px; }
+        .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .info-table td { padding: 12px; border: 1px solid #f1f5f9; font-size: 14px; }
+        .info-label { width: 40%; background-color: #f8faff; font-weight: 700; color: #64748b; }
+        .info-value { width: 60%; font-weight: 600; color: #1e293b; }
+        .footer { background-color: #09193a; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 11px; }
+        .award-badge { display: inline-block; padding: 6px 12px; background-color: #166534; color: #ffffff; border-radius: 50px; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="font-size: 40px; margin-bottom: 10px;">🏛️</div>
+            <h1 style="font-size: 28px; letter-spacing: 2px;">eBHARAT TENDER</h1>
+            <div class="award-badge" style="margin-top: 15px; background-color: #ffffff; color: #166534; border: 2px solid #ffffff;">🏆 LETTER OF ACKNOWLEDGEMENT</div>
+        </div>
+        <div class="content">
+            <p style="font-size: 16px; line-height: 1.8;">Dear <b>{{ bidder_name }}</b>,</p>
+            
+            <p style="font-size: 15px; line-height: 1.6; text-align: justify;">
+                This correspondence serves as the official <strong>Cover Letter and Acknowledgement</strong> from the <b>eBharat Government Tender Portal</b>. We are extremely pleased to announce that <b>{{ company_name }}</b> has been officially awarded the contract. All primary information regarding the success of your bid is summarized below.
+            </p>
+            
+            <div class="success-banner" style="margin-top: 20px;">
+                <strong>📄 PDF Attachment Notice:</strong><br><br>
+                Please find attached to this email a comprehensive document in <strong>PDF format</strong>. The attachment contains each and every detail of all relevant tenders, presented in important data table formats and detailed paragraphs. Kindly review the attached PDF for complete, exhaustive specifications.
+            </div>
+            
+            <div class="section-title">1. Important Contract Data</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Tender Title:</td>
+                    <td class="info-value">{{ tender_title }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Tender ID:</td>
+                    <td class="info-value">{{ tender_id }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Department:</td>
+                    <td class="info-value">{{ department }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Location:</td>
+                    <td class="info-value">{{ location }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Awarded Amount:</td>
+                    <td class="info-value" style="color: #166534; font-size: 16px;">₹ {{ bid_amount }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Award Date:</td>
+                    <td class="info-value">{{ award_date }}</td>
+                </tr>
+            </table>
+
+            <div class="section-title">2. Winning Bidder Profile</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Company Name:</td>
+                    <td class="info-value">{{ company_name }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">GST Number:</td>
+                    <td class="info-value">{{ gst_number }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Registered Address:</td>
+                    <td class="info-value" style="font-size: 12px;">{{ address }}</td>
+                </tr>
+            </table>
+
+            <div class="section-title">Next Steps</div>
+            <p style="font-size: 14px; line-height: 1.6;">
+                The procurement officer will contact you shortly regarding the contract signing and formal project kickoff. Please ensure all your documentation is ready for final verification, as outlined in the highly important attached PDF file.
+            </p>
+            
+            <p style="margin-top: 35px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 13px;">
+                Warm Regards,<br>
+                <b>Regional Procurement Officer</b><br>
+                eBharat Tender Portal
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Government of India · Electronic Procurement System</p>
+            <p>This is an automated formal notification. No reply is required.</p>
+            <p>This System is developed by Darshit Sapariya</p>
+        </div>
+    </div>
+</body>
+</html>

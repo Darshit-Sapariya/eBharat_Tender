@@ -102,7 +102,7 @@
 
 
   <!-- ══════ MAIN FORM ══════ -->
-  <form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data" class="show-loader">
     {% csrf_token %}
 
     <!-- 3-column layout: Avatar | Personal | KYC -->
@@ -143,7 +143,10 @@
             <i class="fas fa-envelope text-indigo-500 text-[0.75rem] flex-shrink-0"></i>
             <div class="min-w-0">
               <p class="text-[0.55rem] font-black text-slate-400 uppercase tracking-tight m-0">Email</p>
-              <p class="text-[0.7rem] font-bold text-slate-700 truncate m-0">{{ request.user.email }}</p>
+              <input type="email" value="{{ request.user.email }}" 
+                     id="sidebarEmail" readonly
+                     class="w-full bg-transparent border-none text-[0.7rem] font-bold text-slate-500 p-0 focus:outline-none focus:ring-0 truncate cursor-not-allowed"
+                     placeholder="your@email.com">
             </div>
           </div>
           <div class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 rounded-xl">
@@ -200,6 +203,12 @@
           <div class="flex flex-col gap-1">
             <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Mobile Number</label>
             <input type="tel" name="mobile" value="{{ profile.mobile }}" placeholder="+91 XXXXX XXXXX"
+                   class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 transition-all duration-200">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[0.62rem] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
+            <input type="email" name="email" value="{{ request.user.email }}" id="mainEmail" onkeyup="syncSidebarEmail(this.value)"
                    class="field-input w-full px-4 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 text-[0.85rem] font-semibold text-slate-700 transition-all duration-200">
           </div>
 
@@ -321,6 +330,29 @@
       link.innerText = 'View Full';
     }
   }
+
+  function syncSidebarEmail(val) {
+    document.getElementById('sidebarEmail').value = val;
+  }
+  function syncMainEmail(val) {
+    document.getElementById('mainEmail').value = val;
+  }
+
+  // Profile Picture Live Preview
+  const profilePicUpload = document.getElementById('profilePic');
+  if (profilePicUpload) {
+    profilePicUpload.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.querySelector('.w-24.rounded-full img');
+          if (img) img.src = e.target.result;
+        }
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
 </script>
 
 {% endblock %}
+```

@@ -109,7 +109,7 @@
 
 
   <!-- ══════ MAIN FORM ══════ -->
-  <form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data" class="show-loader">
     {% csrf_token %}
 
     <!-- 3-column layout: Avatar | Personal+KYC | Role+Submit -->
@@ -235,6 +235,16 @@
                          placeholder="10-digit number"
                          class="field-input w-full pl-8 pr-3 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-50/60 font-dmSans text-[0.85rem] text-slate-800 transition-all duration-200">
                 </div>
+              </div>
+            </div>
+
+            <!-- Email Address -->
+            <div class="flex flex-col gap-1">
+              <label class="font-sora text-[0.68rem] font-bold text-slate-600 uppercase tracking-wider">Email Address</label>
+              <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[0.7rem] pointer-events-none"></i>
+                <input type="email" value="{{ request.user.email }}" readonly
+                       class="field-input w-full pl-8 pr-3 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-slate-100 text-[0.85rem] text-slate-500 cursor-not-allowed transition-all duration-200">
               </div>
             </div>
 
@@ -420,5 +430,22 @@
   </form>
 
 </div>
+
+<script>
+  // Profile Picture Live Preview
+  const picUpload = document.getElementById('picUpload');
+  if (picUpload) {
+    picUpload.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.querySelector('.avatar-ring img');
+          if (img) img.src = e.target.result;
+        }
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
+</script>
 
 {% endblock %}

@@ -124,6 +124,21 @@
 
                         <div class="space-y-5">
                             <span class="label-text">02. Identity Profiles</span>
+                            
+                            <!-- Profile Picture -->
+                            <div class="compact-field">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Profile Picture</label>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-14 h-14 rounded-full bg-slate-100 border-2 border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
+                                        <img id="profile-preview" src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=e2e8f0&color=475569{% endif %}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" name="profile_pic" id="profile_pic_input" accept="image/*" class="input-sm !p-1.5 cursor-pointer bg-white">
+                                        <p class="text-[9px] text-muted mt-1 italic">JPG, PNG or GIF. Max 2MB.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="compact-field">
                                 <div class="flex justify-between items-end mb-2">
                                     <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
@@ -199,4 +214,18 @@
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    // Live Profile Picture Preview
+    document.getElementById('profile_pic_input').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('profile-preview').src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}

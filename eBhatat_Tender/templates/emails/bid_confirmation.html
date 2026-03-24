@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
+        .container { max-width: 650px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
+        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 25px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; }
+        .content { padding: 35px; line-height: 1.6; }
+        .content h2 { color: #0f2a5e; font-size: 18px; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .section-title { font-weight: 800; text-transform: uppercase; font-size: 11px; color: #64748b; letter-spacing: 0.1em; margin: 25px 0 10px; }
+        .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .info-table td { padding: 12px; border: 1px solid #f1f5f9; font-size: 14px; }
+        .info-label { width: 40%; background-color: #f8faff; font-weight: 700; color: #64748b; }
+        .info-value { width: 60%; font-weight: 600; color: #0f2a5e; }
+        .footer { background-color: #09193a; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 11px; }
+        .status-badge { display: inline-block; padding: 4px 10px; background-color: #fef3c7; color: #92400e; border-radius: 6px; font-weight: 700; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="font-size: 40px; margin-bottom: 10px;">🏛️</div>
+            <h1 style="font-size: 28px; letter-spacing: 2px;">eBHARAT TENDER</h1>
+            <div style="display: inline-block; margin-top: 15px; padding: 6px 15px; background-color: #ffffff; color: #0f2a5e; border-radius: 50px; font-weight: bold; font-size: 13px; text-transform: uppercase;">📄 BID SUBMISSION RECEIPT</div>
+            <p style="color:rgba(255,255,255,0.8); font-size:12px; margin-top:10px;">Official Confirmation Record</p>
+        </div>
+        <div class="content">
+            <p style="font-size: 16px; line-height: 1.8;">Dear <b>{{ bidder_name }}</b>,</p>
+            <p style="font-size: 15px; line-height: 1.6; text-align: justify;">This is a formal confirmation that your bid for the following tender has been successfully received and securely recorded by the <b>eBharat Government Tender Portal</b>.</p>
+            
+            <div style="background-color: #dbeafe; border-left: 4px solid #1a56db; padding: 15px; margin-top: 20px; margin-bottom: 25px; color: #1e3a8a; border-radius: 4px; font-size: 14.5px;">
+                <strong>📄 PDF Attachment Notice:</strong><br><br>
+                Please find attached to this email a comprehensive document in <strong>PDF format</strong>. The attachment clearly outlines your complete bid confirmation summary, and all submission details are properly structured using important data table formats and descriptive paragraphs for official verification. Please keep the attached PDF for your records.
+            </div>
+            
+            <div class="section-title">1. Tender Information</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Tender Title:</td>
+                    <td class="info-value">{{ tender_title }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Tender ID:</td>
+                    <td class="info-value">{{ tender_id }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Category:</td>
+                    <td class="info-value">{{ tender_category }}</td>
+                </tr>
+            </table>
+
+            <div class="section-title">2. Submission Details</div>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Company Name:</td>
+                    <td class="info-value">{{ company_name }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Bid Amount:</td>
+                    <td class="info-value" style="color: #1a56db;">₹ {{ bid_amount }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">EMD Status:</td>
+                    <td class="info-value">{{ payment_status|upper }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Submission Date:</td>
+                    <td class="info-value">{{ applied_at }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Current Status:</td>
+                    <td class="info-value"><span class="status-badge">PENDING REVIEW</span></td>
+                </tr>
+            </table>
+
+            <div class="section-title">3. Funding & Financial Support</div>
+            <table class="info-table">
+                {% if funding_applied %}
+                <tr>
+                    <td class="info-label">Funding Applied:</td>
+                    <td class="info-value"><span class="status-badge" style="background-color: #dcfce7; color: #166534;">YES / APPLIED</span></td>
+                </tr>
+                <tr>
+                    <td class="info-label">Funding Scheme:</td>
+                    <td class="info-value">{{ funding_title }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Amount Requested:</td>
+                    <td class="info-value" style="color: #1a56db;">₹ {{ funding_amount }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td class="info-label">Funding Applied:</td>
+                    <td class="info-value" style="color: #64748b; font-style: italic;">Not Applied</td>
+                </tr>
+                {% endif %}
+            </table>
+
+            <p style="margin-top: 25px; font-size: 14px; line-height: 1.6;">You can track the progress of your application through your dashboard. We strongly encourage you to review the thoroughly formulated attached PDF for all relevant submission details formatted properly for your convenience.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="http://{{ domain }}/bids/mybids/" style="display:inline-block; padding:12px 24px; background-color:#1a56db; color:#ffffff; text-decoration:none; border-radius:8px; font-weight:700;">View My Bids</a>
+            </div>
+            
+            <p style="margin-top: 35px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 13px;">Warm Regards,<br><b>Regional Procurement Officer</b><br>eBharat Tender Portal</p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Government of India · Electronic Procurement System</p>
+            <p>Verification Link: <a href="#" style="color:#3b82f6;">Verify e-Receipt</a></p>
+        </div>
+    </div>
+</body>
+</html>

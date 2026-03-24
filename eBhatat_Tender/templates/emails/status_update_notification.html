@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
+        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 25px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; }
+        .content { padding: 35px; line-height: 1.6; }
+        .status-box { padding: 20px; border-radius: 10px; margin: 25px 0; border: 1px solid; }
+        .status-approved { background-color: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+        .status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+        .status-title { font-weight: 800; font-size: 16px; margin-bottom: 5px; text-transform: uppercase; }
+        .remark-box { margin-top: 15px; font-size: 13px; font-style: italic; color: #64748b; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; }
+        .footer { background-color: #09193a; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Activity Notification</h1>
+            <p style="color:rgba(255,255,255,0.6); font-size:11px; margin-top:5px;">eBharat Tender Portal Official System Notice</p>
+        </div>
+        <div class="content">
+            <p>Dear <b>{{ user_name }}</b>,</p>
+            <p>This is a formal notification regarding the status update of your <b>{{ activity_name }}</b> on the eBharat Tender Portal.</p>
+            
+            <div class="status-box {% if status == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
+                <div class="status-title">Status: {{ status|upper }}</div>
+                <div>The request for <b>{{ item_name }}</b> has been {{ status }}.</div>
+                {% if remark %}
+                <div class="remark-box">
+                    <b>Administrator Remark:</b> "{{ remark }}"
+                </div>
+                {% endif %}
+            </div>
+
+            <p style="font-size: 13px; color: #64748b;">
+                {% if status == 'approved' %}
+                Congratulations! You may now proceed with the next steps associated with this activity. Please log in to your dashboard to continue.
+                {% else %}
+                We regret to inform you that your request could not be approved at this time. Please review the remarks above and take necessary actions or contact support for clarification.
+                {% endif %}
+            </p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="http://{{ domain }}/accounts/login/" style="display:inline-block; padding:12px 24px; background-color:#1a56db; color:#ffffff; text-decoration:none; border-radius:8px; font-weight:700;">Login to Portal</a>
+            </div>
+            
+            <p style="margin-top: 35px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 13px;">Regards,<br><b>eBharat Administration</b><br>Government of India</p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Government of India · Electronic Procurement Portal</p>
+            <p>This System is developed by Darshit Sapariya</p>
+        </div>
+    </div>
+</body>
+</html>

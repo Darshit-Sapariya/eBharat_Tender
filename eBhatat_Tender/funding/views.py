@@ -4,6 +4,8 @@ from django.contrib import messages
 from .models import Funding, FundingApplication
 from tenders.models import Tenderss
 from django.db.models import Sum
+from accounts.utils import send_ebharat_email
+from django.contrib.sites.shortcuts import get_current_site
 
 @login_required
 def apply_funding(request, funding_id, tender_id):
@@ -33,6 +35,26 @@ def apply_funding(request, funding_id, tender_id):
                 purpose=purpose,
                 supporting_document=document
             )
+
+            # 📧 Send Funding Application Confirmation Email
+            try:
+                current_site = get_current_site(request)
+                send_ebharat_email(
+                    subject=f"Funding Request Confirmation - {funding.title}",
+                    template_name="funding_application_confirmation.html",
+                    context={
+                        "bidder_name": request.user.first_name or request.user.username,
+                        "funding_title": funding.title,
+                        "tender_title": tender.title,
+                        "amount_requested": amount,
+                        "purpose": purpose,
+                        "domain": current_site.domain,
+                    },
+                    recipient_list=[request.user.email]
+                )
+            except Exception as e:
+                print(f"Funding Email failed: {e}")
+
             messages.success(request, "Funding application submitted successfully!")
             return redirect('public:tenders')
 

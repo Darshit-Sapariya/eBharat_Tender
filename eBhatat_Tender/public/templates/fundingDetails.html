@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+  /* Hero grid texture */
+  .detail-hero::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .detail-hero::after {
+    content: ''; position: absolute;
+    width: 340px; height: 340px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    right: -70px; top: -140px; pointer-events: none;
+  }
+</style>
+
+<div class="bg-[#f8faff] min-h-screen pb-16">
+  <!-- ══════════════════════════════════
+       HERO / COVER
+  ══════════════════════════════════ -->
+  <div class="detail-hero relative overflow-hidden pt-12 pb-24"
+       style="background: linear-gradient(135deg, #09193a 0%, #0f2a5e 52%, #163472 100%);">
+    
+    <div class="absolute inset-0 pointer-events-none"
+         style="background: radial-gradient(ellipse 48% 100% at 88% 50%, rgba(26,86,219,0.17) 0%, transparent 68%);"></div>
+
+    <div class="relative z-[1] max-w-[900px] mx-auto px-4 sm:px-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="inline-flex items-center gap-[6px] px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest bg-white/10 text-white/80 border border-white/20">
+          <i class="fas fa-tag"></i> Funding Scheme
+        </span>
+        <span class="mx-2 text-white/30">•</span>
+        <span class="font-dmSans text-[0.75rem] text-white/60">Posted on {{ funding.created_at|date:"M d, Y" }}</span>
+      </div>
+      <h1 class="font-sora text-[1.8rem] sm:text-[2.2rem] font-extrabold text-white leading-tight mb-4">
+        {{ funding.title }}
+      </h1>
+      {% if funding.tender %}
+      <p class="font-dmSans text-[0.95rem] text-indigo-200 flex items-center gap-2">
+        <i class="fas fa-file-contract"></i> Associated with Tender: <strong>{{ funding.tender.title }}</strong>
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       DETAILS CARD
+  ══════════════════════════════════ -->
+  <div class="max-w-[900px] mx-auto px-4 sm:px-6 relative z-10 -mt-16">
+    <div class="bg-white rounded-[1.5rem] border border-slate-200 shadow-[0_8px_30px_rgba(15,42,94,0.08)] overflow-hidden">
+      
+      <!-- Top Accent Line -->
+      <div class="h-1.5 w-full" style="background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+      
+      <div class="p-8 sm:p-10">
+        
+        <!-- Description -->
+        <h3 class="font-sora text-[1.1rem] font-bold text-[#0f2a5e] mb-4 flex items-center gap-2">
+          <i class="fas fa-info-circle text-blue-500"></i> Scheme Overview
+        </h3>
+        <p class="font-dmSans text-[0.95rem] text-slate-600 leading-relaxed mb-10 whitespace-pre-wrap">{{ funding.description }}</p>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+          <div class="bg-[#f8faff] rounded-xl p-5 border border-blue-50/50 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0">
+              <i class="fas fa-rupee-sign text-lg"></i>
+            </div>
+            <div>
+              <p class="font-dmSans text-[0.75rem] text-slate-400 uppercase tracking-widest font-bold mb-1">Max Funding Amount</p>
+              <p class="font-sora text-[1.4rem] font-extrabold text-emerald-600">₹{{ funding.max_amount }}</p>
+            </div>
+          </div>
+          
+          <div class="bg-[#f8faff] rounded-xl p-5 border border-blue-50/50 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
+              <i class="fas fa-percent text-lg"></i>
+            </div>
+            <div>
+              <p class="font-dmSans text-[0.75rem] text-slate-400 uppercase tracking-widest font-bold mb-1">Interest Rate</p>
+              <p class="font-sora text-[1.4rem] font-extrabold text-[#0f2a5e]">{{ funding.interest_rate }}% <span class="text-[0.7rem] text-slate-400 font-normal ml-1">p.a.</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Call to Action -->
+        {% if funding.tender %}
+          <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <h4 class="font-sora text-[0.95rem] font-bold text-[#0f2a5e] mb-1">Apply for this Funding</h4>
+              <p class="font-dmSans text-[0.85rem] text-blue-800">This scheme is directly tied to a specific tender. You can apply for this funding through the associated tender page.</p>
+            </div>
+            <a href="{% url 'funding:apply_funding' funding.id funding.tender.id %}" class="flex-shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#1a56db] hover:bg-[#0f2a5e] text-white font-sora text-[0.85rem] font-bold rounded-xl shadow-[0_4px_12px_rgba(26,86,219,0.25)] transition-all">
+              <i class="fas fa-paper-plane"></i> Apply Now
+            </a>
+          </div>
+        {% else %}
+          <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0 mt-0.5">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+              <h4 class="font-sora text-[0.95rem] font-bold text-amber-900 mb-1">Application Information</h4>
+              <p class="font-dmSans text-[0.85rem] text-amber-800/80 leading-relaxed">This funding scheme is a general program. To apply, you must navigate to a specific eligible tender on the portal and request this funding during the bid submission process.</p>
+              <a href="{% url 'public:tenders' %}" class="inline-flex items-center gap-2 mt-3 font-bold text-amber-700 hover:text-amber-900 text-[0.85rem]">
+                Browse Active Tenders <i class="fas fa-arrow-right text-[0.7rem]"></i>
+              </a>
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

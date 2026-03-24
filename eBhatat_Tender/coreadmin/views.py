@@ -12,6 +12,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
+from accounts.utils import send_ebharat_email
+from django.contrib.sites.shortcuts import get_current_site
 
 # Create your views here.
 @staff_member_required
@@ -200,6 +202,25 @@ def approve_user(request, profile_id):
             description=f"Approved user {profile.user.username} with role {profile.get_role_display() or 'None'}." + (f" Remark: {remark}" if remark else "")
         )
         messages.success(request, f"User {profile.user.username} approved successfully.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject="Account Approved",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": profile.user.first_name or profile.user.username,
+                    "activity_name": "Account Registration",
+                    "item_name": f"Verification as {profile.get_role_display()}",
+                    "status": "approved",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[profile.user.email]
+            )
+        except Exception as e:
+            print(f"User Approval Email failed: {e}")
     return redirect('coreadmin:user_approvals')
 
 @staff_member_required
@@ -219,6 +240,25 @@ def reject_user(request, profile_id):
             description=f"Rejected user {profile.user.username}." + (f" Remark: {remark}" if remark else "")
         )
         messages.warning(request, f"User {profile.user.username} rejected.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject="Account Verification Status Update",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": profile.user.first_name or profile.user.username,
+                    "activity_name": "Account Registration",
+                    "item_name": "Profile Verification",
+                    "status": "rejected",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[profile.user.email]
+            )
+        except Exception as e:
+            print(f"User Rejection Email failed: {e}")
     return redirect('coreadmin:user_approvals')
 
 @staff_member_required
@@ -232,6 +272,25 @@ def approve_application(request, app_id):
         application.save()
         
         messages.success(request, f"Application for {application.tender.title} approved.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject=f"Bid Approved - {application.tender.title}",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": application.user.first_name or application.user.username,
+                    "activity_name": "Tender Bid Application",
+                    "item_name": application.tender.title,
+                    "status": "approved",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[application.user.email]
+            )
+        except Exception as e:
+            print(f"Bid Approval Email failed: {e}")
     return redirect('coreadmin:application_approvals')
 
 @staff_member_required
@@ -257,6 +316,25 @@ def reject_application(request, app_id):
         )
         
         messages.warning(request, f"Application for {application.tender.title} rejected.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject=f"Bid Application Status Update - {application.tender.title}",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": application.user.first_name or application.user.username,
+                    "activity_name": "Tender Bid Application",
+                    "item_name": application.tender.title,
+                    "status": "rejected",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[application.user.email]
+            )
+        except Exception as e:
+            print(f"Bid Rejection Email failed: {e}")
     return redirect('coreadmin:application_approvals')
 
 @staff_member_required
@@ -285,6 +363,36 @@ def approve_funding_app(request, app_id):
         )
         
         messages.success(request, f"Funding application from {app.bidder.username} approved.")
+
+        # 📧 Send Status Email + PDF Attach
+        try:
+            from funding.utils import generate_funding_award_pdf
+            pdf_content = generate_funding_award_pdf(app)
+            pdf_attachment = {
+                'filename': f'eBharat_Funding_Approval_{app.id}.pdf',
+                'content': pdf_content,
+                'mimetype': 'application/pdf'
+            }
+            
+            from django.utils import timezone
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject=f"Funding Approved - {app.funding.title}",
+                template_name="funding_awarded.html",
+                context={
+                    "bidder_name": app.bidder.first_name or app.bidder.username,
+                    "funding_title": app.funding.title,
+                    "amount_requested": app.amount_requested,
+                    "tender_title": app.tender.title,
+                    "tender_id": app.tender.tender_id,
+                    "approval_date": timezone.now().strftime("%d %B %Y"),
+                    "domain": current_site.domain,
+                },
+                recipient_list=[app.bidder.email],
+                attachments=[pdf_attachment]
+            )
+        except Exception as e:
+            print(f"Funding Approval Email failed: {e}")
     return redirect('coreadmin:funding_approvals')
 
 @staff_member_required
@@ -303,6 +411,25 @@ def reject_funding_app(request, app_id):
         )
         
         messages.warning(request, f"Funding application from {app.bidder.username} rejected.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject=f"Funding Application Status Update - {app.funding.title}",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": app.bidder.first_name or app.bidder.username,
+                    "activity_name": "Funding Application",
+                    "item_name": app.funding.title,
+                    "status": "rejected",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[app.bidder.email]
+            )
+        except Exception as e:
+            print(f"Funding Rejection Email failed: {e}")
     return redirect('coreadmin:funding_approvals')
 
 # --- USER LIST MANAGEMENT ---
@@ -348,6 +475,24 @@ def create_staff(request):
             )
             
             messages.success(request, f"Staff account for {full_name} created successfully.")
+
+            # 📧 Send Welcome/Staff Creation Email
+            try:
+                current_site = get_current_site(request)
+                send_ebharat_email(
+                    subject="Your Staff Account has been Created",
+                    template_name="welcome_email.html",
+                    context={
+                        "full_name": full_name,
+                        "username": username,
+                        "email": email,
+                        "mobile": "N/A", # Staff creation doesn't capture mobile by default
+                        "domain": current_site.domain,
+                    },
+                    recipient_list=[email]
+                )
+            except Exception as e:
+                print(f"Staff Email failed: {e}")
             return redirect('coreadmin:user_list')
             
     return render(request, 'create_staff.html')
@@ -467,6 +612,25 @@ def approve_admin_request(request, request_id):
             description=f"Approved department creation for {admin_req.department_name} / {admin_req.category_name}." + (f" Remark: {remark}" if remark else "")
         )
         messages.success(request, f"Request for {admin_req.department_name} approved.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject="Administrative Request Approved",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": admin_req.user.first_name or admin_req.user.username,
+                    "activity_name": "Department/Category Creation Request",
+                    "item_name": f"{admin_req.department_name} / {admin_req.category_name}",
+                    "status": "approved",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[admin_req.user.email]
+            )
+        except Exception as e:
+            print(f"Admin Req Approval Email failed: {e}")
     return redirect('coreadmin:admin_request_approvals')
 
 @staff_member_required
@@ -487,6 +651,25 @@ def reject_admin_request(request, request_id):
             description=f"Rejected department creation for {admin_req.department_name} / {admin_req.category_name}." + (f" Remark: {remark}" if remark else "")
         )
         messages.warning(request, f"Request for {admin_req.department_name} rejected.")
+
+        # 📧 Send Status Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject="Administrative Request Update",
+                template_name="status_update_notification.html",
+                context={
+                    "user_name": admin_req.user.first_name or admin_req.user.username,
+                    "activity_name": "Department/Category Creation Request",
+                    "item_name": f"{admin_req.department_name} / {admin_req.category_name}",
+                    "status": "rejected",
+                    "remark": remark,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[admin_req.user.email]
+            )
+        except Exception as e:
+            print(f"Admin Req Rejection Email failed: {e}")
     return redirect('coreadmin:admin_request_approvals')
 
 @staff_member_required
@@ -566,6 +749,26 @@ def allocate_user_role(request, profile_id):
                 user=profile.user,
                 message=f"Your account role has been updated to {new_role} by an Administrator."
             )
+
+            # 📧 Send Role Update Email
+            try:
+                current_site = get_current_site(request)
+                send_ebharat_email(
+                    subject="Account Role Updated",
+                    template_name="status_update_notification.html",
+                    context={
+                        "user_name": profile.user.first_name or profile.user.username,
+                        "activity_name": "Account Profile Update",
+                        "item_name": f"Role Allocation to {new_role}",
+                        "status": "approved", # Role change is considered an administrative approval
+                        "remark": f"Your role has been updated from {old_role} to {new_role}.",
+                        "domain": current_site.domain,
+                    },
+                    recipient_list=[profile.user.email]
+                )
+            except Exception as e:
+                print(f"Role Update Email failed: {e}")
+
             from django.contrib import messages
             messages.success(request, f"Role updated successfully for {profile.user.username}.")
         else:

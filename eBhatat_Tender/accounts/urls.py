@@ -8,6 +8,7 @@ urlpatterns = [
     path('myprofile/', views.my_profile, name='myprofile'),
     path('complete-profile/', views.complete_profile, name='complete_profile'),
     path('register/', views.register, name='register'),
+    path('check_username/', views.check_username, name='check_username'),
     path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
     path('notifications/all/', views.view_all_notifications, name='view_all_notifications'),
     path('notifications/clear/', views.clear_notifications, name='clear_notifications'),

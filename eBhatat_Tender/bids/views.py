@@ -6,10 +6,11 @@ from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
 import razorpay
+from accounts.utils import send_ebharat_email
+from django.contrib.sites.shortcuts import get_current_site
 from .models import TenderApplication
 from tenders.models import Tenderss
 from accounts.models import UserProfile, Notification, Watchlist
-from funding.models import Funding, FundingApplication
 from funding.models import Funding, FundingApplication
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -111,6 +112,21 @@ def vendor_profile_update(request):
         return redirect("tenders:dashboard")
 
     if request.method == "POST":
+        full_name = request.POST.get("full_name", "").strip()
+        
+        from django.contrib.auth.models import User
+        
+        # 1. Update Full Name on core User model independently
+        if full_name:
+            User.objects.filter(id=request.user.id).update(first_name=full_name)
+
+        email = request.POST.get("email", "").strip()
+        if email and email != request.user.email:
+            if User.objects.exclude(id=request.user.id).filter(email=email).exists():
+                messages.error(request, "This email address is already in use by another account.")
+                return redirect("bids:vendor_profile_update")
+            User.objects.filter(id=request.user.id).update(email=email)
+
         profile.full_name = request.POST.get("full_name")
         profile.mobile = request.POST.get("mobile")
         profile.address = request.POST.get("address")
@@ -204,8 +220,10 @@ def applybid(request, tender_id):
                 payment_status='paid' if tender.emd_amount > 0 else 'pending',
                 razorpay_payment_id=razorpay_payment_id,
             )
+                  # Handle Funding Application if selected
+            funding_applied = False
+            funding_details = {"title": "Not Applied", "amount": "0.00"}
             
-            # Handle Funding Application if selected
             if request.POST.get("apply_funding") == "on":
                 funding_id = request.POST.get("funding_id")
                 amount_requested = request.POST.get("amount_requested")
@@ -222,6 +240,11 @@ def applybid(request, tender_id):
                         purpose=purpose,
                         supporting_document=supporting_doc
                     )
+                    funding_applied = True
+                    funding_details = {
+                        "title": funding_obj.title,
+                        "amount": amount_requested
+                    }
             
             # 📌 Notify the Tender Creator about the new bid
             Notification.objects.create(
@@ -229,6 +252,39 @@ def applybid(request, tender_id):
                 message=f"New bid received from {application.company_name} for {tender.title}",
                 link=reverse("tenders:view_tender_bids", kwargs={"tender_id": tender.id})
             )
+ 
+            # 📧 Send Bid Confirmation Email
+            try:
+                from .utils import generate_bid_receipt_pdf
+                pdf_content = generate_bid_receipt_pdf(application)
+                pdf_attachment = {
+                    'filename': f'eBharat_Bid_Receipt_{application.id}.pdf',
+                    'content': pdf_content,
+                    'mimetype': 'application/pdf'
+                }
+                current_site = get_current_site(request)
+                send_ebharat_email(
+                    subject=f"Bid Submission Confirmation - {tender.title}",
+                    template_name="bid_confirmation.html",
+                    context={
+                        "bidder_name": request.user.first_name or request.user.username,
+                        "tender_title": tender.title,
+                        "tender_id": tender.tender_id,
+                        "tender_category": str(tender.category),
+                        "company_name": application.company_name,
+                        "bid_amount": application.bid_amount,
+                        "payment_status": application.payment_status,
+                        "applied_at": application.applied_at.strftime("%d %B %Y %I:%M %p"),
+                        "domain": current_site.domain,
+                        "funding_applied": funding_applied,
+                        "funding_title": funding_details["title"],
+                        "funding_amount": funding_details["amount"],
+                    },
+                    recipient_list=[request.user.email],
+                    attachments=[pdf_attachment]
+                )
+            except Exception as e:
+                print(f"Bid Email failed: {e}")
 
             messages.success(request, "Tender Application Submitted Successfully! Your bid has been recorded.")
             return redirect("tenders:tenderDetails", tender_id=tender.id)

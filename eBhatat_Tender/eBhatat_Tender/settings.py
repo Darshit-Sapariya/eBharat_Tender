@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-+@upm9fo%5ic8uwvo5sz))$m9p97@1boq#!6+7^yv6&)oanu(x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -130,3 +130,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Razorpay Integration
 RAZORPAY_KEY_ID = "rzp_test_bilBagOBVTi4lE"
 RAZORPAY_KEY_SECRET = "YOUR_RAZORPAY_SECRET_HERE" # Replace with actual secret key for backend tasks like refunds
+
+# Email Configuration
+# ------------------------------------------------------------------------------
+# In development, print emails to the console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For Production (Uncomment and configure when ready)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ebharattender@gmail.com'
+EMAIL_HOST_PASSWORD = 'qtesdvwtxtzxlqar'
+DEFAULT_FROM_EMAIL = 'ebharattender@gmail.com'

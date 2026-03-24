@@ -66,6 +66,11 @@ def funding(request):
     fundings = Funding.objects.all().order_by('-created_at')
     active_count = fundings.count()
     return render(request, 'funding.html', {'fundings': fundings, 'active_count': active_count})
+
+def fundingDetails(request, funding_id):
+    funding = get_object_or_404(Funding, id=funding_id)
+    return render(request, 'fundingDetails.html', {'funding': funding})
+
 # Explain procurement workflow
 def workflow(request):
     return render(request, 'workflow.html')

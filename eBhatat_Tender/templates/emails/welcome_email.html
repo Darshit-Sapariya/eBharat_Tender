@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
+        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+        .header p { color: rgba(255, 255, 255, 0.7); margin: 5px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .content { padding: 40px; line-height: 1.6; }
+        .content h2 { color: #0f2a5e; font-size: 20px; margin-top: 0; }
+        .info-block { background-color: #f8faff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 25px 0; }
+        .info-row { margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .info-label { font-weight: 700; color: #64748b; font-size: 13px; }
+        .info-value { font-weight: 600; color: #0f2a5e; font-size: 14px; text-align: right; }
+        .footer { background-color: #09193a; padding: 25px; text-align: center; color: rgba(255, 255, 255, 0.5); font-size: 12px; }
+        .footer a { color: #3b82f6; text-decoration: none; }
+        .btn { display: inline-block; padding: 12px 24px; background-color: #1a56db; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- logo placeholder - in prod this would be a real URL -->
+            <h1>eBharat Tender</h1>
+            <p>e-Procurement Portal · Government of India</p>
+        </div>
+        <div class="content">
+            <h2>Welcome to eBharat Tender, {{ full_name }}!</h2>
+            <p>Thank you for registering on the <b>eBharat Government Tender Portal</b>. Your account has been created successfully and is currently pending verification by the administration team. please login to the portal and complete your <b>profile verification</b>. During profile completion, you will be required to <b>select and request your role</b>.</p>
+
+<p>Once submitted, the administration team will review your details and assign the appropriate role. Your access will be activated after approval, and you will receive a notification once verification and role assignment are completed.</p>
+            
+            <div class="info-block">
+                <div class="info-row">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">{{ username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Registered Email:</span>
+                    <span class="info-value">{{ email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Mobile Number:</span>
+                    <span class="info-value">{{ mobile }}</span>
+                </div>
+            </div>
+
+            <p>Once your profile is verified, you will be able to access all features including tender submissions and funding applications.</p>
+            
+            <a href="http://{{ domain }}/accounts/login/" class="btn">Login to Your Dashboard</a>
+            
+            <p style="margin-top: 30px;">Best regards,<br><b>The eBharat Administration Team</b></p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Government of India. All Rights Reserved.</p>
+            <p>This is an automated message, please do not reply. For support, visit our <a href="#">Helpdesk</a>.</p>
+            <p>This System is developed by Darshit Sapariya</p>
+        </div>
+    </div>
+</body>
+</html>

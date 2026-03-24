@@ -227,6 +227,16 @@
     .fields-grid { grid-template-columns: 1fr; }
     .field-full { grid-column: 1; }
   }
+
+  /* username validation animations */
+  .animate-blink {
+    animation: blink-anim 0.5s ease-in-out 7; /* 7 * 0.5 = 3.5 seconds */
+  }
+  @keyframes blink-anim {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
 </style>
 
 
@@ -291,8 +301,11 @@
             <div class="field-wrap">
               <i class="fas fa-user field-icon"></i>
               <input type="text" name="username" id="username"
-                     class="field-input" placeholder="Choose a unique username" required>
+                     class="field-input" placeholder="Choose a unique username"
+                     style="padding-right:2.4rem;" required>
+              <div class="username-status" id="username-status-icon" style="position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); display: none; pointer-events: none;"></div>
             </div>
+            <div id="username-error" style="color: #ef4444; font-size: 0.72rem; margin-top: 6px; font-weight: 700; display: none;">user is already exist in system</div>
           </div>
 
           <!-- Password -->
@@ -379,6 +392,47 @@
     pw2.type = h ? 'text' : 'password';
     pi2.className = h ? 'fas fa-eye-slash' : 'fas fa-eye';
   });
+
+  // Real-time username validation
+  const usernameInput = document.getElementById('username');
+  const statusIcon = document.getElementById('username-status-icon');
+  const errorText = document.getElementById('username-error');
+  let userDebounceTimer;
+
+  usernameInput.addEventListener('input', function() {
+    clearTimeout(userDebounceTimer);
+    const val = this.value.trim();
+    
+    if(val.length > 0) {
+      userDebounceTimer = setTimeout(() => {
+        fetch(`{% url 'accounts:check_username' %}?username=${encodeURIComponent(val)}`)
+          .then(res => res.json())
+          .then(data => {
+            statusIcon.style.display = 'block';
+            if(data.taken) {
+              statusIcon.innerHTML = '<i class="fas fa-times-circle" style="color: #ef4444; font-size: 1rem;"></i>';
+              const iconElem = statusIcon.querySelector('i');
+              iconElem.classList.add('animate-blink');
+              errorText.style.display = 'block';
+              
+              // Remove animation after 3.5 seconds
+              setTimeout(() => {
+                if(iconElem) {
+                  iconElem.classList.remove('animate-blink');
+                }
+              }, 3500);
+            } else {
+              statusIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1rem;"></i>';
+              errorText.style.display = 'none';
+            }
+          });
+      }, 500); // 500ms debounce
+    } else {
+      statusIcon.style.display = 'none';
+      errorText.style.display = 'none';
+    }
+  });
+
 </script>
 
 {% endblock %}

@@ -36,7 +36,7 @@
   <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden"
        style="box-shadow:0 4px 20px rgba(15,42,94,0.06);">
     
-    <form method="POST" enctype="multipart/form-data" class="p-8 max-sm:p-5">
+    <form method="POST" enctype="multipart/form-data" class="show-loader p-8 max-sm:p-5">
       {% csrf_token %}
       
       <!-- Company Details -->
@@ -260,6 +260,8 @@
           "description": "EMD Payment for {{ tender.tender_id }}",
           "handler": function (response){
               document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+              const loader = document.getElementById('global-loader');
+              if (loader) loader.classList.remove('hidden');
               form.submit();
           },
           "prefill": {
@@ -275,6 +277,8 @@
       const rzp1 = new Razorpay(options);
       rzp1.open();
       {% else %}
+      const loader = document.getElementById('global-loader');
+      if (loader) loader.classList.remove('hidden');
       form.submit();
       {% endif %}
   });

@@ -4,7 +4,9 @@ from accounts.models import UserProfile, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from .utils import send_ebharat_email
+from django.contrib.sites.shortcuts import get_current_site
 
 # ==============================================================================
 # AUTHENTICATION & NOTIFICATION VIEWS
@@ -155,6 +157,9 @@ def complete_profile(request):
         profile.gov_id_type = request.POST.get('gov_id_type')
         profile.gov_id_number = request.POST.get('gov_id_number')
         
+        if request.FILES.get('profile_pic'):
+            profile.profile_pic = request.FILES.get('profile_pic')
+            
         if request.FILES.get('gov_id_upload'):
             profile.gov_id_upload = request.FILES.get('gov_id_upload')
             
@@ -170,6 +175,13 @@ def complete_profile(request):
 # REGISTRATION VIEWS
 # ==============================================================================
 # View for user registration
+def check_username(request):
+    username = request.GET.get('username', None)
+    if username:
+        taken = User.objects.filter(username=username).exists()
+        return JsonResponse({'taken': taken})
+    return JsonResponse({'taken': False})
+
 def register(request):
     if request.method == "POST":
         full_name = request.POST.get("full_name")
@@ -209,6 +221,26 @@ def register(request):
         profile.save()
 
         user.save()
+
+        # 📧 Send Welcome Email
+        try:
+            current_site = get_current_site(request)
+            send_ebharat_email(
+                subject="Welcome to eBharat Tender Portal",
+                template_name="welcome_email.html",
+                context={
+                    "full_name": full_name,
+                    "username": username,
+                    "email": email,
+                    "mobile": mobile,
+                    "domain": current_site.domain,
+                },
+                recipient_list=[email]
+            )
+        except Exception as e:
+            # Log error but don't break registration
+            print(f"Email failed: {e}")
+
         return redirect("accounts:login")
 
     return render(request, "register.html")

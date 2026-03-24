@@ -12,6 +12,9 @@ import razorpay
 
 from bids.models import TenderApplication
 from accounts.models import UserProfile, Notification, AdminRequest, Department, Category
+from accounts.utils import send_ebharat_email
+from django.contrib.sites.shortcuts import get_current_site
+from .utils import generate_award_pdf
 from .models import Tenderss
 
 # ==============================================================================
@@ -227,6 +230,13 @@ def updateProfile(request):
                 profile.role = role
 
         profile.save()
+
+        # Update first_name on User model for consistency
+        full_name = request.POST.get("full_name")
+        if full_name:
+            User.objects.filter(id=request.user.id).update(first_name=full_name)
+
+        messages.success(request, "Profile updated successfully!")
         return redirect("tenders:updateProfile")   # reload page after save
 
     profile_data = {
@@ -443,6 +453,41 @@ def update_bid_status(request, bid_id):
             # Close/Award the tender
             bid.tender.status = "awarded"
             bid.tender.save()
+            
+            # 📧 Send Official Award Email to Winner
+            try:
+                current_site = get_current_site(request)
+                context = {
+                    "bidder_name": bid.applicant.first_name or bid.applicant.username,
+                    "company_name": bid.company_name,
+                    "tender_title": bid.tender.title,
+                    "tender_id": bid.tender.tender_id,
+                    "department": bid.tender.department,
+                    "location": bid.tender.location,
+                    "bid_amount": bid.bid_amount,
+                    "award_date": timezone.now().strftime("%d %B %Y"),
+                    "gst_number": bid.gst_number,
+                    "address": bid.registered_address,
+                    "domain": current_site.domain,
+                }
+                
+                pdf_content = generate_award_pdf(context)
+                attachments = [{
+                    'filename': f"Award_Letter_{bid.tender.tender_id}.pdf",
+                    'content': pdf_content,
+                    'mimetype': 'application/pdf'
+                }]
+                
+                send_ebharat_email(
+                    subject="Congratulations! Tender Awarded",
+                    template_name="bid_awarded.html",
+                    context=context,
+                    recipient_list=[bid.applicant.email],
+                    attachments=attachments
+                )
+            except Exception as e:
+                print(f"Award Email failed: {e}")
+
             messages.success(request, f"Tender awarded to {bid.company_name} successfully!")
 
         elif action == "approve":
