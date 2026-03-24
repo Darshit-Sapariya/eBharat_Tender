@@ -1,0 +1,140 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}System Reports{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block content %}
+<div class="ph">
+  <div>
+    <div class="ph-eye">System Administration</div>
+    <div class="ph-title">Reporting & Exports</div>
+    <div class="ph-sub">Generate and download official PDF records for eBharat Tender platform activities.</div>
+  </div>
+  <div class="ph-actions">
+    <div class="topbar-search" style="width: 300px;">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search reports...">
+    </div>
+  </div>
+</div>
+
+<div class="p-6">
+
+<!-- ── Filters ── -->
+<div class="card" style="margin-bottom:22px;">
+    <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
+        <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Data Filters</div>
+    </div>
+    <div class="card-body" style="padding:20px;">
+        <form id="filterForm" method="GET" action="{% url 'coreadmin:reports' %}" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+            
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text);">Filter Type</label>
+                <select name="filter_type" id="filterType" style="padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; cursor:pointer;" onchange="toggleInputs()">
+                    <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Time</option>
+                    <option value="fy" {% if filter_type == 'fy' %}selected{% endif %}>Financial Year</option>
+                    <option value="date" {% if filter_type == 'date' %}selected{% endif %}>Specific Date</option>
+                </select>
+            </div>
+
+            <div id="fyInput" style="display:none; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text);">Financial Year</label>
+                <select name="fy" style="padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; cursor:pointer;">
+                    <option value="2025" {% if fy_val == '2025' %}selected{% endif %}>FY 2025-26</option>
+                    <option value="2024" {% if fy_val == '2024' %}selected{% endif %}>FY 2024-25</option>
+                    <option value="2023" {% if fy_val == '2023' %}selected{% endif %}>FY 2023-24</option>
+                </select>
+            </div>
+
+            <div id="dateInput" style="display:none; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text);">Specific Date</label>
+                <input type="date" name="date" value="{{ date_val|default:'' }}" style="padding:9px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="padding:10px 24px;">Apply Filter</button>
+            <a href="{% url 'coreadmin:reports' %}" class="btn btn-outline" style="padding:10px 24px;">Reset</a>
+            
+        </form>
+    </div>
+</div>
+
+<!-- ── Preview Data ── -->
+<div class="card" style="margin-bottom:22px;">
+    <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
+        <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Data Preview (Top 50 Results)</div>
+        <div style="display: flex; gap:12px; align-items: center;">
+            <div style="font-size:12px; color:var(--text);">
+                <strong>{{ total_tenders }}</strong> Tenders &nbsp;|&nbsp; <strong>{{ total_bids }}</strong> Bids &nbsp;|&nbsp; <strong style="color:var(--green);">₹{{ total_disbursed|intcomma }}</strong> Disbursed
+            </div>
+            
+            <a href="{% url 'coreadmin:download_report_pdf' %}?filter_type={{ filter_type }}&date={{ date_val|urlencode }}&fy={{ fy_val|urlencode }}" target="_blank" class="btn" style="background:var(--indigo); color:white; padding:8px 16px; border-radius:100px; font-size:12px;">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+        </div>
+    </div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table style="width: 100%; border-collapse: collapse;" id="reportsTable">
+            <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+                <tr style="text-align: left; font-size: 11px; color: var(--text); text-transform: uppercase;">
+                    <th style="padding: 16px 20px;">Tender ID</th>
+                    <th style="padding: 16px 20px;">Tender Notice</th>
+                    <th style="padding: 16px 20px;">Category</th>
+                    <th style="padding: 16px 20px;">Status</th>
+                    <th style="padding: 16px 20px;">Publish Date</th>
+                    <th style="padding: 16px 20px; text-align:right;">Est. Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tender in tenders %}
+                <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;">
+                    <td style="padding: 16px 20px; font-family:monospace; font-weight: 600; color: var(--text);">TND-{{ tender.id|stringformat:"04d" }}</td>
+                    <td style="padding: 16px 20px; font-size: 13px; color: var(--text);">{{ tender.title|truncatechars:45 }}</td>
+                    <td style="padding: 16px 20px; font-size: 13px; color: var(--text);">{{ tender.category|default:"-" }}</td>
+                    <td style="padding: 16px 20px;">
+                        {% if tender.status == 'open' %}
+                            <span class="badge bg-green">Open</span>
+                        {% elif tender.status == 'awarded' %}
+                            <span class="badge bg-blue">Awarded</span>
+                        {% else %}
+                            <span class="badge bg-gray">{{ tender.status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 16px 20px; font-size: 13px; color: var(--text);">{{ tender.created_at|date:"d M Y" }}</td>
+                    <td style="padding: 16px 20px; text-align:right; font-weight:700; font-family:monospace; color:var(--text);">₹{{ tender.estimated_value|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:60px; color:var(--text); opacity:0.5;">
+                        <i class="fas fa-folder-open mb-3" style="font-size: 24px;"></i>
+                        <div style="font-size: 14px;">No relevant tenders found for this timeframe.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function toggleInputs() {
+        const type = document.getElementById('filterType').value;
+        const fyDiv = document.getElementById('fyInput');
+        const dateDiv = document.getElementById('dateInput');
+        
+        fyDiv.style.display = 'none';
+        dateDiv.style.display = 'none';
+        
+        if (type === 'fy') {
+            fyDiv.style.display = 'flex';
+        } else if (type === 'date') {
+            dateDiv.style.display = 'flex';
+        }
+    }
+    // Initialize
+    toggleInputs();
+</script>
+
+</div>
+{% endblock %}

@@ -115,6 +115,7 @@ def coreadmin_deshbord(request):
     recent_tenders_list = Tenderss.objects.order_by('-created_at')[:5]
     
     context = {
+        'page_title': 'Dashboard',
         'total_tenders': total_tenders,
         'tenders_delta': tenders_delta,
         'tenders_delta_abs': abs(tenders_delta),
@@ -161,6 +162,7 @@ def user_approvals(request):
     pending_users = UserProfile.objects.filter(status='pending').order_by('-created_at')
     approved_users = UserProfile.objects.filter(status='approved').order_by('-created_at')[:20]
     return render(request, 'approvals.html', {
+        'page_title': 'User Approvals',
         'pending_users': pending_users,
         'approved_users': approved_users,
         'type': 'users'
@@ -171,6 +173,7 @@ def application_approvals(request):
     pending_apps = TenderApplication.objects.filter(status='pending').order_by('-applied_at')
     approved_apps = TenderApplication.objects.filter(status='approved').order_by('-applied_at')[:20]
     return render(request, 'approvals.html', {
+        'page_title': 'Tender Approvals',
         'pending_apps': pending_apps,
         'approved_apps': approved_apps,
         'type': 'applications'
@@ -342,6 +345,7 @@ def funding_approvals(request):
     pending_apps = FundingApplication.objects.filter(status='pending').order_by('-applied_at')
     approved_apps = FundingApplication.objects.filter(status='approved').order_by('-applied_at')[:20]
     return render(request, 'approvals.html', {
+        'page_title': 'Funding Approvals',
         'pending_funding': pending_apps,
         'approved_funding': approved_apps,
         'type': 'funding'
@@ -437,7 +441,7 @@ def reject_funding_app(request, app_id):
 @staff_member_required
 def user_list(request):
     role = request.GET.get('role', 'all')
-    if role == 'vendor':
+    if role == 'bidder':
         profiles = UserProfile.objects.filter(role='bidder')
     elif role == 'creator':
         profiles = UserProfile.objects.filter(role='creator')
@@ -445,6 +449,7 @@ def user_list(request):
         profiles = UserProfile.objects.all()
     
     return render(request, 'user_list.html', {
+        'page_title': 'User Management',
         'profiles': profiles,
         'current_role': role
     })
@@ -495,7 +500,7 @@ def create_staff(request):
                 print(f"Staff Email failed: {e}")
             return redirect('coreadmin:user_list')
             
-    return render(request, 'create_staff.html')
+    return render(request, 'create_staff.html', {'page_title': 'Create Staff Account'})
 
 # --- TENDER LIST MANAGEMENT ---
 
@@ -520,6 +525,7 @@ def tender_list(request):
         })
     
     return render(request, 'tender_list.html', {
+        'page_title': 'Tender Directory',
         'tenders': tenders_data
     })
 
@@ -530,6 +536,7 @@ def tender_bidders(request, tender_id):
     applications = tender.applications.all().order_by('-applied_at')
     
     return render(request, 'tender_bidders.html', {
+        'page_title': f'Bidders for TND-{tender.id:04d}',
         'tender': tender,
         'applications': applications,
         'bid_count': applications.count(),
@@ -541,7 +548,7 @@ def tender_bidders(request, tender_id):
 @login_required
 def funding_list(request):
     fundings = Funding.objects.all().order_by('-created_at')
-    return render(request, 'funding_list.html', {'fundings': fundings})
+    return render(request, 'funding_list.html', {'page_title': 'Manage Funding Schemes', 'fundings': fundings})
 
 @login_required
 def create_funding(request):
@@ -571,7 +578,7 @@ def create_funding(request):
         return redirect('coreadmin:funding_list')
         
     tenders = Tenderss.objects.filter(status='open')
-    return render(request, 'create_funding.html', {'tenders': tenders})
+    return render(request, 'create_funding.html', {'page_title': 'Create Funding Scheme', 'tenders': tenders})
 
 # --- ADMIN REQUESTS (Department/Category Approval) ---
 
@@ -580,6 +587,7 @@ def admin_request_approvals(request):
     pending_requests = AdminRequest.objects.filter(status='pending').order_by('-created_at')
     approved_requests = AdminRequest.objects.filter(status='approved').order_by('-created_at')[:10]
     return render(request, 'approvals.html', {
+        'page_title': 'Administrative Requests',
         'pending_requests': pending_requests,
         'approved_requests': approved_requests,
         'type': 'admin_requests'
@@ -673,54 +681,203 @@ def reject_admin_request(request, request_id):
     return redirect('coreadmin:admin_request_approvals')
 
 @staff_member_required
-def analytics(request):
-    now = timezone.now()
-    months = []
-    tender_trend = []
-    bid_trend = []
-    reg_trend = []
+def system_reports(request):
+    filter_type = request.GET.get('filter_type', 'all')
+    date_val = request.GET.get('date')
+    fy_val = request.GET.get('fy')
     
-    # Last 6 months trend
-    for i in range(5, -1, -1):
-        target_date = now - timedelta(days=i*30)
-        months.append(target_date.strftime('%b %Y'))
+    tenders = Tenderss.objects.all()
+    bids = TenderApplication.objects.all()
+    
+    import datetime
+    
+    if filter_type == 'date' and date_val:
+        filter_date = datetime.datetime.strptime(date_val, '%Y-%m-%d').date()
+        tenders = tenders.filter(created_at__date=filter_date)
+        bids = bids.filter(applied_at__date=filter_date)
+    elif filter_type == 'fy' and fy_val:
+        start_year = int(fy_val)
+        start_date = datetime.date(start_year, 4, 1)
+        end_date = datetime.date(start_year + 1, 3, 31)
+        tenders = tenders.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        bids = bids.filter(applied_at__date__gte=start_date, applied_at__date__lte=end_date)
         
-        t_count = Tenderss.objects.filter(created_at__month=target_date.month, created_at__year=target_date.year).count()
-        b_count = TenderApplication.objects.filter(applied_at__month=target_date.month, applied_at__year=target_date.year).count()
-        r_count = UserProfile.objects.filter(created_at__month=target_date.month, created_at__year=target_date.year).count()
+    tenders = tenders.order_by('-created_at')
+    
+    total_tenders = tenders.count()
+    total_bids = bids.count()
+    total_disbursed = bids.filter(status='awarded').aggregate(Sum('bid_amount'))['bid_amount__sum'] or 0
+    
+    return render(request, 'reports.html', {
+        'page_title': 'System Reports',
+        'tenders': tenders[:50], # Performance limit on preview
+        'total_tenders': total_tenders,
+        'total_bids': total_bids,
+        'total_disbursed': total_disbursed,
+        'filter_type': filter_type,
+        'date_val': date_val,
+        'fy_val': fy_val
+    })
+
+@staff_member_required
+def download_report_pdf(request):
+    filter_type = request.GET.get('filter_type', 'all')
+    date_val = request.GET.get('date')
+    fy_val = request.GET.get('fy')
+    
+    tenders = Tenderss.objects.all()
+    bids = TenderApplication.objects.all()
+    
+    import datetime
+    report_subtitle = "Overall System Data"
+    
+    if filter_type == 'date' and date_val:
+        filter_date = datetime.datetime.strptime(date_val, '%Y-%m-%d').date()
+        tenders = tenders.filter(created_at__date=filter_date)
+        bids = bids.filter(applied_at__date=filter_date)
+        report_subtitle = f"For specific date: {filter_date.strftime('%d %b %Y')}"
+    elif filter_type == 'fy' and fy_val:
+        start_year = int(fy_val)
+        start_date = datetime.date(start_year, 4, 1)
+        end_date = datetime.date(start_year + 1, 3, 31)
+        tenders = tenders.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        bids = bids.filter(applied_at__date__gte=start_date, applied_at__date__lte=end_date)
+        report_subtitle = f"For Financial Year: {start_year}-{start_year+1}"
         
-        tender_trend.append(t_count)
-        bid_trend.append(b_count)
-        reg_trend.append(r_count)
+    tenders = tenders.order_by('-created_at')
+    
+    total_tenders = tenders.count()
+    total_bids = bids.count()
+    total_disbursed = bids.filter(status='awarded').aggregate(Sum('bid_amount'))['bid_amount__sum'] or 0
+    
+    # Generate PDF
+    from io import BytesIO
+    from django.http import HttpResponse
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, KeepTogether
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=50)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Custom Canvas for Header/Footer (Landscape adapted)
+    def header_footer(canvas, doc):
+        canvas.saveState()
+        width, height = landscape(A4)
+        # Header Logo & Text
+        canvas.setFont('Helvetica-Bold', 14)
+        canvas.setFillColor(colors.HexColor('#0f2a5e'))
+        canvas.drawString(30, height - 30, "eBHARAT TENDER")
+        # Header Subtitle
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor('#64748b'))
+        canvas.drawRightString(width - 30, height - 30, report_subtitle)
+        # Decorative Line under header
+        canvas.setStrokeColor(colors.HexColor('#cbd5e1'))
+        canvas.line(30, height - 35, width - 30, height - 35)
+        
+        # Footer text (Page No)
+        page_num = canvas.getPageNumber()
+        canvas.setFont('Helvetica-Bold', 9)
+        canvas.setFillColor(colors.HexColor('#1e293b'))
+        canvas.drawRightString(width - 30, 20, f"Page No. {page_num}")
+        # Line above footer
+        canvas.setStrokeColor(colors.HexColor('#cbd5e1'))
+        canvas.line(30, 35, width - 30, 35)
+        canvas.restoreState()
 
-    # Category Distribution
-    cat_data = Tenderss.objects.values('category').annotate(count=Count('id')).order_by('-count')
-    cat_labels = [c['category'] or "Uncategorized" for c in cat_data]
-    cat_counts = [c['count'] for c in cat_data]
+    title_style = ParagraphStyle(name='TitleStyle', parent=styles['Heading1'], fontSize=18, spaceAfter=20, textColor=colors.HexColor('#0f2a5e'), alignment=1)
+    elements.append(Paragraph("Official System Data Report", title_style))
+    
+    # Meta Summary Table
+    summary_data = [
+        ["Total Tenders", "Total Bids Received", "Total Disbursed (INR)"],
+        [str(total_tenders), str(total_bids), f"{float(total_disbursed):,.2f}"]
+    ]
+    summary_table = Table(summary_data, colWidths=[150, 150, 200])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f1f5f9')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('GRID', (0,0), (-1,-1), 1, colors.HexColor('#e2e8f0')),
+        ('FONTSIZE', (0,1), (-1,1), 14),
+        ('TOPPADDING', (0,1), (-1,1), 12),
+        ('BOTTOMPADDING', (0,1), (-1,1), 12),
+    ]))
+    elements.append(summary_table)
+    elements.append(Spacer(1, 20))
+    
+    # Main Data Table
+    data = [["ID", "Title", "Category", "Status", "Date", "Est. Value (INR)"]]
+    for t in tenders:
+        data.append([
+            f"TND-{t.id:04d}",
+            t.title[:45] + "..." if len(t.title) > 45 else t.title,
+            t.category if t.category else "N/A",
+            t.status.upper(),
+            t.created_at.strftime("%d %b %Y"),
+            f"{t.estimated_value:,.2f}"
+        ])
+        
+    if len(data) > 1:
+        # repeatRows=1 forces the header row to appear on every new page!
+        t_table = Table(data, colWidths=[60, 250, 120, 80, 80, 120], repeatRows=1)
+        t_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f2a5e')),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('PADDING', (0,0), (-1,-1), 8),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+            ('ALIGN', (5,0), (5,-1), 'RIGHT'), # Values right
+            ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#f8faff')]),
+        ]))
+        elements.append(t_table)
+    else:
+        elements.append(Paragraph("No tenders found for the selected period.", styles['Italic']))
 
-    # Status Distribution
-    status_data = Tenderss.objects.values('status').annotate(count=Count('id'))
-    status_labels = [s['status'].upper() for s in status_data]
-    status_counts = [s['count'] for s in status_data]
-
-    # TOP Publishers (Creator Roles)
-    top_publishers = Tenderss.objects.values('created_by__username').annotate(total=Count('id')).order_by('-total')[:5]
-    pub_labels = [p['created_by__username'] for p in top_publishers]
-    pub_counts = [p['total'] for p in top_publishers]
-
-    context = {
-        'months': months,
-        'tender_trend': tender_trend,
-        'bid_trend': bid_trend,
-        'reg_trend': reg_trend,
-        'cat_labels': cat_labels,
-        'cat_counts': cat_counts,
-        'status_labels': status_labels,
-        'status_counts': status_counts,
-        'pub_labels': pub_labels,
-        'pub_counts': pub_counts,
-    }
-    return render(request, 'analytics.html', context)
+    # ── Awarded Bids details Section ──
+    awarded_bids = bids.filter(status='awarded')
+    if awarded_bids.exists():
+        elements.append(PageBreak()) # Send details to a fresh page cleanly
+        elements.append(Paragraph("Awarded Company Details", styles['Heading2']))
+        elements.append(Spacer(1, 10))
+        
+        for ab in awarded_bids:
+            details_data = [
+                ["Tender", ab.tender.title[:65] + "..." if len(ab.tender.title) > 65 else ab.tender.title],
+                ["Company Name", ab.company_name],
+                ["Authorized Bidder", ab.bidder_name],
+                ["Contact Info", f"{ab.official_email}  |  Mobile: {ab.mobile_number}"],
+                ["Address", f"{ab.registered_address}, {ab.city}, {ab.state} - {ab.pin_code}"],
+                ["Awarded Amount", f"INR {ab.bid_amount:,.2f}"]
+            ]
+            detail_table = Table(details_data, colWidths=[130, 450])
+            detail_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f8faff')),
+                ('TEXTCOLOR', (0,0), (-1,-1), colors.HexColor('#1e293b')),
+                ('FONTNAME', (0,0), (0,-1), 'Helvetica-Bold'),
+                ('FONTNAME', (1,0), (1,-1), 'Helvetica'),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#e2e8f0')),
+                ('PADDING', (0,0), (-1,-1), 8),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ]))
+            # KeepTogether ensures the specific company table is not split across multiple pages
+            elements.append(KeepTogether([detail_table, Spacer(1, 15)]))
+            
+    doc.build(elements, onFirstPage=header_footer, onLaterPages=header_footer)
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    import time
+    stamp = int(time.time())
+    response['Content-Disposition'] = f'attachment; filename="eBharat_Report_{stamp}.pdf"'
+    return response
 
 def logout_view(request):
     logout(request)
@@ -779,14 +936,14 @@ def allocate_user_role(request, profile_id):
 @login_required
 def action_history(request):
     logs = ActionLog.objects.all().order_by('-timestamp')
-    return render(request, 'action_history.html', {'logs': logs})
+    return render(request, 'action_history.html', {'page_title': 'System Audit Log', 'logs': logs})
 
 # --- NOTICE MANAGEMENT ---
 
 @login_required
 def notice_list(request):
     notices = Notice.objects.all().order_by('-created_at')
-    return render(request, 'manage_notices.html', {'notices': notices})
+    return render(request, 'manage_notices.html', {'page_title': 'Manage Noticeboard', 'notices': notices})
 
 @login_required
 def create_notice(request):
@@ -845,3 +1002,40 @@ def delete_notice(request, notice_id):
     
     messages.warning(request, f"Notice '{title}' deleted.")
     return redirect('coreadmin:notice_list')
+
+
+@staff_member_required
+def admin_profile(request):
+    from django.contrib.auth import update_session_auth_hash
+    from django.contrib.auth.forms import PasswordChangeForm
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'update_profile':
+            request.user.first_name = request.POST.get('first_name', '')
+            request.user.last_name = request.POST.get('last_name', '')
+            request.user.email = request.POST.get('email', '')
+            request.user.save()
+            messages.success(request, "Your profile details have been successfully updated.")
+            return redirect('coreadmin:admin_profile')
+            
+        elif action == 'change_password':
+            form = PasswordChangeForm(request.user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                # Maintain session so the user is not automatically logged out
+                update_session_auth_hash(request, user)
+                messages.success(request, "Your password was successfully updated.")
+                return redirect('coreadmin:admin_profile')
+            else:
+                for error_list in form.errors.values():
+                    for error in error_list:
+                        messages.error(request, error)
+                    
+    else:
+        form = PasswordChangeForm(request.user)
+        
+    return render(request, 'admin_profile.html', {
+        'page_title': 'Profile Settings',
+        'password_form': form,
+    })

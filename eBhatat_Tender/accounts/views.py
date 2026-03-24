@@ -23,7 +23,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.is_superuser:
-                return redirect("coreadmin:base")
+                return redirect("coreadmin:deshbord")
             return redirect("public:home")
         else:
             return redirect("accounts:login")

@@ -1,851 +1,692 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Control Center{% endblock %} · Super Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:           '#7b1c2e',
+            orange:         '#ea580c',
+            'orange-light': '#fb923c',
+            accent:         '#f59e0b',
+            surface:        '#f8faff',
+            'surface-2':    '#f1f5f9',
+            text:           '#1e293b',
+            muted:          '#64748b',
+            border:         '#e2e8f0',
+            indigo:         '#6366f1',
+            'indigo-light': '#818cf8',
+          },
+          fontFamily: {
+            sora:   ['Sora', 'sans-serif'],
+            dmSans: ['"DM Sans"', 'sans-serif'],
+          },
+          width:   { sidebar: '220px' },
+          height:  { topbar:  '56px'  },
+          margin:  { sidebar: '220px', topbar: '56px' },
+          spacing: { sidebar: '220px', topbar: '56px' },
+        }
+      }
+    }
+  </script>
+
   <style>
     :root {
-      --sidebar-w: 240px;
-      --topbar-h: 64px;
+      --navy:         #7b1c2e;
+      --navy-dark:    #5a1220;
+      --orange:       #ea580c;
+      --orange-light: #fb923c;
+      --border:       #e2e8f0;
+      --surface:      #f8faff;
+      --text:         #1e293b;
+      --muted:        #64748b;
+      --indigo:       #6366f1;
+      --indigo-light: #818cf8;
+      --sidebar-w:    220px;
+      --topbar-h:     56px;
 
-      /* Sidebar */
-      --sb-bg:        #0e0f14;
-      --sb-border:    rgba(255,255,255,0.06);
-      --sb-text:      #7c8099;
-      --sb-hover-bg:  rgba(255,255,255,0.05);
-      --sb-active-bg: rgba(99,102,241,0.15);
-      --sb-active:    #818cf8;
-      --sb-section:   #3d4060;
-
-      /* Content */
-      --bg:        #f5f6fb;
-      --surface:   #ffffff;
-      --surface-2: #f0f1f8;
-      --border:    #e4e6f0;
-      --border-2:  #d0d4e8;
-
-      /* Text */
-      --t1: #0f1020;
-      --t2: #4a5070;
-      --t3: #8a90aa;
-      --t4: #b8bcd0;
-
-      /* Accent */
-      --accent:      #6366f1;
-      --accent-2:    #818cf8;
-      --accent-soft: rgba(99,102,241,0.1);
-      --accent-bdr:  rgba(99,102,241,0.25);
-
-      /* Status */
       --green:  #10b981; --green-bg: #ecfdf5; --green-b: #a7f3d0;
       --red:    #ef4444; --red-bg:   #fef2f2; --red-b:   #fca5a5;
       --amber:  #f59e0b; --amber-bg: #fffbeb; --amber-b: #fde68a;
       --blue:   #3b82f6; --blue-bg:  #eff6ff; --blue-b:  #bfdbfe;
       --purple: #8b5cf6; --purple-bg:#f5f3ff; --purple-b:#ddd6fe;
-      --rose:   #f43f5e; --rose-bg:  #fff1f2; --rose-b:  #fecdd3;
+      
+      /* Legacy Variables for Sub-pages Compatibility */
+      --bg1: var(--surface);
+      --bg2: #ffffff;
+      --bg3: #f1f5f9;
+      --border2: var(--border);
+      --accent2: var(--indigo-light);
+      --t1: var(--text);
+      --t2: #475569;
+      --t3: #94a3b8;
+      --t4: #cbd5e1;
+      --accent: var(--indigo);
+      --accent-soft: rgba(99,102,241,0.1);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 14px; }
-    body {
-      margin: 0;
-      background: var(--bg1);
-      color: var(--text);
-      font-family: 'Open Sans', 'Roboto', Arial, sans-serif;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
+/* START INJECTED GLOBALS */
+  /* PAGE HEADER */
+  .ph { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 22px 24px 18px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #fafbff 0%, #f5f3ff08 100%); }
+  .ph-eye { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--indigo); background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.15); display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; margin-bottom: 6px; }
+  .ph-eye::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--indigo); animation: pulse 2s infinite; }
+  .ph-title { font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; line-height: 1.2; }
+  .ph-sub { font-size: 0.76rem; color: var(--t3); margin-top: 2px; }
+  .ph-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; text-decoration: none; transition: all 0.15s cubic-bezier(0.4,0,0.2,1); white-space: nowrap; border: 1.5px solid transparent; }
+  .btn-sm  { font-size: 0.775rem; padding: 7px 14px; }
+  .btn-xs  { font-size: 0.7rem;   padding: 4px 10px; border-radius: 6px; }
+  .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 2px 8px rgba(99,102,241,0.25); }
+  .btn-primary:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.35); transform: translateY(-1px); color: white; }
+  .btn-outline { background: white; color: #475569; border-color: var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .btn-outline:hover { border-color: #c7d2fe; color: var(--indigo); background: #eef2ff; }
+
+  /* STAT CARDS */
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0; border-bottom: 1px solid var(--border); }
+  .sc { padding: 18px 20px 16px; border-right: 1px solid var(--border); position: relative; overflow: hidden; transition: background 0.15s; cursor: default; }
+  .sc:last-child { border-right: none; }
+  .sc:nth-child(4n) { border-right: none; }
+  .sc::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.15s; }
+  .sc:hover::after { opacity: 1; }
+  .sc:hover { z-index: 1; }
+  .sc.v-indigo::after { background: rgba(99,102,241,0.03); }  .sc.v-green::after  { background: rgba(16,185,129,0.03); }  .sc.v-amber::after  { background: rgba(245,158,11,0.03); }  .sc.v-blue::after   { background: rgba(59,130,246,0.03); }  .sc.v-purple::after { background: rgba(139,92,246,0.03); }  .sc.v-rose::after   { background: rgba(244,63,94,0.03); }
+  .sc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .sc-ico { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+  .v-indigo .sc-ico { background: rgba(99,102,241,0.1); color: #6366f1; }  .v-green  .sc-ico { background: rgba(16,185,129,0.1); color: #10b981; }  .v-amber  .sc-ico { background: rgba(245,158,11,0.1); color: #f59e0b; }  .v-blue   .sc-ico { background: rgba(59,130,246,0.1); color: #3b82f6; }  .v-purple .sc-ico { background: rgba(139,92,246,0.1); color: #8b5cf6; }  .v-rose   .sc-ico { background: rgba(244,63,94,0.1); color: #f43f5e; }
+  .sc-delta { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; display: inline-flex; align-items: center; gap: 3px; }
+  .sc-delta.up   { background: #ecfdf5; color: #059669; }  .sc-delta.down { background: #fef2f2; color: #dc2626; }  .sc-delta.flat { background: #f1f5f9; color: #64748b; }
+  .sc-val { font-family: 'Sora', sans-serif; font-size: 1.45rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; line-height: 1; margin-bottom: 3px; }
+  .sc-lbl { font-size: 0.72rem; font-weight: 600; color: #64748b; margin-bottom: 5px; }
+  .sc-foot { font-size: 0.65rem; color: var(--t3); }
+
+  /* BOTTOM GRID */
+  .g32 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+  @media (max-width: 900px) { .g32 { grid-template-columns: 1fr; } }
+
+  /* CARD */
+  .card { background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(15,42,94,0.04); }
+  .card-head, .ch { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: #fafbff; }
+  .card-title, .ct { font-family: 'Sora', sans-serif; font-size: 0.82rem; font-weight: 700; color: #1e293b; }
+  .cs { font-size: 0.67rem; color: var(--t3); margin-top: 1px; }
+  .card-body { padding: 0; overflow-x: auto; }
+  .cb { padding: 4px 0; }
+
+  /* BADGE */
+  .badge { font-size: 0.65rem; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid transparent; }
+  .bg-red    { background: var(--red-bg);    color: var(--red);    border-color: var(--red-b); }
+  .bg-green  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-b); }
+  .bg-amber  { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-b); }
+  .bg-blue   { background: var(--blue-bg);   color: var(--blue);   border-color: var(--blue-b); }
+  .bg-purple { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-b); }
+  .bg-indigo { background: rgba(99,102,241,0.08); color: var(--indigo); border-color: rgba(99,102,241,0.18); }
+  .badge-gray, .bg-gray { color: var(--t3); background: var(--surface-2); border-color: var(--border); }
+
+  /* APPROVAL LIST ROWS */
+  .apv-row { display: flex; align-items: center; gap: 11px; padding: 11px 18px; border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+  .apv-row:last-child { border-bottom: none; }
+  .apv-row:hover { background: #fafbff; }
+  .uav { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: white; flex-shrink: 0; }
+  .uname { font-size: 0.78rem; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+  .usub { font-size: 0.65rem; color: var(--t3); margin-top: 1px; }
+
+  /* TIMELINE / ACTIVITY */
+  .tl { padding: 6px 0; }
+  .tli { display: flex; align-items: flex-start; gap: 10px; padding: 9px 18px; border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+  .tli:last-child { border-bottom: none; }
+  .tli:hover { background: #fafbff; }
+  .tl-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; margin-top: 1px; }
+  .tl-t { font-size: 0.76rem; font-weight: 500; color: #334155; line-height: 1.3; }
+  .tl-m { font-size: 0.63rem; color: var(--t3); margin-top: 2px; }
+
+  /* EMPTY STATE */
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; gap: 6px; }
+  .empty-state i { font-size: 1.4rem; color: #cbd5e1; margin-bottom: 4px; }
+  .empty-state p { font-size: 0.75rem; color: var(--t3); text-align: center; }
+
+  /* BORDER ROWS on stats */
+  @media (max-width: 1100px) { .stats { grid-template-columns: repeat(4, 1fr); } .sc:nth-child(4n) { border-right: none; } .sc:nth-child(n+5) { border-top: 1px solid var(--border); } }
+  @media (max-width: 700px) { .stats { grid-template-columns: repeat(2, 1fr); } .sc:nth-child(even) { border-right: none; } .sc:nth-child(4n) { border-right: none; } .sc:nth-child(n+3) { border-top: 1px solid var(--border); } }
+/* END INJECTED GLOBALS */
+
+    /* ── Scrollbars ── */
+    .sidebar-nav::-webkit-scrollbar       { width: 2px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15); border-radius: 2px; }
+
+    /* ── Sidebar subtle dot texture ── */
+    .sidebar::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(99,102,241,0.04) 1px, transparent 1px);
+      background-size: 18px 18px;
+      pointer-events: none;
     }
-    a { text-decoration: none; color: inherit; }
-    button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
-
-    /* ── LAYOUT ── */
-    .layout { display: flex; width: 100%; }
-
-    /* ══════════════════════════════════════
-       SIDEBAR
-    ══════════════════════════════════════ */
-    .sidebar {
-      width: var(--sidebar-w);
-      background: var(--sb-bg);
-      position: fixed;
-      inset: 0 auto 0 0;
-      z-index: 300;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-      border-right: 1px solid var(--sb-border);
+    /* ── Active nav item ── */
+    .nav-item {
+      position: relative;
+      transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%) scaleY(0);
+      width: 3px; height: 60%;
+      background: linear-gradient(180deg, #6366f1, #8b5cf6);
+      border-radius: 0 3px 3px 0;
+      transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.06)) !important;
+      color: #6366f1 !important;
+      font-weight: 600;
+    }
+    .nav-item.active::before {
+      transform: translateY(-50%) scaleY(1);
+    }
+    .nav-item.active .nav-icon {
+      color: #6366f1;
+      filter: drop-shadow(0 0 6px rgba(99,102,241,0.4));
+    }
+    .nav-item.active .nav-text {
+      color: #6366f1;
     }
 
-    /* ── Logo ── */
-    .sb-brand {
-      height: var(--topbar-h);
+    /* ── Hover state ── */
+    .nav-item:not(.active):hover {
+      background: rgba(99,102,241,0.05);
+      color: #6366f1;
+      transform: translateX(2px);
+    }
+    .nav-item:not(.active):hover .nav-icon {
+      color: #6366f1;
+    }
+    .nav-item:not(.active):hover .nav-text {
+      color: #6366f1;
+    }
+    .nav-item:not(.active):hover::before {
+      transform: translateY(-50%) scaleY(0.6);
+      opacity: 0.4;
+    }
+
+    /* ── Badge pill ── */
+    .sb-badge {
+      font-size: 8px; font-weight: 700;
+      background: #6366f1; color: white;
+      padding: 2px 6px; border-radius: 99px;
+      min-width: 18px; text-align: center;
+      flex-shrink: 0; letter-spacing: 0.02em;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.4;
+    }
+    .sb-badge.warn   { background: var(--amber); color: #000; }
+    .sb-badge.danger { background: var(--red); }
+
+    /* ── Profile dropdown ── */
+    .profile-dropdown {
+      opacity: 0; visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .profile-wrap.show .profile-dropdown {
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+    .profile-wrap.show .profile-chevron { transform: rotate(180deg); }
+
+    /* ── Transitions ── */
+    .sidebar       { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .topbar        { transition: left 0.3s; }
+    .main-wrap     { transition: margin-left 0.3s; }
+    .profile-chevron { transition: transform 0.2s; }
+
+    /* ── Typography ── */
+    body { -webkit-font-smoothing: antialiased; }
+    h1,h2,h3,h4,h5,h6 { font-family: 'Sora', sans-serif; }
+
+    /* ── Status dot pulse ── */
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+    .s-dot { animation: pulse 2s infinite; }
+
+    /* ── Page entrance ── */
+    @keyframes pageUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .page-content { animation: pageUp 0.3s ease; }
+
+    /* ── Toast ── */
+    @keyframes toastIn { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
+    .toast-item { animation: toastIn 0.3s cubic-bezier(.16,1,.3,1); }
+
+    /* ── Stat card hover ── */
+    .stat-card { transition: all 0.2s; }
+    .stat-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.07); transform: translateY(-2px); }
+
+    /* ── Table row hover ── */
+    .dt-row:hover td { background: #f8f9fe; }
+
+    /* ── Section label ── */
+    .nav-section-label {
+      font-size: 0.56rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 0.6rem 0.5rem 0.25rem;
       display: flex;
       align-items: center;
-      padding: 0 24px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fff;
-      font-family: 'Roboto', sans-serif;
-      border-bottom: 1px solid var(--sb-border);
-      letter-spacing: 0.5px;
+      gap: 0.4rem;
     }
-
-    .sb-logo-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 4px 12px rgba(99,102,241,0.3);
-    }
-
-    .sb-logo-icon i { color: white; font-size: 14px; }
-
-    .sb-logo-text { flex: 1; min-width: 0; }
-    .sb-logo-name {
-      font-family: 'Outfit', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.01em;
-    }
-    .sb-logo-sub {
-      font-family: 'Fira Code', monospace;
-      font-size: 9px;
-      color: var(--sb-section);
-      letter-spacing: 0.08em;
-      margin-top: 1px;
-      text-transform: uppercase;
-    }
-
-    /* ── Nav ── */
-    .sb-nav { flex: 1; overflow-y: auto; padding: 12px 0 16px; }
-
-    .sb-section {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 20px 18px 7px;
-    }
-    .sb-section span {
-      font-family: 'Fira Code', monospace;
-      font-size: 9px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--sb-section);
-      white-space: nowrap;
-    }
-    .sb-section::after {
+    .nav-section-label::after {
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--sb-border);
+      background: linear-gradient(90deg, rgba(226,232,240,0.8), transparent);
     }
 
-    /* ── Nav Item ── */
-    .sb-item {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      margin: 2px 10px;
-      padding: 0;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: background 0.15s;
-      border: 1px solid transparent;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .sb-item:hover { background: var(--sb-hover-bg); }
-
-    .sb-item.active {
-      background: var(--sb-active-bg);
-      border-color: rgba(99,102,241,0.2);
-    }
-
-    /* Icon box */
-    .sb-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 13px;
-      color: var(--sb-text);
-      transition: color 0.15s;
-    }
-
-    .sb-item:hover .sb-icon { color: #c8ccee; }
-    .sb-item.active .sb-icon { color: var(--sb-active); }
-
-    /* Label */
-    .sb-label {
-      flex: 1;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--sb-text);
-      transition: color 0.15s;
-      padding-right: 8px;
-    }
-
-    .sb-item:hover .sb-label { color: #dde0f5; }
-    .sb-item.active .sb-label { color: #ffffff; font-weight: 600; }
-
-    /* Badge pill */
-    .sb-badge {
-      font-family: 'Fira Code', monospace;
-      font-size: 9px;
-      font-weight: 600;
-      background: #6366f1;
-      color: white;
-      padding: 2px 7px;
-      border-radius: 99px;
-      margin-right: 10px;
-      min-width: 20px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .sb-badge.warn { background: var(--amber); color: #000; }
-    .sb-badge.danger { background: var(--red); }
-
-    /* Active left bar */
-    .sb-item.active::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 6px; bottom: 6px;
-      width: 3px;
-      background: var(--accent-2);
-      border-radius: 0 3px 3px 0;
-    }
-
-    /* ── Footer ── */
-    .sb-footer {
-      padding: 12px;
-      border-top: 1px solid var(--sb-border);
-      flex-shrink: 0;
-    }
-
-    .sb-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 10px;
-      border-radius: 9px;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.03);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .sb-profile:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-
-    .sb-avatar {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #6366f1, #ec4899);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; font-weight: 600;
-      color: white; flex-shrink: 0;
-    }
-
-    .sb-pname { font-size: 12px; font-weight: 600; color: #dde0f5; }
-    .sb-prole { font-family: 'Fira Code', monospace; font-size: 9px; color: var(--sb-section); margin-top: 1px; }
-    .sb-pmore { color: var(--sb-section); font-size: 11px; margin-left: auto; }
-
-    /* ══════════════════════════════════════
-       MAIN
-    ══════════════════════════════════════ */
-    .main {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      min-width: 0;
-      transition: margin 0.3s;
-    }
-
-    /* ── Topbar ── */
-    .topbar {
-      height: var(--topbar-h);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 28px;
-      gap: 14px;
-      position: sticky; top: 0; z-index: 100;
-    }
-
-    .burger {
-      display: none;
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--t2);
-      align-items: center; justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-      transition: all 0.15s;
-    }
-    .burger:hover { background: var(--surface-2); color: var(--t1); }
-
-    /* Search bar */
-    .topbar-search {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 0 14px;
-      height: 38px;
-      width: 280px;
-      cursor: text;
-      transition: all 0.15s;
-    }
-    .topbar-search:focus-within { border-color: var(--accent-bdr); background: var(--surface); box-shadow: 0 0 0 3px var(--accent-soft); }
-    .topbar-search i { color: var(--t4); font-size: 12px; flex-shrink: 0; }
-    .topbar-search input { flex: 1; border: none; background: transparent; outline: none; font-size: 13px; font-family: inherit; color: var(--t1); }
-    .topbar-search input::placeholder { color: var(--t4); }
-    .search-kbd {
-      font-family: 'Fira Code', monospace;
-      font-size: 9px;
-      color: var(--t4);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-
-    .status-pill {
-      display: flex; align-items: center; gap: 7px;
-      padding: 6px 13px;
-      border-radius: 99px;
-      background: var(--green-bg);
-      border: 1px solid var(--green-b);
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; font-weight: 500;
-      color: var(--green);
-    }
-    .s-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
-
-    .tb-btn {
-      width: 38px; height: 38px;
-      border-radius: 9px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--t3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.15s;
-    }
-    .tb-btn:hover { background: var(--surface-2); color: var(--t1); border-color: var(--border-2); }
-    .notif { position: absolute; top: -3px; right: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--red); border: 2px solid var(--surface); display: flex; align-items: center; justify-content: center; font-family: 'Fira Code', monospace; font-size: 7px; color: white; font-weight: 700; }
-
-    /* Admin chip in topbar */
-    .admin-chip {
-      display: flex; align-items: center; gap: 9px;
-      padding: 5px 13px 5px 6px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .admin-chip:hover { background: var(--surface-2); }
-    .chip-av {
-      width: 28px; height: 28px;
-      border-radius: 99px;
-      background: linear-gradient(135deg, #6366f1, #ec4899);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Fira Code', monospace;
-      font-size: 9px; font-weight: 700; color: white;
-    }
-    .chip-name { font-size: 12px; font-weight: 600; color: var(--t1); }
-
-    /* ── PAGE ── */
-    .page {
-      flex: 1;
-      padding: 28px 32px 52px;
-      animation: up 0.35s ease;
-    }
-    @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-
-    /* ── Page Header ── */
-
-    /* ── Page Header ── */
-    .ph {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
-    }
-    .ph-eye {
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 6px;
-    }
-    .ph-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 24px; font-weight: 800;
-      color: var(--t1); letter-spacing: -0.03em;
-    }
-    .ph-sub { font-size: 13px; color: var(--t3); margin-top: 4px; font-weight: 400; }
-    .ph-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* ── BUTTONS ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border-radius: 9px;
-      font-size: 13px; font-weight: 600;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      cursor: pointer; border: 1px solid transparent;
-      transition: all 0.15s; white-space: nowrap;
-    }
-    .btn-primary {
-      background: var(--accent); color: white;
-      box-shadow: 0 2px 8px rgba(99,102,241,0.35);
-    }
-    .btn-primary:hover { background: #4f52d8; box-shadow: 0 4px 16px rgba(99,102,241,0.45); transform: translateY(-1px); }
-    .btn-outline { background: var(--surface); color: var(--t2); border-color: var(--border-2); }
-    .btn-outline:hover { background: var(--surface-2); color: var(--t1); }
-    .btn-ghost { background: transparent; color: var(--t3); border-color: transparent; }
-    .btn-ghost:hover { background: var(--surface-2); color: var(--t1); }
-    .btn-green { background: var(--green-bg); color: var(--green); border-color: var(--green-b); }
-    .btn-green:hover { background: #d1fae5; }
-    .btn-red { background: var(--red-bg); color: var(--red); border-color: var(--red-b); }
-    .btn-red:hover { background: #fee2e2; }
-    .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 7px; }
-    .btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
-    .btn-icon { padding: 7px; width: 32px; height: 32px; justify-content: center; border-radius: 7px; }
-
-    /* ── STAT CARDS ── */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .sc {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.2s;
-    }
-    .sc:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.07); transform: translateY(-2px); border-color: var(--border-2); }
-
-    .sc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
-
-    .sc-ico {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-
-    .sc-delta {
-      display: flex; align-items: center; gap: 4px;
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; font-weight: 600;
-      padding: 4px 9px; border-radius: 99px;
-    }
-    .up   { color: var(--green);  background: var(--green-bg); }
-    .down { color: var(--red);    background: var(--red-bg); }
-    .flat { color: var(--t3);     background: var(--surface-2); }
-
-    .sc-val {
-      font-family: 'Outfit', sans-serif;
-      font-size: 32px; font-weight: 800;
-      color: var(--t1); letter-spacing: -0.04em; line-height: 1;
-      margin-bottom: 5px;
-    }
-    .sc-lbl { font-size: 12px; color: var(--t3); font-weight: 500; }
-    .sc-foot {
-      margin-top: 14px; padding-top: 14px;
-      border-top: 1px solid var(--border);
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; color: var(--t4);
-    }
-
-    /* Color variants */
-    .v-indigo .sc-ico { background: var(--accent-soft); color: var(--accent); }
-    .v-green  .sc-ico { background: var(--green-bg);    color: var(--green); }
-    .v-red    .sc-ico { background: var(--red-bg);      color: var(--red); }
-    .v-amber  .sc-ico { background: var(--amber-bg);    color: var(--amber); }
-    .v-blue   .sc-ico { background: var(--blue-bg);     color: var(--blue); }
-    .v-purple .sc-ico { background: var(--purple-bg);   color: var(--purple); }
-    .v-rose   .sc-ico { background: var(--rose-bg);     color: var(--rose); }
-
-    .v-indigo:hover { border-color: rgba(99,102,241,0.2); }
-    .v-green:hover  { border-color: rgba(16,185,129,0.2); }
-    .v-red:hover    { border-color: rgba(239,68,68,0.2); }
-    .v-amber:hover  { border-color: rgba(245,158,11,0.2); }
-    .v-blue:hover   { border-color: rgba(59,130,246,0.2); }
-    .v-purple:hover { border-color: rgba(139,92,246,0.2); }
-    .v-rose:hover   { border-color: rgba(244,63,94,0.2); }
-
-    /* ── CARD ── */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-
-    .ch {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px; border-bottom: 1px solid var(--border);
-      gap: 12px; flex-wrap: wrap;
-    }
-    .ct {
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px; font-weight: 700;
-      color: var(--t1); letter-spacing: -0.01em;
-    }
-    .cs {
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; color: var(--t4);
-      text-transform: uppercase; letter-spacing: 0.08em;
-      margin-top: 2px;
-    }
-    .cb { padding: 22px; }
-
-    /* ── TABLE ── */
-    .tw { overflow-x: auto; }
-    .dt { width: 100%; border-collapse: collapse; }
-    .dt thead { background: var(--surface-2); }
-    .dt th {
-      padding: 10px 18px;
-      font-family: 'Fira Code', monospace;
-      font-size: 9px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--t3); text-align: left; white-space: nowrap;
-      border-bottom: 1px solid var(--border);
-    }
-    .dt td {
-      padding: 14px 18px; font-size: 13px; color: var(--t1);
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle; transition: background 0.1s;
-    }
-    .dt tbody tr:hover td { background: #f8f9fe; }
-    .dt tbody tr:last-child td { border-bottom: none; }
-
-    /* ── BADGES ── */
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 10px; border-radius: 6px;
-      font-family: 'Fira Code', monospace;
-      font-size: 9px; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      border: 1px solid; white-space: nowrap;
-    }
-    .badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
-    .bg-green  { color:var(--green);  background:var(--green-bg);  border-color:var(--green-b); }
-    .bg-red    { color:var(--red);    background:var(--red-bg);    border-color:var(--red-b); }
-    .bg-amber  { color:var(--amber);  background:var(--amber-bg);  border-color:var(--amber-b); }
-    .bg-blue   { color:var(--blue);   background:var(--blue-bg);   border-color:var(--blue-b); }
-    .bg-indigo { color:var(--accent); background:var(--accent-soft); border-color:var(--accent-bdr); }
-    .bg-purple { color:var(--purple); background:var(--purple-bg); border-color:var(--purple-b); }
-    .bg-gray   { color:var(--t3);     background:var(--surface-2); border-color:var(--border); }
-
-    /* ── GRID ── */
-    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .g32 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
-
-    /* ── USER CELL ── */
-    .ucell { display: flex; align-items: center; gap: 10px; }
-    .uav {
-      width: 32px; height: 32px; border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Fira Code', monospace;
-      font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
-    }
-    .uname { font-size: 13px; font-weight: 600; color: var(--t1); }
-    .usub  { font-size: 11px; color: var(--t3); font-family: 'Fira Code', monospace; margin-top: 1px; }
-
-    /* ── PROGRESS ── */
-    .pb { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 7px; }
-    .pf { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-
-    /* ── TIMELINE ── */
-    .tl { display: flex; flex-direction: column; gap: 0; }
-    .tli { display: flex; gap: 13px; padding: 13px 0; border-bottom: 1px solid var(--border); }
-    .tli:last-child { border-bottom: none; padding-bottom: 0; }
-    .tl-icon {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; flex-shrink: 0; margin-top: 1px;
-    }
-    .tl-t { font-size: 13px; font-weight: 600; color: var(--t1); }
-    .tl-m { font-family: 'Fira Code', monospace; font-size: 10px; color: var(--t4); margin-top: 3px; }
-
-    /* ── OVERLAY ── */
-    .overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4); z-index: 200;
-    }
-    .overlay.show { display: block; animation: fi 0.2s; }
-    @keyframes fi { from{opacity:0} to{opacity:1} }
-
-    /* ── TOAST ── */
-    .toast-wrap { position: fixed; bottom: 20px; right: 22px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-    .toast {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 16px;
-      background: #111218;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 11px;
-      font-size: 13px; color: #e0e4f8;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      min-width: 260px; max-width: 360px;
-      animation: ts 0.3s cubic-bezier(.16,1,.3,1);
-    }
-    @keyframes ts { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
-    .ti { font-size: 15px; flex-shrink: 0; }
-    .tm { flex: 1; }
-    .tc { color: rgba(255,255,255,0.3); font-size: 12px; cursor: pointer; }
-
-    /* Responsive */
-    @media(max-width:1280px) { .stats { grid-template-columns: repeat(2,1fr); } }
-    @media(max-width:1024px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); box-shadow: 0 0 60px rgba(0,0,0,0.4); }
-      .main { margin-left: 0; }
-      .burger { display: flex; }
-      .topbar-search { width: 200px; }
-    }
-    @media(max-width:768px) {
-      .page { padding: 18px 16px 40px; }
-      .stats { grid-template-columns: 1fr; }
-      .g2,.g32 { grid-template-columns: 1fr; }
-      .topbar-search { display: none; }
-      .ph { flex-direction: column; align-items: flex-start; }
+    /* ── Sidebar brand glow ── */
+    .brand-icon-wrap {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      box-shadow: 0 2px 12px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
     }
   </style>
+
   {% block extra_css %}{% endblock %}
 </head>
-<body>
-<div class="layout">
 
-  <div class="overlay" id="ov" onclick="closeSb()"></div>
+<body class="font-dmSans bg-surface text-text overflow-x-hidden">
 
-  <!-- ══ SIDEBAR ══ -->
-  <aside class="sidebar" id="sb">
+<!-- ═══════ SIDEBAR OVERLAY (mobile) ═══════ -->
+<div id="sidebarOverlay"
+     onclick="closeSidebar()"
+     class="hidden fixed inset-0 bg-[rgba(9,25,58,0.55)] backdrop-blur-sm z-[199]">
+</div>
 
-    <!-- Logo -->
-    <div class="sb-brand" style="gap: 12px;">
-      <div class="sb-logo-icon"><i class="fas fa-landmark"></i></div>
-      <div class="sb-logo-text">
-        <div class="sb-logo-name" style="line-height:1;">Super Admin</div>
-        <div class="sb-logo-sub" style="line-height:1;">Control Center</div>
-      </div>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside id="sidebar"
+       class="sidebar fixed top-0 left-0 w-[220px] h-screen bg-white border-r border-slate-100
+              flex flex-col z-[200] overflow-hidden -translate-x-full lg:translate-x-0">
+
+  <!-- Brand -->
+  <a href="{% url 'coreadmin:deshbord' %}"
+     class="flex items-center gap-[0.6rem] px-4 py-[0.9rem] border-b border-slate-100
+            flex-shrink-0 relative z-[1] no-underline group">
+    <div>
+      <span class="font-sora text-[0.88rem] font-extrabold text-slate-800 leading-tight">
+        eBharat Administration Panel
+        <span class="block text-[0.52rem] font-normal text-slate-400 tracking-[0.08em] uppercase mt-[1px]">
+          Control Center
+        </span>
+      </span>
     </div>
+  </a>
 
-    <!-- Nav -->
-    <nav class="sb-nav">
+  <!-- Nav -->
+  <nav class="sidebar-nav flex-1 overflow-y-auto px-2.5 pb-3 pt-1 relative z-[1]">
 
-      <div class="sb-section"><span>Overview</span></div>
+    <!-- Overview -->
+    <div class="nav-section-label">Overview</div>
 
-      <a href="{% url 'coreadmin:deshbord' %}" class="sb-item {% block nav_dashboard %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-gauge-high"></i></div>
-        <span class="sb-label">Dashboard</span>
-      </a>
-      <a href="{% url 'coreadmin:analytics' %}" class="sb-item {% block nav_analytics %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-chart-line"></i></div>
-        <span class="sb-label">Analytics</span>
-      </a>
+    <a href="{% url 'coreadmin:deshbord' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_dashboard %}{% endblock %}">
+      <i class="nav-icon fas fa-gauge-high w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Dashboard</span>
+    </a>
 
-      <div class="sb-section"><span>Procurement</span></div>
+    <a href="{% url 'coreadmin:reports' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_reports %}{% endblock %}">
+      <i class="nav-icon fas fa-file-pdf w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">System Reports</span>
+    </a>
 
-      <a href="{% url 'coreadmin:tender_list' %}" class="sb-item {% block nav_tenders %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-file-contract"></i></div>
-        <span class="sb-label">Tenders</span>
-        <!-- <span class="sb-badge"></span> -->
-      </a>
-      <a href="{% url 'coreadmin:application_approvals' %}" class="sb-item {% block nav_bids %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-gavel"></i></div>
-        <span class="sb-label">Bids</span>
-        {% if pending_app_approvals %}<span class="sb-badge">{{ pending_app_approvals }}</span>{% endif %}
-      </a>
-      <a href="{% url 'coreadmin:funding_approvals' %}" class="sb-item {% block nav_funding_apps %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-check-double"></i></div>
-        <span class="sb-label">Funding Approvals</span>
-        {% if pending_funding_count %}<span class="sb-badge warn">{{ pending_funding_count }}</span>{% endif %}
-      </a>
-      <a href="{% url 'coreadmin:funding_list' %}" class="sb-item {% block nav_funding %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-hand-holding-dollar"></i></div>
-        <span class="sb-label">Manage Funding</span>
-      </a>
-      <a href="{% url 'coreadmin:admin_request_approvals' %}" class="sb-item {% block nav_requests %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-circle-plus"></i></div>
-        <span class="sb-label">Department Approval</span>
-        {% if pending_admin_req_count %}<span class="sb-badge danger">{{ pending_admin_req_count }}</span>{% endif %}
-      </a>
+    <!-- Procurement -->
+    <div class="nav-section-label mt-1">Procurement</div>
 
-      <div class="sb-section"><span>Users</span></div>
+    <a href="{% url 'coreadmin:tender_list' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_tenders %}{% endblock %}">
+      <i class="nav-icon fas fa-file-contract w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Tenders</span>
+    </a>
 
-      <a href="{% url 'coreadmin:user_approvals' %}" class="sb-item {% block nav_vendors %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-building"></i></div>
-        <span class="sb-label">Profile Approvals</span>
-        {% if pending_user_approvals %}<span class="sb-badge">{{ pending_user_approvals }}</span>{% endif %}
-      </a>
-      <a href="{% url 'coreadmin:user_list' %}" class="sb-item {% block nav_users %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-users"></i></div>
-        <span class="sb-label">All Users</span>
-      </a>
-      {% if request.user.is_superuser %}
-      <a href="{% url 'coreadmin:create_staff' %}" class="sb-item">
-        <div class="sb-icon"><i class="fas fa-user-shield"></i></div>
-        <span class="sb-label">Create Staff</span>
-      </a>
+    <a href="{% url 'coreadmin:application_approvals' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_bids %}{% endblock %}">
+      <i class="nav-icon fas fa-gavel w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text flex-1">Bids</span>
+      {% if pending_app_approvals %}
+        <span class="sb-badge">{{ pending_app_approvals }}</span>
       {% endif %}
-      <!-- <a href="#" class="sb-item">
-        <div class="sb-icon"><i class="fas fa-landmark"></i></div>
-        <span class="sb-label">Departments</span>
-      </a> -->
+    </a>
+ <div class="nav-section-label mt-1">Funding</div>
+    <a href="{% url 'coreadmin:funding_approvals' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_funding_apps %}{% endblock %}">
+      <i class="nav-icon fas fa-check-double w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text flex-1">Funding Approvals</span>
+      {% if pending_funding_count %}
+        <span class="sb-badge warn">{{ pending_funding_count }}</span>
+      {% endif %}
+    </a>
 
-      <div class="sb-section"><span>Communications</span></div>
+    <a href="{% url 'coreadmin:funding_list' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_funding %}{% endblock %}">
+      <i class="nav-icon fas fa-hand-holding-dollar w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Manage Funding</span>
+    </a>
 
-      <a href="{% url 'coreadmin:notice_list' %}" class="sb-item {% block nav_notices %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-bullhorn"></i></div>
-        <span class="sb-label">Noticeboard</span>
-      </a>
+    <a href="{% url 'coreadmin:admin_request_approvals' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_requests %}{% endblock %}">
+      <i class="nav-icon fas fa-circle-plus w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text flex-1">Dept. Approval</span>
+      {% if pending_admin_req_count %}
+        <span class="sb-badge danger">{{ pending_admin_req_count }}</span>
+      {% endif %}
+    </a>
 
-      <div class="sb-section"><span>System</span></div>
+    <!-- Users -->
+    <div class="nav-section-label mt-1">Users</div>
 
-      <a href="{% url 'coreadmin:action_history' %}" class="sb-item {% block nav_audit %}{% endblock %}">
-        <div class="sb-icon"><i class="fas fa-shield-halved"></i></div>
-        <span class="sb-label">Action History</span>
-      </a>
+    <a href="{% url 'coreadmin:user_approvals' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_vendors %}{% endblock %}">
+      <i class="nav-icon fas fa-building w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text flex-1">Profile Approvals</span>
+      {% if pending_user_approvals %}
+        <span class="sb-badge">{{ pending_user_approvals }}</span>
+      {% endif %}
+    </a>
 
+    <a href="{% url 'coreadmin:user_list' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_users %}{% endblock %}">
+      <i class="nav-icon fas fa-users w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">All Users</span>
+    </a>
+
+    {% if request.user.is_superuser %}
+    <a href="{% url 'coreadmin:create_staff' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]">
+      <i class="nav-icon fas fa-user-shield w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Create Staff</span>
+    </a>
+    {% endif %}
+
+    <!-- Communications -->
+    <div class="nav-section-label mt-1">Communications</div>
+
+    <a href="{% url 'coreadmin:notice_list' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_notices %}{% endblock %}">
+      <i class="nav-icon fas fa-bullhorn w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Noticeboard</span>
+    </a>
+
+    <!-- System -->
+    <div class="nav-section-label mt-1">System</div>
+
+    <a href="{% url 'coreadmin:action_history' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_audit %}{% endblock %}">
+      <i class="nav-icon fas fa-shield-halved w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">Action History</span>
+    </a>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="flex items-center gap-[0.55rem] px-3.5 py-[0.7rem] border-t border-slate-100
+              flex-shrink-0 relative z-[1] bg-slate-50/50">
+    <div class="w-[30px] h-[30px] rounded-full flex items-center justify-center
+                bg-gradient-to-br from-indigo-500 to-purple-500
+                text-white text-[0.62rem] font-bold flex-shrink-0
+                border-2 border-white shadow-sm uppercase">
+      {{ request.user.first_name|default:"A"|make_list|first }}
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-[0.76rem] font-bold text-slate-700 whitespace-nowrap overflow-hidden text-ellipsis leading-tight">
+        {{ request.user.get_full_name|default:"System Admin" }}
+      </p>
+      <p class="text-[0.6rem] text-slate-400 leading-tight">Root Access</p>
+    </div>
+    <a href="{% url 'coreadmin:logout' %}"
+       class="flex items-center justify-center w-[28px] h-[28px] rounded-[8px]
+              bg-red-50 text-red-400 hover:bg-red-500 hover:text-white
+              transition-all duration-200 flex-shrink-0"
+       title="Sign Out">
+      <i class="fas fa-power-off text-[0.75rem]"></i>
+    </a>
+  </div>
+
+</aside>
+
+
+<!-- ═══════ TOPBAR ═══════ -->
+<header class="topbar fixed top-0 right-0 h-[56px] bg-white/[0.98] backdrop-blur-[12px]
+               border-b border-border flex items-center px-5 gap-3 z-[100]
+               shadow-[0_1px_0_rgba(15,42,94,0.05)]
+               left-0 lg:left-[220px]">
+
+  <!-- Mobile hamburger -->
+  <button id="sidebarToggle"
+          onclick="openSidebar()"
+          aria-label="Open menu"
+          class="lg:hidden flex w-8 h-8 rounded-[8px] border-[1.5px] border-border bg-white
+                 items-center justify-center cursor-pointer text-muted text-[0.85rem] flex-shrink-0
+                 transition-all duration-[0.18s] hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Page title + breadcrumb -->
+  <div class="flex-1 min-w-0 flex flex-col justify-center ml-1">
+    <h1 class="font-sora text-[1rem] md:text-[1.05rem] font-extrabold text-slate-700 leading-snug
+               whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
+      {{ page_title|default:"Dashboard" }}
+    </h1>
+    <nav aria-label="Breadcrumb" class="flex items-center gap-[0.35rem] text-[0.65rem] font-medium text-muted mt-[1px]">
+      <span class="text-slate-400">Administration</span>
+      <i class="fas fa-chevron-right text-[0.45rem] opacity-50"></i>
+      <span class="text-indigo-500 font-semibold">{{ page_title|default:"Dashboard" }}</span>
     </nav>
+  </div>
 
-    <!-- Footer -->
-    <div class="sb-footer">
-      <div class="sb-profile">
-        <div class="sb-avatar">SA</div>
-        <div>
-          <div class="sb-pname">Super Admin</div>
-          <div class="sb-prole">Root Access</div>
-        </div>
-        <a href="{% url 'coreadmin:logout' %}" class="sb-pmore" title="Logout" style="color:var(--sb-section); transition: color 0.15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--sb-section)'">
-          <i class="fas fa-power-off"></i>
-        </a>
+
+  <!-- Welcome chip -->
+  <div class="hidden lg:flex items-center gap-2 px-3 py-1
+              bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/60 rounded-full
+              shadow-[0_2px_8px_rgba(99,102,241,0.07)]
+              transition-all duration-300 hover:shadow-[0_4px_12px_rgba(99,102,241,0.13)] hover:-translate-y-[1px]
+              group cursor-default">
+    <span class="text-[0.9rem] group-hover:rotate-12 transition-transform duration-300 origin-bottom-right inline-block">👋</span>
+    <span class="text-[0.75rem] text-slate-600 font-medium whitespace-nowrap">
+      Welcome, <strong class="text-slate-700 font-bold">{{ request.user.first_name|default:"Admin" }}</strong>
+    </span>
+  </div>
+
+  <!-- Notification btn -->
+  <button onclick="showToast('No new notifications', 'info')"
+          class="flex w-8 h-8 rounded-[8px] border-[1.5px] border-border bg-white
+                 items-center justify-center cursor-pointer text-slate-500 text-[0.85rem] relative
+                 transition-all duration-[0.18s] hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50">
+    <i class="fas fa-bell"></i>
+    {% if request.user.notifications.unread.count %}
+    <span class="absolute -top-[3px] -right-[3px] w-[14px] h-[14px] rounded-full bg-red-500 border-2 border-white
+                 flex items-center justify-center text-[6px] font-bold text-white">
+      {{ request.user.notifications.unread.count }}
+    </span>
+    {% endif %}
+  </button>
+
+  <!-- Profile dropdown -->
+  <div class="profile-wrap relative" id="profileWrap">
+    <div onclick="toggleProfileDropdown()"
+         class="flex items-center gap-1.5 pl-[0.25rem] pr-[0.55rem] py-[0.25rem]
+                rounded-full border-[1.5px] border-border bg-white cursor-pointer flex-shrink-0
+                transition-all duration-[0.18s] hover:border-indigo-200 hover:bg-surface">
+      <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center
+                  bg-gradient-to-br from-indigo-500 to-purple-500
+                  text-white text-[0.6rem] font-bold border-[1.5px] border-slate-200 uppercase">
+        {{ request.user.first_name|default:"A"|make_list|first }}
       </div>
+      <span class="hidden sm:block text-[0.78rem] font-semibold text-text max-w-[90px] whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ request.user.first_name|default:"Admin" }}
+      </span>
+      <i class="fas fa-chevron-down profile-chevron text-[0.58rem] text-muted"></i>
     </div>
 
-  </aside>
-
-  <!-- ══ MAIN ══ -->
-  <div class="main">
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <button class="burger" id="burger" onclick="toggleSb()"><i class="fas fa-bars"></i></button>
-
-      <div class="topbar-search">
-        <i class="fas fa-search"></i>
-        <input placeholder="Search tenders, users, bids…">
-        <span class="search-kbd">⌘K</span>
+    <!-- Dropdown -->
+    <div class="profile-dropdown absolute top-full right-0 mt-2 bg-white border border-border
+                rounded-xl shadow-[0_4px_16px_rgba(15,42,94,0.1)] min-w-[150px] z-[200] overflow-hidden">
+      <div class="px-[1rem] py-[0.5rem] border-b border-border">
+        <p class="text-[0.63rem] font-bold text-slate-400 uppercase tracking-[0.08em]">Admin Settings</p>
       </div>
+      <a href="{% url 'coreadmin:admin_profile' %}"
+         class="flex items-center gap-[0.55rem] px-[1rem] py-[0.55rem]
+                text-slate-600 text-[0.8rem] font-medium no-underline border-b border-slate-100
+                transition-colors duration-[0.15s] hover:bg-slate-50 hover:text-indigo-600">
+        <i class="fas fa-user-cog text-[0.85rem]"></i>
+        Profile Settings
+      </a>
+      <a href="{% url 'coreadmin:logout' %}"
+         class="flex items-center gap-[0.55rem] px-[1rem] py-[0.55rem]
+                text-red-500 text-[0.8rem] font-medium no-underline
+                transition-colors duration-[0.15s] hover:bg-red-50 hover:text-red-600">
+        <i class="fas fa-power-off text-[0.85rem]"></i>
+        Sign Out
+      </a>
+    </div>
+  </div>
 
-      <div class="topbar-right">
-        <div class="status-pill">
-          <span class="s-dot"></span>
-          All Systems OK
-        </div>
+</header>
 
-        <button class="tb-btn" onclick="showToast('No new notifications','info')">
-          <i class="fas fa-bell"></i>
-          {% if request.user.notifications.unread.count %}
-          <span class="notif">{{ request.user.notifications.unread.count }}</span>
-          {% endif %}
-        </button>
 
-        <button class="tb-btn" onclick="showToast('Help center coming soon','info')">
-          <i class="fas fa-circle-question"></i>
-        </button>
-
-        <div class="admin-chip" onclick="toggleProfileDropdown(event)" style="position:relative;">
-          <div class="chip-av">SA</div>
-          <span class="chip-name">Super Admin</span>
-          <i class="fas fa-chevron-down" style="color:var(--t4);font-size:10px;"></i>
-          
-          <!-- Profile Dropdown -->
-          <div id="profileDropdown" style="display:none; position:absolute; top:calc(100% + 10px); right:0; width:180px; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.1); padding:8px; z-index:1000; animation: up 0.2s ease;">
-            <div style="padding:8px 12px; border-bottom:1px solid var(--surface-2); margin-bottom:4px;">
-                <div style="font-size:11px; font-weight:700; color:var(--t4); text-transform:uppercase;">Admin Settings</div>
-            </div>
-            <a href="{% url 'coreadmin:logout' %}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; color:var(--red); font-size:13px; font-weight:600; text-decoration:none; transition:background 0.1s;" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background='transparent'">
-                <i class="fas fa-power-off"></i> Sign Out
-            </a>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Page -->
-    <main class="page">
-        {% block content %}{% endblock %}
-    </main>
+<!-- ═══════ MAIN ═══════ -->
+<div class="main-wrap ml-0 lg:ml-[220px] pt-[56px] min-h-screen">
+  <div class="p-4 sm:p-6">
+    <div class="page-content bg-white rounded-2xl border border-border shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+      {% block content %}{% endblock %}
+    </div>
   </div>
 </div>
 
-<div class="toast-wrap" id="tw"></div>
+
+<!-- ═══════ TOAST ═══════ -->
+<div id="toastWrap" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2"></div>
+
+
+<!-- ═══════ GLOBAL LOADING OVERLAY ═══════ -->
+<div id="global-loader"
+     class="fixed inset-0 z-[9999] flex items-center justify-center hidden"
+     style="background-color:rgba(255,255,255,0.82); backdrop-filter:blur(5px);">
+  <div class="flex flex-col items-center p-8 bg-white rounded-2xl shadow-2xl border border-slate-100">
+    <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+    <p class="mt-4 font-sora text-slate-800 font-extrabold text-[1rem]">Processing…</p>
+    <p class="text-[0.72rem] text-slate-500 mt-1 font-medium text-center max-w-[180px]">
+      Please wait while we securely process your request.
+    </p>
+  </div>
+</div>
+
 
 <script>
-  function toggleSb() {
-    document.getElementById('sb').classList.toggle('open');
-    document.getElementById('ov').classList.toggle('show');
+  /* ── Sidebar ── */
+  function openSidebar() {
+    document.getElementById('sidebar').classList.remove('-translate-x-full');
+    document.getElementById('sidebarOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
   }
-  
-  function toggleProfileDropdown(e) {
-    e.stopPropagation();
-    const d = document.getElementById('profileDropdown');
-    d.style.display = (d.style.display === 'none') ? 'block' : 'none';
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
   }
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', () => { if (window.innerWidth <= 1023) closeSidebar(); });
+  });
+  window.addEventListener('resize', () => { if (window.innerWidth > 1023) closeSidebar(); });
 
-  // Close dropdown on click outside
-  window.addEventListener('click', () => {
-    const d = document.getElementById('profileDropdown');
-    if(d) d.style.display = 'none';
+  /* ── Profile dropdown ── */
+  function toggleProfileDropdown() {
+    document.getElementById('profileWrap').classList.toggle('show');
+  }
+  window.addEventListener('click', function(e) {
+    const pw = document.getElementById('profileWrap');
+    if (pw && !pw.contains(e.target)) pw.classList.remove('show');
   });
 
-  function closeSb() {
-    document.getElementById('sb').classList.remove('open');
-    document.getElementById('ov').classList.remove('show');
+  /* ── Toast ── */
+  function showToast(msg, type = 'success') {
+    const icons  = { success:'fa-circle-check', error:'fa-circle-xmark', warn:'fa-triangle-exclamation', info:'fa-circle-info' };
+    const colors = { success:'#10b981', error:'#ef4444', warn:'#f59e0b', info:'#6366f1' };
+    const wrap = document.getElementById('toastWrap');
+    const el   = document.createElement('div');
+    el.className = 'toast-item flex items-center gap-3 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl shadow-lg text-slate-700 text-[0.8rem] font-medium min-w-[220px] max-w-[340px]';
+    el.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]};font-size:0.9rem;flex-shrink:0;"></i>
+                    <span class="flex-1">${msg}</span>
+                    <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 text-xs ml-1">
+                      <i class="fas fa-xmark"></i>
+                    </button>`;
+    wrap.appendChild(el);
+    setTimeout(() => {
+      el.style.cssText += 'transition:.3s;opacity:0;transform:translateX(110%)';
+      setTimeout(() => el.remove(), 300);
+    }, 3500);
   }
-  function showToast(msg, type='success') {
-    const icons  = {success:'fa-circle-check',error:'fa-circle-xmark',warn:'fa-triangle-exclamation',info:'fa-circle-info'};
-    const colors = {success:'#10b981',error:'#ef4444',warn:'#f59e0b',info:'#6366f1'};
-    const w = document.getElementById('tw');
-    const t = document.createElement('div');
-    t.className = 'toast';
-    t.innerHTML = `<i class="fas ${icons[type]} ti" style="color:${colors[type]}"></i><span class="tm">${msg}</span><button class="tc" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>`;
-    w.appendChild(t);
-    setTimeout(() => { t.style.cssText += 'transition:.3s;opacity:0;transform:translateX(110%)'; setTimeout(()=>t.remove(),300); }, 3500);
-  }
+
+  /* ── Global loader on form submit ── */
+  document.addEventListener('submit', function(e) {
+    if (e.target.classList.contains('show-loader')) {
+      const loader = document.getElementById('global-loader');
+      if (loader) loader.classList.remove('hidden');
+    }
+  });
+
+  /* ── Logout confirmation ── */
+  document.addEventListener('DOMContentLoaded', function() {
+    const logoutUrl = "{% url 'coreadmin:logout' %}";
+    document.querySelectorAll(`a[href="${logoutUrl}"]`).forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Ready to Leave?',
+          text: 'You will be signed out of your session.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#6366f1',
+          cancelButtonColor: '#64748b',
+          confirmButtonText: 'Yes, Sign Out'
+        }).then(result => { if (result.isConfirmed) window.location.href = logoutUrl; });
+      });
+    });
+  });
 </script>
+
 {% block extra_js %}{% endblock %}
 </body>
 </html>

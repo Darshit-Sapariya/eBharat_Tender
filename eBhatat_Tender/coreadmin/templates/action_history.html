@@ -12,13 +12,13 @@
 {% endblock %}
 
 {% block content %}
-<div class="ph" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div class="ph">
     <div>
         <div class="ph-eye">Platform Administration</div>
         <div class="ph-title">System Audit Log</div>
         <div class="ph-sub">Immutable audit trail of administrator and system activities.</div>
     </div>
-    <div style="display:flex; gap:16px; align-items:center;">
+    <div class="ph-actions">
         <div style="position:relative; width:250px;">
             <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text); opacity:0.5; font-size:13px;"></i>
             <input type="text" placeholder="Search logs..." id="logSearch" style="width:100%; box-sizing:border-box; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; transition:box-shadow 0.2s;">
@@ -27,6 +27,8 @@
         <button class="btn btn-primary" style="border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600;"><i class="fas fa-download mr-1"></i> Export Log</button>
     </div>
 </div>
+
+<div class="p-6">
 
 <div class="card">
     <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
@@ -112,4 +114,5 @@
         }
     });
 </script>
+</div>
 {% endblock %}

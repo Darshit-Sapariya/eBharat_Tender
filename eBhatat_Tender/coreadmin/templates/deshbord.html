@@ -5,7 +5,8 @@
 {% block nav_dashboard %}active{% endblock %}
 
 {% block content %}
-<!-- Header -->
+
+<!-- ── Page Header ── -->
 <div class="ph">
   <div>
     <div class="ph-eye">Overview · FY 2025–26</div>
@@ -22,117 +23,144 @@
   </div>
 </div>
 
-<!-- Stats -->
-<div class="stats">
-  <div class="sc v-indigo">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-file-contract"></i></div>
-      <div class="sc-delta {% if tenders_delta > 0 %}up{% elif tenders_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if tenders_delta > 0 %}fa-arrow-up{% elif tenders_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ tenders_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ total_tenders|default:"0" }}</div>
-    <div class="sc-lbl">Total Tenders</div>
-    <div class="sc-foot">{{ active_tenders }} active</div>
-  </div>
+<!-- ── Stats Grid ── -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
 
-  <div class="sc v-green">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-indian-rupee-sign"></i></div>
-      <div class="sc-delta {% if disbursed_delta > 0 %}up{% elif disbursed_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if disbursed_delta > 0 %}fa-arrow-up{% elif disbursed_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ disbursed_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">₹{{ total_awarded_val|default:"0"|intcomma }}</div>
-    <div class="sc-lbl">Total Disbursed</div>
-    <div class="sc-foot">FY 2025–26 cumulative</div>
-  </div>
+<!-- Total Tenders -->
+<a href="{% url 'coreadmin:tender_list' %}">
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center text-sm">
+<i class="fa-solid fa-file-contract"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full
+{% if tenders_delta > 0 %} bg-green-100 text-green-600
+{% elif tenders_delta < 0 %} bg-red-100 text-red-600
+{% else %} bg-slate-100 text-slate-500 {% endif %}">
+{{ tenders_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ total_tenders|default:"0" }}</div>
+<div class="text-xs text-slate-500">Total Tenders</div>
+<div class="text-[11px] text-slate-400 mt-1">{{ active_tenders }} active</div>
+</div>
+</a>
 
-  <div class="sc v-amber">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-clock"></i></div>
-      <div class="sc-delta {% if pending_delta > 0 %}down{% elif pending_delta < 0 %}up{% else %}flat{% endif %}">
-        <i class="fas {% if pending_delta > 0 %}fa-arrow-up{% elif pending_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ pending_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ total_pending|default:"0" }}</div>
-    <div class="sc-lbl">Pending Reviews</div>
-    <div class="sc-foot">Requires immediate action</div>
-  </div>
-
-  <div class="sc v-blue">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-users"></i></div>
-      <div class="sc-delta {% if vendors_delta > 0 %}up{% elif vendors_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if vendors_delta > 0 %}fa-arrow-up{% elif vendors_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ vendors_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ total_vendors|default:"0"|intcomma }}</div>
-    <div class="sc-lbl">Registered Vendors</div>
-    <div class="sc-foot">{{ pending_user_approvals }} awaiting approval</div>
-  </div>
-
-  <div class="sc v-purple">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-gavel"></i></div>
-      <div class="sc-delta {% if contracts_delta > 0 %}up{% elif contracts_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if contracts_delta > 0 %}fa-arrow-up{% elif contracts_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ contracts_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ contracts_executed|default:"0" }}</div>
-    <div class="sc-lbl">Contracts Executed</div>
-    <div class="sc-foot">{{ bids_this_month }} bids this month</div>
-  </div>
-
-  <div class="sc v-rose">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-lock"></i></div>
-      <div class="sc-delta {% if emd_delta > 0 %}up{% elif emd_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if emd_delta > 0 %}fa-arrow-up{% elif emd_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ emd_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">₹{{ emd_escrow|default:"0"|intcomma }}</div>
-    <div class="sc-lbl">EMD Escrow</div>
-    <div class="sc-foot">{{ active_holds }} holds active</div>
-  </div>
-
-  <div class="sc v-green">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-check-double"></i></div>
-      <div class="sc-delta {% if approval_delta > 0 %}up{% elif approval_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if approval_delta > 0 %}fa-arrow-up{% elif approval_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ approval_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ approval_rate|default:"0" }}%</div>
-    <div class="sc-lbl">Approval Rate</div>
-    <div class="sc-foot">30-day rolling average</div>
-  </div>
-
-  <div class="sc v-indigo">
-    <div class="sc-top">
-      <div class="sc-ico"><i class="fas fa-shield-halved"></i></div>
-      <div class="sc-delta {% if audit_delta > 0 %}up{% elif audit_delta < 0 %}down{% else %}flat{% endif %}">
-        <i class="fas {% if audit_delta > 0 %}fa-arrow-up{% elif audit_delta < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
-        {{ audit_delta_abs }}%
-      </div>
-    </div>
-    <div class="sc-val">{{ audit_logs_today|default:"0" }}</div>
-    <div class="sc-lbl">Audit Logs Today</div>
-    <div class="sc-foot">All systems nominal</div>
-  </div>
+<!-- Disbursed -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-indian-rupee-sign"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ disbursed_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">₹{{ total_awarded_val|default:"0"|intcomma }}</div>
+<div class="text-xs text-slate-500">Total Disbursed</div>
+<div class="text-[11px] text-slate-400 mt-1">FY 2025–26 cumulative</div>
 </div>
 
 
+<!-- Pending -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center text-sm">
+<i class="fas fa-clock"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ pending_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ total_pending|default:"0" }}</div>
+<div class="text-xs text-slate-500">Pending Reviews</div>
+<div class="text-[11px] text-slate-400 mt-1">Requires action</div>
+</div>
 
-<!-- Bottom Grid -->
-<div class="g32" style="margin-bottom:22px;">
+
+<!-- Vendors -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-users"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ vendors_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ total_vendors|default:"0"|intcomma }}</div>
+<div class="text-xs text-slate-500">Registered Vendors</div>
+<div class="text-[11px] text-slate-400 mt-1">{{ pending_user_approvals }} awaiting</div>
+</div>
+
+
+<!-- Contracts -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-gavel"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ contracts_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ contracts_executed|default:"0" }}</div>
+<div class="text-xs text-slate-500">Contracts Executed</div>
+<div class="text-[11px] text-slate-400 mt-1">{{ bids_this_month }} bids</div>
+</div>
+
+
+<!-- EMD -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-lock"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ emd_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">₹{{ emd_escrow|default:"0"|intcomma }}</div>
+<div class="text-xs text-slate-500">EMD Escrow</div>
+<div class="text-[11px] text-slate-400 mt-1">{{ active_holds }} holds</div>
+</div>
+
+
+<!-- Approval -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-check-double"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ approval_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ approval_rate|default:"0" }}%</div>
+<div class="text-xs text-slate-500">Approval Rate</div>
+<div class="text-[11px] text-slate-400 mt-1">30-day avg</div>
+</div>
+
+
+<!-- Audit -->
+<div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition border border-slate-200">
+<div class="flex items-center justify-between mb-2">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center text-sm">
+<i class="fas fa-shield-halved"></i>
+</div>
+<div class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+{{ audit_delta_abs }}%
+</div>
+</div>
+<div class="text-lg font-bold text-slate-800">{{ audit_logs_today|default:"0" }}</div>
+<div class="text-xs text-slate-500">Audit Logs Today</div>
+<div class="text-[11px] text-slate-400 mt-1">All systems nominal</div>
+</div>
+
+</div>
+
+<!-- ── Bottom Grid ── -->
+<div class="g32">
 
   <!-- Pending Approvals -->
   <div class="card">
@@ -141,93 +169,108 @@
         <div class="ct">Pending Approvals</div>
         <div class="cs">Requires your action</div>
       </div>
-      <span class="badge bg-red">{{ combined_pending|length }} pending</span>
+      <span class="badge bg-red">
+        <i class="fas fa-circle" style="font-size:5px;"></i>
+        {{ combined_pending|length }} pending
+      </span>
     </div>
-    <div>
-      {% for item in combined_pending|slice:":6" %}
-      <div style="display:flex;align-items:center;gap:13px;padding:14px 20px;border-bottom:1px solid var(--border);">
-        {% if item.type == 'user' %}
-            <div class="uav" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">{{ item.obj.user.username|make_list|first|upper }}</div>
-            <div style="flex:1;min-width:0;">
-                <div class="uname">{{ item.obj.company_name|default:item.obj.user.username }}</div>
-                <div class="usub">Profile Approval · Vendor</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-                <a href="{% url 'coreadmin:user_approvals' %}" class="btn btn-outline btn-xs">Review</a>
-            </div>
-        {% elif item.type == 'bid' %}
-            <div class="uav" style="background:linear-gradient(135deg,#3b82f6,#0ea5e9);">B</div>
-            <div style="flex:1;min-width:0;">
-                <div class="uname">{{ item.obj.company_name }}</div>
-                <div class="usub">Bid Approval · TND-{{ item.obj.tender.id|stringformat:"04d" }}</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-                <a href="{% url 'coreadmin:application_approvals' %}" class="btn btn-outline btn-xs">Review</a>
-            </div>
-        {% elif item.type == 'funding' %}
-            <div class="uav" style="background:linear-gradient(135deg,#10b981,#059669);">F</div>
-            <div style="flex:1;min-width:0;">
-                <div class="uname">{{ item.obj.bidder.username }}</div>
-                <div class="usub">Funding · ₹{{ item.obj.amount_requested|intcomma }}</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-                <a href="{% url 'coreadmin:funding_approvals' %}" class="btn btn-outline btn-xs">Review</a>
-            </div>
-        {% elif item.type == 'admin_req' %}
-            <div class="uav" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">{{ item.obj.department_name|make_list|first|upper }}</div>
-            <div style="flex:1;min-width:0;">
-                <div class="uname">{{ item.obj.user.username }}</div>
-                <div class="usub">Request · {{ item.obj.department_name }}</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-                <a href="{% url 'coreadmin:admin_request_approvals' %}" class="btn btn-outline btn-xs">Review</a>
-            </div>
+
+    {% for item in combined_pending|slice:":6" %}
+    <div class="apv-row">
+
+      {% if item.type == 'user' %}
+        <div class="uav" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+          {{ item.obj.user.username|make_list|first|upper }}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="uname">{{ item.obj.company_name|default:item.obj.user.username }}</div>
+          <div class="usub">Profile Approval · Vendor</div>
+        </div>
+        <a href="{% url 'coreadmin:user_approvals' %}" class="btn btn-outline btn-xs">Review</a>
+
+      {% elif item.type == 'bid' %}
+        <div class="uav" style="background:linear-gradient(135deg,#3b82f6,#0ea5e9);">B</div>
+        <div style="flex:1;min-width:0;">
+          <div class="uname">{{ item.obj.company_name }}</div>
+          <div class="usub">Bid Approval · TND-{{ item.obj.tender.id|stringformat:"04d" }}</div>
+        </div>
+        <a href="{% url 'coreadmin:application_approvals' %}" class="btn btn-outline btn-xs">Review</a>
+
+      {% elif item.type == 'funding' %}
+        <div class="uav" style="background:linear-gradient(135deg,#10b981,#059669);">F</div>
+        <div style="flex:1;min-width:0;">
+          <div class="uname">{{ item.obj.bidder.username }}</div>
+          <div class="usub">Funding · ₹{{ item.obj.amount_requested|intcomma }}</div>
+        </div>
+        <a href="{% url 'coreadmin:funding_approvals' %}" class="btn btn-outline btn-xs">Review</a>
+
+      {% elif item.type == 'admin_req' %}
+        <div class="uav" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">
+          {{ item.obj.department_name|make_list|first|upper }}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="uname">{{ item.obj.user.username }}</div>
+          <div class="usub">Request · {{ item.obj.department_name }}</div>
+        </div>
+        <a href="{% url 'coreadmin:admin_request_approvals' %}" class="btn btn-outline btn-xs">Review</a>
+      {% endif %}
+
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <i class="fas fa-circle-check" style="color:#a7f3d0;"></i>
+      <p>No pending approvals at the moment.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Activity Feed -->
+  <div class="card">
+    <div class="ch">
+      <div>
+        <div class="ct">Activity Feed</div>
+        <div class="cs">Audit trail · latest actions</div>
+      </div>
+      <span class="badge bg-indigo">
+        <i class="fas fa-rss" style="font-size:8px;"></i>
+        Live
+      </span>
+    </div>
+    <div class="tl">
+      {% for log in recent_activity %}
+      <div class="tli">
+        {% if 'APPROVAL' in log.action_type %}
+          <div class="tl-icon" style="background:var(--green-bg);color:var(--green);">
+            <i class="fas fa-check"></i>
+          </div>
+        {% elif 'REJECTION' in log.action_type %}
+          <div class="tl-icon" style="background:var(--red-bg);color:var(--red);">
+            <i class="fas fa-xmark"></i>
+          </div>
+        {% else %}
+          <div class="tl-icon" style="background:var(--accent-soft);color:var(--accent);">
+            <i class="fas fa-info"></i>
+          </div>
         {% endif %}
+        <div style="flex:1;min-width:0;">
+          <div class="tl-t">{{ log.description|truncatechars:50 }}</div>
+          <div class="tl-m">
+            <i class="fas fa-user-circle" style="font-size:9px;margin-right:2px;"></i>
+            {{ log.admin_user.username }}
+            <span style="margin:0 4px;opacity:0.4;">·</span>
+            {{ log.timestamp|timesince }} ago
+          </div>
+        </div>
       </div>
       {% empty %}
-      <div style="padding: 20px; text-align: center; color: var(--t3); font-size: 13px;">No pending approvals at the moment.</div>
+      <div class="empty-state">
+        <i class="fas fa-clock-rotate-left"></i>
+        <p>No recent activity to display.</p>
+      </div>
       {% endfor %}
     </div>
   </div>
 
-  <!-- Activity + Health -->
-  <div style="display:flex;flex-direction:column;gap:20px;">
-
-    <!-- Activity -->
-    <div class="card">
-      <div class="ch">
-        <div>
-          <div class="ct">Activity Feed</div>
-          <div class="cs">Audit trail · latest</div>
-        </div>
-      </div>
-      <div class="cb">
-        <div class="tl">
-          {% for log in recent_activity %}
-          <div class="tli">
-            {% if 'APPROVAL' in log.action_type %}
-                <div class="tl-icon" style="background:var(--green-bg);color:var(--green);"><i class="fas fa-check"></i></div>
-            {% elif 'REJECTION' in log.action_type %}
-                <div class="tl-icon" style="background:var(--red-bg);color:var(--red);"><i class="fas fa-xmark"></i></div>
-            {% else %}
-                <div class="tl-icon" style="background:var(--accent-soft);color:var(--accent);"><i class="fas fa-info"></i></div>
-            {% endif %}
-            <div>
-              <div class="tl-t">{{ log.description|truncatechars:40 }}</div>
-              <div class="tl-m">{{ log.admin_user.username }} · {{ log.timestamp|timesince }} ago</div>
-            </div>
-          </div>
-          {% empty %}
-          <div class="tli" style="border:none;">
-            <div class="tl-m">No recent activity</div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-
-
-  </div>
 </div>
+
 {% endblock %}

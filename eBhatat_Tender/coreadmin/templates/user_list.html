@@ -72,7 +72,8 @@
                         <div style="font-size:12px; color:var(--text); opacity:0.6; margin-top:4px;"><i class="fas fa-phone mr-1"></i> {{ profile.mobile|default:"No Mobile" }}</div>
                     </td>
                     <td style="padding: 18px 20px;">
-                        <div style="font-size:13px; font-weight:500; color:var(--text);">{{ profile.get_gov_id_type_display|default:"―" }}</div>
+                        <div style="font-size:13px; font-weight:500; color:var(--text);">{{ profile.gov_id_type|upper|default:"ID" }}</div>
+                        <div style="font-size:11px; color:var(--text); opacity:0.6; margin-bottom:4px; font-family:monospace;">{{ profile.masked_id|default:"―" }}</div>
                         {% if profile.gov_id_upload %}
                             <a href="{{ profile.gov_id_upload.url }}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px; font-weight:600;">
                                 <i class="fas fa-file-pdf"></i> VIEW KYC RECORD

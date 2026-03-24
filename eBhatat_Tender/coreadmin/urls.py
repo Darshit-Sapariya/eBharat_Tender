@@ -49,6 +49,9 @@ urlpatterns = [
     path('notices/edit/<int:notice_id>/', views.edit_notice, name='edit_notice'),
     path('notices/delete/<int:notice_id>/', views.delete_notice, name='delete_notice'),
 
-    path('analytics/', views.analytics, name='analytics'),
+    path('profile/', views.admin_profile, name='admin_profile'),
+
+    path('reports/', views.system_reports, name='reports'),
+    path('reports/pdf/', views.download_report_pdf, name='download_report_pdf'),
     path('logout/', views.logout_view, name='logout'),
 ]

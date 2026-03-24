@@ -12,18 +12,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="ph" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div class="ph">
     <div>
         <div class="ph-eye">Communication Hub</div>
         <div class="ph-title">Noticeboard Management</div>
         <div class="ph-sub">Broadcast important announcements and instructions to the public portal.</div>
     </div>
-    <div style="display:flex; gap:16px; align-items:center;">
+    <div class="ph-actions">
         <button class="btn btn-primary" onclick="resetNoticeForm(); document.getElementById('createNoticeCard').style.display='block'; this.style.display='none';" style="border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600;">
             <i class="fas fa-plus mr-1"></i> Compose New Notice
         </button>
     </div>
 </div>
+
+<div class="p-6">
 
 <!-- Create Notice Card (Initially Hidden) -->
 <div id="createNoticeCard" class="card" style="margin-bottom: 24px; display: none; animation: slideDown 0.3s ease-out;">
@@ -122,8 +124,12 @@
                     </td>
                     <td style="padding: 18px 20px; text-align: right;">
                         <div style="display:flex; gap:8px; justify-content:flex-end;">
-                            <button type="button" class="btn btn-outline btn-icon btn-sm" title="Edit" 
-                                    onclick="editNotice('{{ notice.id }}', '{{ notice.title|escapejs }}', '{{ notice.description|escapejs }}', '{{ notice.category }}', {{ notice.is_pinned|yesno:'true,false' }})">
+                            <button type="button" class="btn btn-outline btn-icon btn-sm action-edit-notice" title="Edit" 
+                                    data-id="{{ notice.id }}"
+                                    data-title="{{ notice.title }}"
+                                    data-description="{{ notice.description }}"
+                                    data-category="{{ notice.category }}"
+                                    data-pinned="{{ notice.is_pinned|yesno:'true,false' }}">
                                 <i class="fas fa-pen"></i>
                             </button>
                             <form method="POST" action="{% url 'coreadmin:delete_notice' notice.id %}" onsubmit="return confirm('Are you sure you want to delete this notice?');" style="display:inline;">
@@ -147,6 +153,18 @@
 </div>
 
 <script>
+document.addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.action-edit-notice');
+    if (editBtn) {
+        const id = editBtn.dataset.id;
+        const title = editBtn.dataset.title;
+        const description = editBtn.dataset.description;
+        const category = editBtn.dataset.category;
+        const isPinned = editBtn.dataset.pinned === 'true';
+        editNotice(id, title, description, category, isPinned);
+    }
+});
+
 function editNotice(id, title, description, category, isPinned) {
     const card = document.getElementById('createNoticeCard');
     const form = card.querySelector('form');
@@ -195,4 +213,5 @@ function resetNoticeForm() {
     to { opacity: 1; transform: translateY(0); }
 }
 </style>
+</div>
 {% endblock %}
