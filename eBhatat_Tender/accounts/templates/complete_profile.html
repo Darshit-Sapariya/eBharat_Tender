@@ -144,7 +144,7 @@
                                     <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
                                     <span class="lock-tag">Verified</span>
                                 </div>
-                                <input type="text" class="input-sm" value="{{ user.username }}" readonly>
+                                <input type="text" name="username" class="input-sm" value="{{ user.username }}">
                             </div>
                             <div class="compact-field">
                                 <div class="flex justify-between items-end mb-2">
@@ -156,7 +156,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="compact-field">
                                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Mobile</label>
-                                    <input type="text" name="mobile" class="input-sm" value="{{ profile.mobile }}" >
+                                    <input type="text" name="mobile" class="input-sm" placeholder="+91 9898989898" value="{{ profile.mobile }}" >
                                 </div>
                                 <div class="compact-field">
                                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">City/Base</label>

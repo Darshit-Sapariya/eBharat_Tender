@@ -34,8 +34,8 @@ class Tenderss(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.tender_id:
-            import datetime
-            year = datetime.date.today().year
+            from django.utils import timezone
+            year = timezone.localdate().year
             last_tender = Tenderss.objects.filter(tender_id__startswith=f"EBT-{year}").order_by("-id").first()
             if last_tender and last_tender.tender_id:
                 try:

@@ -27,6 +27,7 @@ urlpatterns = [
     path('bids/', include('bids.urls')),
     path('coreadmin/', include('coreadmin.urls')),
     path('funding/', include('funding.urls')),
+    path('accounts/', include('allauth.urls')),
 
     
 ]

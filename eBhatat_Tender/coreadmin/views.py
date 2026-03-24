@@ -82,8 +82,11 @@ def coreadmin_deshbord(request):
     approval_delta = calculate_delta(approval_rate, prev_approval_rate)
     
     # Audit Logs
-    audit_logs_today = ActionLog.objects.filter(timestamp__date=now.date()).count()
-    prev_audit_logs_today = ActionLog.objects.filter(timestamp__date=(now - timedelta(days=1)).date()).count()
+    today = timezone.localdate()
+    yesterday = today - timedelta(days=1)
+    
+    audit_logs_today = ActionLog.objects.filter(timestamp__date=today).count()
+    prev_audit_logs_today = ActionLog.objects.filter(timestamp__date=yesterday).count()
     audit_delta = calculate_delta(audit_logs_today, prev_audit_logs_today)
     
     recent_activity = ActionLog.objects.order_by('-timestamp')[:5]
@@ -926,10 +929,8 @@ def allocate_user_role(request, profile_id):
             except Exception as e:
                 print(f"Role Update Email failed: {e}")
 
-            from django.contrib import messages
             messages.success(request, f"Role updated successfully for {profile.user.username}.")
         else:
-            from django.contrib import messages
             messages.error(request, "No valid role selected.")
     return redirect('coreadmin:user_list')
 

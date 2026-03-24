@@ -100,7 +100,7 @@ def logout_view(request):
 # Manage personal KYC profile
 @login_required
 def my_profile(request):
-    profile = request.user.userprofile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     # 🚩 Mandatory Onboarding Check (skip for superusers)
     if not request.user.is_superuser:
@@ -143,7 +143,7 @@ def complete_profile(request):
     if request.user.is_superuser:
         return redirect('coreadmin:base')
         
-    profile = request.user.userprofile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     # If already completed, don't show this page again
     if profile.mobile and profile.address and profile.role:
@@ -165,6 +165,16 @@ def complete_profile(request):
             
         profile.status = 'pending'
         profile.save()
+
+        # Update username if changed
+        new_username = request.POST.get('username')
+        if new_username and new_username != request.user.username:
+            if not User.objects.filter(username=new_username).exists():
+                request.user.username = new_username
+                request.user.save()
+            else:
+                messages.error(request, f"Username '{new_username}' is already taken.")
+                return redirect('accounts:complete_profile')
         
         messages.success(request, "Profile submitted for verification!")
         return redirect('accounts:myprofile')

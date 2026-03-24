@@ -1,0 +1,40 @@
+﻿python : System check 
+identified some issues:
+At line:1 char:1
++ python manage.py check 
+2>&1 | Out-File -FilePath 
+"check_output.txt" - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo        
+  :     NotSpecified: 
+(System ch    eck 
+identified some issue    
+s::String) [], RemoteExce 
+   ption
+    + 
+FullyQualifiedErrorId :   
+  NativeCommandError
+ 
+
+WARNINGS:
+?: settings.ACCOUNT_AUTHEN
+TICATION_METHOD is 
+deprecated, use: settings.
+ACCOUNT_LOGIN_METHODS = 
+{'email'}
+?: settings.ACCOUNT_EMAIL_
+REQUIRED is deprecated, 
+use: settings.ACCOUNT_SIGN
+UP_FIELDS = ['email*', 
+'password1*', 
+'password2*']
+?: settings.ACCOUNT_USERNA
+ME_REQUIRED is 
+deprecated, use: settings.
+ACCOUNT_SIGNUP_FIELDS = 
+['email*', 'password1*', 
+'password2*']
+
+System check identified 3 
+issues (0 silenced).

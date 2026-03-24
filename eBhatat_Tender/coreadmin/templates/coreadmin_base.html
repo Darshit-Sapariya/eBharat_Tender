@@ -517,6 +517,15 @@
   </div>
 
 
+  <!-- Delhi clock -->
+  <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+    <div class="flex items-center gap-1.5">
+      <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+      <span class="text-[0.62rem] font-bold text-slate-400 uppercase tracking-wider">Delhi Time</span>
+    </div>
+    <div id="ist-clock" class="text-[0.78rem] font-bold text-slate-700 font-mono">00:00:00</div>
+  </div>
+
   <!-- Welcome chip -->
   <div class="hidden lg:flex items-center gap-2 px-3 py-1
               bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/60 rounded-full
@@ -666,6 +675,24 @@
       if (loader) loader.classList.remove('hidden');
     }
   });
+
+  /* ── IST Clock ── */
+  function updateISTClock() {
+    const options = { 
+      timeZone: 'Asia/Kolkata', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit', 
+      hour12: true 
+    };
+    const formatter = new Intl.DateTimeFormat('en-IN', options);
+    const clockElement = document.getElementById('ist-clock');
+    if (clockElement) {
+      clockElement.textContent = formatter.format(new Date());
+    }
+  }
+  setInterval(updateISTClock, 1000);
+  updateISTClock();
 
   /* ── Logout confirmation ── */
   document.addEventListener('DOMContentLoaded', function() {

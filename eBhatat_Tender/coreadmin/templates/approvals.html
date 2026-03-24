@@ -121,7 +121,7 @@
                         </td>
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('user', '{{ profile.id }}', '{{ profile.user.username }}', '{{ profile.role }}', '{{ profile.gov_id_upload.url|default:'' }}')">Check</button>
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('user', '{{ profile.id }}', '{{ profile.user.username }}', '{{ profile.role }}', '{% if profile.gov_id_upload %}{{ profile.gov_id_upload.url }}{% endif %}')">Check</button>
                                 <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('user', '{{ profile.id }}')">Reject</button>
                             </div>
                         </td>
@@ -159,7 +159,7 @@
                         </td>
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('app', '{{ app.id }}', '{{ app.company_name }} Bid', '', '{{ app.technical_bid.url|default:'' }}')">Approve</button>
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('app', '{{ app.id }}', '{{ app.company_name }} Bid', '', '{% if app.technical_bid %}{{ app.technical_bid.url }}{% endif %}')">Approve</button>
                                 <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('app', '{{ app.id }}')">Reject</button>
                             </div>
                         </td>
@@ -194,7 +194,7 @@
                         </td>
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('funding_app', '{{ app.id }}', '{{ app.bidder.username }} Request', '', '{{ app.supporting_document.url|default:'' }}')">Approve</button>
+                                <button class="btn btn-primary btn-sm" onclick="openApprovalModal('funding_app', '{{ app.id }}', '{{ app.bidder.username }} Request', '', '{% if app.supporting_document %}{{ app.supporting_document.url }}{% endif %}')">Approve</button>
                                 <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('funding_app', '{{ app.id }}')">Reject</button>
                             </div>
                         </td>

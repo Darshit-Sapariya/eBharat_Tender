@@ -95,11 +95,11 @@ class AdminRequest(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.department_name} / {self.category_name}"
 
-# 🔹 AUTO CREATE PROFILE (except superuser and staff)
+# 🔹 AUTO CREATE PROFILE 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created and not instance.is_superuser and not instance.is_staff:
-        UserProfile.objects.create(user=instance)
+    if created:
+        UserProfile.objects.get_or_create(user=instance)
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist')
