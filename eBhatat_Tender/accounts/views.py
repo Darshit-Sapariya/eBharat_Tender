@@ -176,6 +176,20 @@ def complete_profile(request):
                 messages.error(request, f"Username '{new_username}' is already taken.")
                 return redirect('accounts:complete_profile')
         
+        # Add password if user doesn't have a usable one (e.g. from Google login)
+        if not request.user.has_usable_password():
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+            if password and confirm_password:
+                if password == confirm_password:
+                    request.user.set_password(password)
+                    request.user.save()
+                    from django.contrib.auth import update_session_auth_hash
+                    update_session_auth_hash(request, request.user)
+                else:
+                    messages.error(request, "Passwords do not match.")
+                    return redirect('accounts:complete_profile')
+
         messages.success(request, "Profile submitted for verification!")
         return redirect('accounts:myprofile')
         

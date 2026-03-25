@@ -9,7 +9,6 @@ urlpatterns = [
     
     # User Management
     path('users/', views.user_list, name='user_list'),
-    path('users/create-staff/', views.create_staff, name='create_staff'),
     
     # Tender Management
     path('tender_list/', views.tender_list, name='tender_list'),

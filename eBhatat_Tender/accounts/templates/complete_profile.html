@@ -116,7 +116,7 @@
                                     <input type="radio" name="role" value="creator" class="sr-only role-input" required {% if profile.role == 'creator' %}checked{% endif %}>
                                     <div class="mini-card text-center">
                                         <i class="fas fa-pen-nib text-blue-500 mb-2"></i>
-                                        <div class="text-[11px] font-bold text-navy">Creator</div>
+                                        <div class="text-[11px] font-bold text-navy"> Tender Creator</div>
                                     </div>
                                 </label>
                             </div>
@@ -142,10 +142,22 @@
                             <div class="compact-field">
                                 <div class="flex justify-between items-end mb-2">
                                     <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
-                                    <span class="lock-tag">Verified</span>
+                                    <span id="username-status" class="text-[10px] font-bold text-slate-500"></span>
                                 </div>
-                                <input type="text" name="username" class="input-sm" value="{{ user.username }}">
+                                <input type="text" id="username_input" name="username" class="input-sm" value="{{ user.username }}" placeholder="Choose a username" required>
                             </div>
+                            {% if not user.has_usable_password %}
+                            <div class="grid grid-cols-2 gap-4 mb-5">
+                                <div class="compact-field mb-0">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Set Password</label>
+                                    <input type="password" name="password" class="input-sm" placeholder="For future logins" required>
+                                </div>
+                                <div class="compact-field mb-0">
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Confirm Password</label>
+                                    <input type="password" name="confirm_password" class="input-sm" placeholder="Confirm password" required>
+                                </div>
+                            </div>
+                            {% endif %}
                             <div class="compact-field">
                                 <div class="flex justify-between items-end mb-2">
                                     <label class="text-[10px] font-bold text-slate-500 uppercase">Legal Name</label>
@@ -227,5 +239,39 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
+
+    // Real-time Username Validation
+    const usernameInput = document.getElementById('username_input');
+    const usernameStatus = document.getElementById('username-status');
+    const currentUsername = "{{ user.username }}";
+
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            const username = this.value;
+            if (username.length < 3) {
+                usernameStatus.textContent = '';
+                usernameStatus.className = 'text-[10px] font-bold text-slate-500';
+                return;
+            }
+            if (username === currentUsername) {
+                usernameStatus.textContent = 'Current Username';
+                usernameStatus.className = 'text-[10px] font-bold text-emerald-500';
+                return;
+            }
+
+            fetch("{% url 'accounts:check_username' %}?username=" + username)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.taken) {
+                        usernameStatus.textContent = '❌ Username taken';
+                        usernameStatus.className = 'text-[10px] font-bold text-red-500';
+                    } else {
+                        usernameStatus.textContent = '✅ Available';
+                        usernameStatus.className = 'text-[10px] font-bold text-emerald-500';
+                    }
+                })
+                .catch(error => console.error('Error fetching username availability:', error));
+        });
+    }
 </script>
 {% endblock %}
