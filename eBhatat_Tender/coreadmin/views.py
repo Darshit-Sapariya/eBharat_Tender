@@ -14,6 +14,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from accounts.utils import send_ebharat_email
 from django.contrib.sites.shortcuts import get_current_site
+import calendar
+import json
 
 # Create your views here.
 @staff_member_required
@@ -43,11 +45,11 @@ def coreadmin_deshbord(request):
     disbursed_delta = calculate_delta(float(total_awarded_val), float(prev_awarded_val))
     
     # Pending Reviews
-    pending_user_approvals = UserProfile.objects.filter(status='pending').count()
+    pending_user_approvals = UserProfile.objects.filter(status='pending').exclude(user__is_superuser=True).exclude(user__is_staff=True).count()
     pending_app_approvals = TenderApplication.objects.filter(status='pending').count()
     total_pending = pending_user_approvals + pending_app_approvals
     
-    prev_pending_users = UserProfile.objects.filter(status='pending', created_at__lt=prev_30_days).count()
+    prev_pending_users = UserProfile.objects.filter(status='pending', created_at__lt=prev_30_days).exclude(user__is_superuser=True).exclude(user__is_staff=True).count()
     prev_pending_apps = TenderApplication.objects.filter(status='pending', applied_at__lt=prev_30_days).count()
     prev_total_pending = prev_pending_users + prev_pending_apps
     pending_delta = calculate_delta(total_pending, prev_total_pending)
@@ -95,15 +97,10 @@ def coreadmin_deshbord(request):
     pending_funding_count = FundingApplication.objects.filter(status='pending').count()
     pending_admin_req_count = AdminRequest.objects.filter(status='pending').count()
 
-    # --- CHART DATA (Tenders by Category) ---
-    categories_data = Tenderss.objects.values('category').annotate(count=Count('id')).order_by('-count')
-    cat_labels = [item['category'] for item in categories_data]
-    cat_counts = [item['count'] for item in categories_data]
-    category_stats = list(zip(cat_labels, cat_counts))
-    
+
     # --- COMBINED PENDING LIST ---
     combined_pending = []
-    for u in UserProfile.objects.filter(status='pending').order_by('-created_at')[:5]:
+    for u in UserProfile.objects.filter(status='pending').exclude(user__is_superuser=True).exclude(user__is_staff=True).order_by('-created_at')[:5]:
         combined_pending.append({'type': 'user', 'obj': u, 'date': u.created_at})
     for a in TenderApplication.objects.filter(status='pending').order_by('-applied_at')[:5]:
         combined_pending.append({'type': 'bid', 'obj': a, 'date': a.applied_at})
@@ -152,7 +149,6 @@ def coreadmin_deshbord(request):
         'audit_delta_abs': abs(audit_delta),
         'recent_activity': recent_activity,
         'combined_pending': combined_pending,
-        'category_stats': category_stats,
         'recent_tenders': recent_tenders_list,
     }
     
@@ -162,7 +158,7 @@ def coreadmin_deshbord(request):
 
 @staff_member_required
 def user_approvals(request):
-    pending_users = UserProfile.objects.filter(status='pending').order_by('-created_at')
+    pending_users = UserProfile.objects.filter(status='pending').exclude(user__is_superuser=True).exclude(user__is_staff=True).order_by('-created_at')
     approved_users = UserProfile.objects.filter(status='approved').order_by('-created_at')[:20]
     return render(request, 'approvals.html', {
         'page_title': 'User Approvals',
@@ -1039,4 +1035,21 @@ def admin_profile(request):
     return render(request, 'admin_profile.html', {
         'page_title': 'Profile Settings',
         'password_form': form,
+    })
+
+
+@staff_member_required
+def emd_escrow_list(request):
+    applications = TenderApplication.objects.filter(payment_status__in=['paid', 'refunded']).select_related('tender', 'applicant').order_by('-applied_at')
+    
+    active_escrow = applications.filter(payment_status='paid', tender__status='open').aggregate(total=Sum('tender__emd_amount'))['total'] or 0
+    total_refunded = applications.filter(payment_status='refunded').aggregate(total=Sum('tender__emd_amount'))['total'] or 0
+    total_collected = applications.filter(payment_status='paid').aggregate(total=Sum('tender__emd_amount'))['total'] or 0
+    
+    return render(request, 'emd_escrow.html', {
+        'page_title': 'EMD Escrow Management',
+        'applications': applications,
+        'active_escrow': active_escrow,
+        'total_refunded': total_refunded,
+        'total_collected': total_collected
     })

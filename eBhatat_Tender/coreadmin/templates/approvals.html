@@ -31,7 +31,7 @@
     <div class="ph-sub">Review and authorize pending compliance requests securely in the system.</div>
   </div>
 </div>
-
+<div class="p-3">
 <div class="card">
     <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
         <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Verification Queue {% if type == 'users' %}· Profiles{% elif type == 'applications' %}· Bids{% elif type == 'funding' %}· Funding{% endif %}</div>
@@ -122,7 +122,7 @@
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
                                 <button class="btn btn-primary btn-sm" onclick="openApprovalModal('user', '{{ profile.id }}', '{{ profile.user.username }}', '{{ profile.role }}', '{% if profile.gov_id_upload %}{{ profile.gov_id_upload.url }}{% endif %}')">Check</button>
-                                <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('user', '{{ profile.id }}')">Reject</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="openRejectModal('user', '{{ profile.id }}')">Reject</button>
                             </div>
                         </td>
                     </tr>
@@ -160,7 +160,7 @@
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
                                 <button class="btn btn-primary btn-sm" onclick="openApprovalModal('app', '{{ app.id }}', '{{ app.company_name }} Bid', '', '{% if app.technical_bid %}{{ app.technical_bid.url }}{% endif %}')">Approve</button>
-                                <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('app', '{{ app.id }}')">Reject</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="openRejectModal('app', '{{ app.id }}')">Reject</button>
                             </div>
                         </td>
                     </tr>
@@ -195,7 +195,7 @@
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
                                 <button class="btn btn-primary btn-sm" onclick="openApprovalModal('funding_app', '{{ app.id }}', '{{ app.bidder.username }} Request', '', '{% if app.supporting_document %}{{ app.supporting_document.url }}{% endif %}')">Approve</button>
-                                <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('funding_app', '{{ app.id }}')">Reject</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="openRejectModal('funding_app', '{{ app.id }}')">Reject</button>
                             </div>
                         </td>
                     </tr>
@@ -215,7 +215,7 @@
                         <td style="padding: 18px 20px; text-align: right;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
                                 <button class="btn btn-primary btn-sm" onclick="openApprovalModal('request', '{{ req.id }}', '{{ req.user.username }} Request')">Approve</button>
-                                <button class="btn btn-outline btn-sm" style="color:var(--red); border-color:var(--red);" onclick="openRejectModal('request', '{{ req.id }}')">Reject</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="openRejectModal('request', '{{ req.id }}')">Reject</button>
                             </div>
                         </td>
                     </tr>
@@ -225,6 +225,7 @@
                 {% endif %}
             </tbody>
         </table>
+    </div>
     </div>
 </div>
 
@@ -236,7 +237,7 @@
             <button type="button" style="background:none; border:none; color:var(--text); opacity:0.5; cursor:pointer; padding:4px;" onclick="closeModal()"><i class="fas fa-times"></i></button>
         </div>
         <div style="padding: 24px;">
-            <form id="approvalForm" method="POST">
+            <form id="approvalForm" method="POST" class="mail-loader-form">
                 {% csrf_token %}
                 <div id="userRoleField" style="display:none; margin-bottom:20px;">
                     <label style="display:block; font-size:12px; font-weight:600; color:var(--text); opacity:0.8; text-transform:uppercase; margin-bottom:8px;">Assign Role Permission</label>

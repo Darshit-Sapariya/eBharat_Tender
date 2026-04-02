@@ -37,7 +37,7 @@ urlpatterns = [
     path('request/reject/<int:request_id>/', views.reject_admin_request, name='reject_admin_request'),
 
     # Analytics
-
+    path('emd-escrow/', views.emd_escrow_list, name='emd_escrow_list'),
     # History & Roles
     path('history/', views.action_history, name='action_history'),
     path('allocate/user/<int:profile_id>/', views.allocate_user_role, name='allocate_user_role'),

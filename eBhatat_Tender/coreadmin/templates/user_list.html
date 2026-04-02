@@ -24,13 +24,13 @@
           <input type="text" placeholder="Search profiles..." id="userSearch" style="width:100%; box-sizing:border-box; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:13px; outline:none; transition:box-shadow 0.2s;">
       </div>
       <div style="display:flex; background:var(--bg3); border-radius:8px; padding:4px; border:1px solid var(--border);">
-          <a href="?role=all" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'all' or not current_role %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">All</a>
-          <a href="?role=bidder" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'bidder' %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">Bidders</a>
-          <a href="?role=creator" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; color:var(--text); {% if current_role == 'creator' %}background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}opacity:0.6; transition:opacity 0.2s;{% endif %}">Creators</a>
+          <a href="?role=all" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; {% if current_role == 'all' or not current_role %}color:#fff; background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}color:var(--text); opacity:0.6; transition:opacity 0.2s;{% endif %}">All</a>
+          <a href="?role=bidder" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; {% if current_role == 'bidder' %}color:#fff; background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}color:var(--text); opacity:0.6; transition:opacity 0.2s;{% endif %}">Bidders</a>
+          <a href="?role=creator" style="padding: 6px 14px; font-size:12px; text-decoration:none; border-radius:6px; font-weight:600; {% if current_role == 'creator' %}color:#fff; background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.2);{% else %}color:var(--text); opacity:0.6; transition:opacity 0.2s;{% endif %}">Creators</a>
       </div>
   </div>
 </div>
-
+<div class="p-5">
 <div class="card">
     <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
         <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Registered Platform Entities</div>
@@ -84,7 +84,11 @@
                     </td>
                     <td style="padding: 18px 20px;">
                         <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
-                            {% if profile.role == 'bidder' %}
+                            {% if profile.user.is_superuser %}
+                            <span class="badge" style="background-color: #8b5cf6; color: #ffffff;">Super Admin</span>
+                            {% elif profile.user.is_staff and not profile.role %}
+                            <span class="badge" style="background-color: #0f2a5e; color: #ffffff;">Platform Staff</span>
+                            {% elif profile.role == 'bidder' %}
                             <span class="badge bg-blue">Bidder</span>
                             {% elif profile.role == 'creator' %}
                             <span class="badge bg-amber">Tender Creator</span>
@@ -133,7 +137,7 @@
         </table>
     </div>
 </div>
-
+</div>
 <script>
     document.getElementById('userSearch').addEventListener('keyup', function() {
         let filter = this.value.toUpperCase();

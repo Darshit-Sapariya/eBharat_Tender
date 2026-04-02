@@ -60,6 +60,7 @@
       --amber:  #f59e0b; --amber-bg: #fffbeb; --amber-b: #fde68a;
       --blue:   #3b82f6; --blue-bg:  #eff6ff; --blue-b:  #bfdbfe;
       --purple: #8b5cf6; --purple-bg:#f5f3ff; --purple-b:#ddd6fe;
+      --primary: #6366f1;
       
       /* Legacy Variables for Sub-pages Compatibility */
       --bg1: var(--surface);
@@ -85,17 +86,28 @@
   .ph-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
 
   /* BUTTONS */
-  .btn { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; text-decoration: none; transition: all 0.15s cubic-bezier(0.4,0,0.2,1); white-space: nowrap; border: 1.5px solid transparent; }
-  .btn-sm  { font-size: 0.775rem; padding: 7px 14px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; text-decoration: none; transition: all 0.15s cubic-bezier(0.4,0,0.2,1); white-space: nowrap; border: 1px solid transparent; font-size: 0.85rem; padding: 10px 18px; }
+  .btn-sm  { font-size: 0.75rem; padding: 7px 14px; border-radius: 6px; }
   .btn-xs  { font-size: 0.7rem;   padding: 4px 10px; border-radius: 6px; }
-  .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 2px 8px rgba(99,102,241,0.25); }
-  .btn-primary:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.35); transform: translateY(-1px); color: white; }
-  .btn-outline { background: white; color: #475569; border-color: var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .btn-outline:hover { border-color: #c7d2fe; color: var(--indigo); background: #eef2ff; }
+  
+  .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6) !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(99,102,241,0.25); border: none; }
+  .btn-primary:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.35); transform: translateY(-1px); color: #ffffff !important; opacity: 0.95; }
+  
+  .btn-outline { background: #ffffff !important; color: #475569 !important; border-color: var(--border) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .btn-outline:hover { border-color: #c7d2fe !important; color: #6366f1 !important; background: #eef2ff !important; }
+  
+  .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25); border: none; }
+  .btn-danger:hover { box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35); transform: translateY(-1px); color: #ffffff !important; opacity: 0.95; }
+  
+  .btn-outline-danger { background: #ffffff !important; color: #ef4444 !important; border-color: #fca5a5 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .btn-outline-danger:hover { border-color: #ef4444 !important; color: #ffffff !important; background: #ef4444 !important; }
+
+  .btn-icon { padding: 0; width: 34px; height: 34px; }
+  .btn-icon.btn-sm { width: 28px; height: 28px; padding: 0; }
 
   /* STAT CARDS */
   .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0; border-bottom: 1px solid var(--border); }
-  .sc { padding: 18px 20px 16px; border-right: 1px solid var(--border); position: relative; overflow: hidden; transition: background 0.15s; cursor: default; }
+  .sc { padding: 23px 25px 21px; border-right: 1px solid var(--border); position: relative; overflow: hidden; transition: background 0.15s; cursor: default; }
   .sc:last-child { border-right: none; }
   .sc:nth-child(4n) { border-right: none; }
   .sc::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.15s; }
@@ -117,7 +129,7 @@
 
   /* CARD */
   .card { background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(15,42,94,0.04); }
-  .card-head, .ch { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: #fafbff; }
+  .card-head, .ch { display: flex; align-items: center; justify-content: space-between; padding: 19px 23px; border-bottom: 1px solid var(--border); background: #fafbff; }
   .card-title, .ct { font-family: 'Sora', sans-serif; font-size: 0.82rem; font-weight: 700; color: #1e293b; }
   .cs { font-size: 0.67rem; color: var(--t3); margin-top: 1px; }
   .card-body { padding: 0; overflow-x: auto; }
@@ -375,6 +387,13 @@
       {% endif %}
     </a>
  <div class="nav-section-label mt-1">Funding</div>
+    <a href="{% url 'coreadmin:emd_escrow_list' %}"
+       class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
+              text-slate-500 no-underline text-[0.795rem] mb-[1px]
+              {% block nav_escrow %}{% endblock %}">
+      <i class="nav-icon fas fa-lock w-[15px] text-center text-[0.8rem] flex-shrink-0 text-slate-400"></i>
+      <span class="nav-text">EMD Escrow</span>
+    </a>
     <a href="{% url 'coreadmin:funding_approvals' %}"
        class="nav-item flex items-center gap-[0.55rem] px-[0.75rem] py-[0.48rem] rounded-[8px]
               text-slate-500 no-underline text-[0.795rem] mb-[1px]
@@ -549,10 +568,8 @@
          class="flex items-center gap-1.5 pl-[0.25rem] pr-[0.55rem] py-[0.25rem]
                 rounded-full border-[1.5px] border-border bg-white cursor-pointer flex-shrink-0
                 transition-all duration-[0.18s] hover:border-indigo-200 hover:bg-surface">
-      <div class="w-[26px] h-[26px] rounded-full flex items-center justify-center
-                  bg-gradient-to-br from-indigo-500 to-purple-500
+      <div class="bg-gradient-to-br from-indigo-500 to-purple-500
                   text-white text-[0.6rem] font-bold border-[1.5px] border-slate-200 uppercase">
-        {{ request.user.first_name|default:"A"|make_list|first }}
       </div>
       <span class="hidden sm:block text-[0.78rem] font-semibold text-text max-w-[90px] whitespace-nowrap overflow-hidden text-ellipsis">
         {{ request.user.first_name|default:"Admin" }}
@@ -589,7 +606,7 @@
 <!-- ═══════ MAIN ═══════ -->
 <div class="main-wrap ml-0 lg:ml-[220px] pt-[56px] min-h-screen">
   <div class="p-4 sm:p-6">
-    <div class="page-content bg-white rounded-2xl border border-border shadow-[0_2px_12px_rgba(15,42,94,0.04)] overflow-hidden">
+    <div class="page-content bg-white rounded-2xl border border-border shadow-[0_2px_12px_rgba(15,42,94,0.04)]">
       {% block content %}{% endblock %}
     </div>
   </div>
@@ -600,18 +617,7 @@
 <div id="toastWrap" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2"></div>
 
 
-<!-- ═══════ GLOBAL LOADING OVERLAY ═══════ -->
-<div id="global-loader"
-     class="fixed inset-0 z-[9999] flex items-center justify-center hidden"
-     style="background-color:rgba(255,255,255,0.82); backdrop-filter:blur(5px);">
-  <div class="flex flex-col items-center p-8 bg-white rounded-2xl shadow-2xl border border-slate-100">
-    <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-    <p class="mt-4 font-sora text-slate-800 font-extrabold text-[1rem]">Processing…</p>
-    <p class="text-[0.72rem] text-slate-500 mt-1 font-medium text-center max-w-[180px]">
-      Please wait while we securely process your request.
-    </p>
-  </div>
-</div>
+{% include 'email_loader.html' %}
 
 
 <script>

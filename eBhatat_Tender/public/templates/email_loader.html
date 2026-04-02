@@ -1,0 +1,331 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Noto+Sans:wght@400;500&display=swap');
+  
+  :root {
+    --saffron:#FF671F;
+    --ebharat-white:#FFFFFF;
+    --green:#046A38;
+    --navy:#0f2a5e;
+  }
+  
+  /* LOADER OVERLAY */
+  .ebharat-loader-overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,0.85); /* LIGHT OVERLAY */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter:blur(6px);
+  }
+  .ebharat-loader-overlay.active {opacity:1;visibility:visible;}
+  .ebharat-loader-overlay.fade-out {opacity:0;visibility:hidden;}
+
+  .ebharat-loader-card {
+    background:#ffffff; /* LIGHT CARD */
+    border:1px solid rgba(0,0,0,0.06);
+    border-radius:20px;
+    padding:40px 48px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+    min-width:320px;
+    box-shadow:0 32px 80px rgba(15,42,94,0.12); /* SOFT SHADOW */
+    transform:scale(0.88);
+    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .ebharat-loader-overlay.active .ebharat-loader-card {transform:scale(1);}
+
+  /* LOGO AREA */
+  .ebharat-logo-wrap {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0px;
+  }
+
+  /* SPINNER RING */
+  .ebharat-spinner-wrap {position:relative;width:72px;height:72px;}
+  .ebharat-spinner-track {
+    position:absolute;inset:0;
+    border-radius:50%;
+    border:3px solid rgba(0,0,0,0.06); /* LIGHT TRACK */
+  }
+  .ebharat-spinner-ring {
+    position:absolute;inset:0;
+    border-radius:50%;
+    border:3px solid transparent;
+    border-top-color:var(--saffron);
+    border-right-color:rgba(0,0,0,0.1); /* LIGHT TRAIL */
+    animation:ebharat-spin 0.9s linear infinite;
+  }
+  .ebharat-spinner-ring-2 {
+    position:absolute;
+    inset:8px;
+    border-radius:50%;
+    border:2px solid transparent;
+    border-bottom-color:var(--green);
+    animation:ebharat-spin 1.3s linear infinite reverse;
+  }
+  .ebharat-spinner-dot {
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:12px;height:12px;
+    border-radius:50%;
+    background:var(--saffron);
+    animation:ebharat-pulse-dot 0.9s ease-in-out infinite;
+  }
+  @keyframes ebharat-spin{to{transform:rotate(360deg);}}
+  @keyframes ebharat-pulse-dot{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1;}50%{transform:translate(-50%,-50%) scale(0.6);opacity:0.5;}}
+
+  /* STATUS TEXT */
+  .ebharat-status-text {
+    font-family:'Rajdhani',sans-serif;
+    font-size:17px;
+    font-weight:600;
+    color:#475569; /* SLATE TEXT */
+    letter-spacing:0.5px;
+    text-align:center;
+    min-height:24px;
+    transition:opacity 0.3s;
+  }
+  .ebharat-dots-anim::after {
+    content:'';
+    animation:ebharat-dots 1.4s steps(4,end) infinite;
+  }
+  @keyframes ebharat-dots{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}100%{content:'';}}
+
+  /* PROGRESS BAR */
+  .ebharat-progress-wrap {
+    width:240px;
+    height:4px;
+    background:#e2e8f0; /* LIGHT BG */
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .ebharat-progress-bar {
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--saffron),var(--green));
+    border-radius:99px;
+    transition:width 0.4s ease;
+  }
+
+  /* FLAG STRIPE ACCENT */
+  .ebharat-flag-stripe {
+    display:flex;
+    gap:0;
+    width:200px;
+    height:3px;
+    border-radius:99px;
+    overflow:hidden;
+    opacity:0.9;
+    margin-top:8px;
+  }
+  .ebharat-flag-stripe span {flex:1;}
+
+  /* SUCCESS STATE */
+  .ebharat-success-wrap {
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  @keyframes ebharat-success-pop {from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .ebharat-checkmark-circle {
+    width:72px;height:72px;
+    border-radius:50%;
+    background:rgba(4,106,56,0.1);
+    border:2px solid var(--green);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ebharat-checkmark-svg {width:36px;height:36px;}
+  .ebharat-checkmark-path {
+    stroke:var(--green);
+    stroke-width:3;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    fill:none;
+    stroke-dasharray:40;
+    stroke-dashoffset:40;
+  }
+  @keyframes ebharat-draw-check {to{stroke-dashoffset:0;}}
+  
+  .ebharat-success-title {
+    font-family:'Rajdhani',sans-serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--navy); /* NAVY TEXT */
+    letter-spacing:0.5px;
+  }
+  .ebharat-success-sub {
+    font-size:14px;
+    color:#64748b; /* LIGHT SUBTEXT */
+    text-align:center;
+    line-height:1.5;
+  }
+</style>
+
+<!-- LOADER OVERLAY -->
+<div class="ebharat-loader-overlay" id="ebharatLoaderOverlay">
+  <div class="ebharat-loader-card">
+    <div class="ebharat-logo-wrap">
+      {% load static %}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);">
+          <span style="color:var(--saffron);">e</span>Bharat
+        </span>
+        <span style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:3px;color:var(--green);">TENDER</span>
+      </div>
+      <div class="ebharat-flag-stripe">
+        <span style="background:var(--saffron);"></span>
+        <span style="background:#e2e8f0;"></span>
+        <span style="background:var(--green);"></span>
+      </div>
+    </div>
+
+    <!-- LOADING STATE -->
+    <div id="ebharatLoadingState" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <div class="ebharat-spinner-wrap">
+        <div class="ebharat-spinner-track"></div>
+        <div class="ebharat-spinner-ring"></div>
+        <div class="ebharat-spinner-ring-2"></div>
+        <div class="ebharat-spinner-dot"></div>
+      </div>
+      <div class="ebharat-status-text ebharat-dots-anim" id="ebharatStatusText">Sending request</div>
+      <div class="ebharat-progress-wrap">
+        <div class="ebharat-progress-bar" id="ebharatProgressBar"></div>
+      </div>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="ebharat-success-wrap" id="ebharatSuccessState">
+      <div class="ebharat-checkmark-circle">
+        <svg class="ebharat-checkmark-svg" viewBox="0 0 36 36">
+          <path class="ebharat-checkmark-path" id="ebharatCheckmarkPath" d="M8 18l7 7 13-13"/>
+        </svg>
+      </div>
+      <div class="ebharat-success-title">Successfully Processed!</div>
+      <div class="ebharat-success-sub">Your request has been processed<br>and notifications sent</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ebharatMessages = [
+  "Sending request",
+  "Encrypting data",
+  "Connecting to secure server",
+  "Delivering notifications securely",
+  "Almost done"
+];
+
+let ebharatMsgIdx = 0, ebharatMsgInterval = null;
+
+function triggerEbharatLoader() {
+  const overlay = document.getElementById('ebharatLoaderOverlay');
+  const loadingState = document.getElementById('ebharatLoadingState');
+  const successState = document.getElementById('ebharatSuccessState');
+  const progressBar = document.getElementById('ebharatProgressBar');
+  const statusText = document.getElementById('ebharatStatusText');
+  const checkmarkPath = document.getElementById('ebharatCheckmarkPath');
+
+  ebharatMsgIdx = 0;
+  progressBar.style.width = '0%';
+  statusText.textContent = ebharatMessages[0];
+  statusText.classList.add('ebharat-dots-anim');
+  loadingState.style.display = 'flex';
+  successState.style.display = 'none';
+  successState.style.animation = 'none';
+  checkmarkPath.style.animation = 'none';
+
+  overlay.classList.remove('fade-out');
+  overlay.classList.add('active');
+
+  let progress = 0;
+  clearInterval(ebharatMsgInterval);
+  ebharatMsgInterval = setInterval(() => {
+    // Dynamically progress up to ~92%
+    progress += (92 - progress) * 0.05; 
+    progressBar.style.width = progress + '%';
+    const msgStep = Math.floor((progress / 92) * (ebharatMessages.length - 1));
+    if(msgStep !== ebharatMsgIdx && msgStep < ebharatMessages.length){
+      ebharatMsgIdx = msgStep;
+      statusText.textContent = ebharatMessages[ebharatMsgIdx];
+    }
+  }, 100);
+}
+
+function completeEbharatLoader() {
+  const loadingState = document.getElementById('ebharatLoadingState');
+  const successState = document.getElementById('ebharatSuccessState');
+  const progressBar = document.getElementById('ebharatProgressBar');
+  const statusText = document.getElementById('ebharatStatusText');
+  const checkmarkPath = document.getElementById('ebharatCheckmarkPath');
+  const overlay = document.getElementById('ebharatLoaderOverlay');
+
+  clearInterval(ebharatMsgInterval);
+  progressBar.style.width = '100%';
+  statusText.classList.remove('ebharat-dots-anim');
+  statusText.textContent = "Done";
+
+  setTimeout(() => {
+    loadingState.style.display = 'none';
+    successState.style.display = 'flex';
+    successState.style.animation = 'ebharat-success-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';
+    checkmarkPath.style.animation = 'ebharat-draw-check 0.5s ease 0.1s forwards';
+  }, 300);
+}
+
+// Bind interceptor
+document.addEventListener('submit', function(e) {
+  if (e.target.classList.contains('mail-loader-form')) {
+    e.preventDefault(); // Intercept!
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+       submitBtn.disabled = true;
+       submitBtn.style.opacity = '0.7';
+    }
+    
+    // Start our custom branded loader
+    triggerEbharatLoader();
+    
+    // Simulate Fetch for form submission
+    const formData = new FormData(form);
+    
+    // Add submit button value if any
+    if (e.submitter && e.submitter.name) {
+       formData.append(e.submitter.name, e.submitter.value);
+    }
+    
+    fetch(form.getAttribute('action') || window.location.href, {
+       method: form.getAttribute('method') || 'POST',
+       body: formData,
+    }).then(response => {
+       // Convert to text to inject back
+       return response.text().then(text => ({text, response}));
+    }).then(({text, response}) => {
+       completeEbharatLoader();
+       // Keep success state up for 1.8 seconds, then inject the new page
+       setTimeout(() => {
+          document.open();
+          document.write(text);
+          document.close();
+          if (response.redirected) {
+             window.history.pushState({}, '', response.url);
+          }
+       }, 1800);
+    }).catch(err => {
+       console.error("AJAX submit failed", err);
+       form.submit(); // fallback
+    });
+  }
+});
+</script>

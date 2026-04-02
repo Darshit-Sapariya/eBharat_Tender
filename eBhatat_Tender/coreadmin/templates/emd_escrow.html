@@ -1,0 +1,138 @@
+{% extends 'coreadmin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}EMD Escrow Management · Super Admin{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'coreadmin:deshbord' %}">Dashboard</a>
+<i class="fas fa-chevron-right"></i>
+<span>EMD Escrow</span>
+{% endblock %}
+
+{% block content %}
+<div class="ph" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+  <div>
+    <div class="ph-eye">Financial Administration</div>
+    <div class="ph-title">EMD Escrow Management</div>
+    <div class="ph-sub">Track and manage Earnest Money Deposits (EMDs) across all tender applications.</div>
+  </div>
+</div>
+<div class="p-5">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+    <!-- Collected -->
+    <div class="relative overflow-hidden bg-white border border-slate-200 border-b-[4px] border-b-slate-300 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-b-emerald-400 transition-all duration-300 hover:-translate-y-0.5 group">
+        <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-emerald-50/60 group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
+        <div class="relative z-10 flex items-start justify-between">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-[13px] shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                <i class="fas fa-indian-rupee-sign"></i>
+            </div>
+        </div>
+        <div class="relative z-10 mt-3">
+            <div class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total EMD Collected</div>
+            <div class="text-[1.25rem] font-sora font-extrabold text-slate-800 tracking-tight leading-none">₹{{ total_collected|intcomma }}</div>
+            <div class="text-[10px] font-medium text-slate-500 mt-1.5 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-chart-line text-[9px] text-emerald-400"></i> Lifetime Collection
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Escrow -->
+    <div class="relative overflow-hidden bg-white border border-slate-200 border-b-[4px] border-b-slate-300 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-b-indigo-400 transition-all duration-300 hover:-translate-y-0.5 group">
+        <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-indigo-50/60 group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
+        <div class="relative z-10 flex items-start justify-between">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center text-[13px] shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                <i class="fas fa-lock"></i>
+            </div>
+        </div>
+        <div class="relative z-10 mt-3">
+            <div class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Active Escrow</div>
+            <div class="text-[1.25rem] font-sora font-extrabold text-slate-800 tracking-tight leading-none">₹{{ active_escrow|intcomma }}</div>
+            <div class="text-[10px] font-medium text-slate-500 mt-1.5 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-shield-halved text-[9px] text-indigo-400"></i> Currently Held in Escrow
+            </div>
+        </div>
+    </div>
+    
+    <!-- Refunded -->
+    <div class="relative overflow-hidden bg-white border border-slate-200 border-b-[4px] border-b-slate-300 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-b-blue-400 transition-all duration-300 hover:-translate-y-0.5 group">
+        <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-blue-50/60 group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
+        <div class="relative z-10 flex items-start justify-between">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[13px] shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                <i class="fas fa-undo"></i>
+            </div>
+        </div>
+        <div class="relative z-10 mt-3">
+            <div class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Refunded</div>
+            <div class="text-[1.25rem] font-sora font-extrabold text-slate-800 tracking-tight leading-none">₹{{ total_refunded|intcomma }}</div>
+            <div class="text-[10px] font-medium text-slate-500 mt-1.5 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-rotate-left text-[9px] text-blue-400"></i> Lifetime Refunds
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="p-3">
+<div class="card">
+    <div class="card-head" style="background:var(--bg3); border-bottom:2px solid var(--border2);">
+        <div class="card-title" style="color:var(--text); letter-spacing:0.05em;">Escrow Transactions</div>
+    </div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: var(--bg2); border-bottom: 2px solid var(--border);">
+                <tr style="text-align: left; font-size: 11px; color: var(--text); text-transform: uppercase;">
+                    <th style="padding: 16px 20px; width: 25%;">Tender Info</th>
+                    <th style="padding: 16px 20px; width: 20%;">Applicant / Bidder</th>
+                    <th style="padding: 16px 20px; width: 20%;">EMD Amount</th>
+                    <th style="padding: 16px 20px; width: 20%;">Payment Status & ID</th>
+                    <th style="padding: 16px 20px; width: 15%;">Applied On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;">
+                    <td style="padding: 18px 20px;">
+                        <div style="font-weight:600; font-size:14px; color:var(--text);">{{ app.tender.title|truncatechars:40 }}</div>
+                        <div style="font-size:12px; color:var(--text); opacity:0.6; margin-top:4px;">ID: TND-{{ app.tender.tender_id }}</div>
+                        {% if app.tender.status == 'open' %}
+                            <span class="badge bg-green" style="font-size:10px; margin-top:4px;">Open Tender</span>
+                        {% else %}
+                            <span class="badge bg-gray" style="font-size:10px; margin-top:4px;">Closed/Awarded</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-size:13px; color:var(--text); font-weight:600;">{{ app.company_name }}</div>
+                        <div style="font-size:11px; color:var(--text); opacity:0.6; margin-top:4px;">{{ app.applicant.username }}</div>
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-family: monospace; font-weight:700; font-size:15px; color:var(--text);">₹{{ app.tender.emd_amount|intcomma }}</div>
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        {% if app.payment_status == 'paid' %}
+                            <span class="badge bg-amber badge-dot">Held in Escrow</span>
+                        {% elif app.payment_status == 'refunded' %}
+                            <span class="badge bg-gray badge-dot">Refunded</span>
+                        {% endif %}
+                        <div style="font-size:11px; color:var(--text); opacity:0.6; margin-top:6px; font-family:monospace;">
+                            Txn: {{ app.razorpay_payment_id|default:"N/A"|truncatechars:20 }}
+                        </div>
+                    </td>
+                    <td style="padding: 18px 20px;">
+                        <div style="font-size:13px; color:var(--text);">{{ app.applied_at|date:"d M Y" }}</div>
+                        <div style="font-size:11px; color:var(--text); opacity:0.6;">{{ app.applied_at|timesince }} ago</div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:60px; color:var(--text); opacity:0.5;">
+                        <i class="fas fa-lock mb-3" style="font-size: 24px;"></i>
+                        <div style="font-size: 14px;">No EMD transactions found.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

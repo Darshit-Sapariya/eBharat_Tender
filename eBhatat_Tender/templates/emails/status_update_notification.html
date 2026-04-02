@@ -4,55 +4,72 @@
     <meta charset="utf-8">
     <style>
         body { font-family: 'DM Sans', Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 42, 94, 0.08); }
-        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 25px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; }
-        .content { padding: 35px; line-height: 1.6; }
-        .status-box { padding: 20px; border-radius: 10px; margin: 25px 0; border: 1px solid; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 16px rgba(15, 42, 94, 0.08); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0f2a5e 0%, #163472 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+        .header p { color: rgba(255, 255, 255, 0.7); margin: 5px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .content { padding: 40px; line-height: 1.6; }
+        
+        .status-box { padding: 30px 25px; border-radius: 12px; margin: 30px 0; border: 1.5px solid; text-align: center; }
         .status-approved { background-color: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
         .status-rejected { background-color: #fef2f2; border-color: #fecaca; color: #b91c1c; }
-        .status-title { font-weight: 800; font-size: 16px; margin-bottom: 5px; text-transform: uppercase; }
-        .remark-box { margin-top: 15px; font-size: 13px; font-style: italic; color: #64748b; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; }
-        .footer { background-color: #09193a; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.4); font-size: 11px; }
+        
+        .status-icon { font-size: 28px; margin: 0 auto 15px auto; display: block; width: 56px; height: 56px; line-height: 56px; border-radius: 50%; font-weight: bold; }
+        .status-approved .status-icon { background-color: #dcfce7; color: #16a34a; }
+        .status-rejected .status-icon { background-color: #fee2e2; color: #dc2626; }
+        
+        .status-title { font-weight: 800; font-size: 20px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .status-text { font-size: 15px; font-weight: 500; }
+        
+        .remark-box { margin-top: 25px; background-color: rgba(255,255,255,0.7); padding: 15px 20px; border-radius: 8px; font-size: 14px; font-style: italic; color: #475569; text-align: left; border: 1px dashed rgba(0,0,0,0.15); box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); }
+        
+        .footer { background-color: #09193a; padding: 25px; text-align: center; color: rgba(255, 255, 255, 0.5); font-size: 12px; line-height: 1.6; }
+        .btn { display: inline-block; padding: 14px 28px; background-color: #1a56db; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Activity Notification</h1>
-            <p style="color:rgba(255,255,255,0.6); font-size:11px; margin-top:5px;">eBharat Tender Portal Official System Notice</p>
+            <p>eBharat Tender Portal Official System Notice</p>
         </div>
         <div class="content">
-            <p>Dear <b>{{ user_name }}</b>,</p>
-            <p>This is a formal notification regarding the status update of your <b>{{ activity_name }}</b> on the eBharat Tender Portal.</p>
+            <h2 style="color: #0f2a5e; font-size: 20px; margin-top: 0; margin-bottom: 15px;">Dear {{ user_name }},</h2>
+            <p style="color: #475569; font-size: 15px;">This is a formal notification regarding the status update of your <b>{{ activity_name }}</b> on the eBharat Tender Portal.</p>
             
             <div class="status-box {% if status == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
-                <div class="status-title">Status: {{ status|upper }}</div>
-                <div>The request for <b>{{ item_name }}</b> has been {{ status }}.</div>
+                <div class="status-icon">
+                    {% if status == 'approved' %}✓{% else %}✗{% endif %}
+                </div>
+                <div class="status-title">{{ status }}</div>
+                <div class="status-text">The request for <b style="color: inherit;">{{ item_name }}</b> has been {{ status }}.</div>
+                
                 {% if remark %}
                 <div class="remark-box">
-                    <b>Administrator Remark:</b> "{{ remark }}"
+                    <b style="color: #1e293b; font-style: normal; display: block; margin-bottom: 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Administrator Remark:</b>
+                    "{{ remark }}"
                 </div>
                 {% endif %}
             </div>
 
-            <p style="font-size: 13px; color: #64748b;">
+            <p style="font-size: 14px; color: #64748b; line-height: 1.7; background-color: #f8fafc; padding: 16px 20px; border-radius: 8px; border-left: 4px solid #cbd5e1;">
                 {% if status == 'approved' %}
-                Congratulations! You may now proceed with the next steps associated with this activity. Please log in to your dashboard to continue.
+                <b style="color: #0f2a5e;">Congratulations!</b> You may now proceed with the next steps associated with this activity. Please log in to your dashboard to continue.
                 {% else %}
-                We regret to inform you that your request could not be approved at this time. Please review the remarks above and take necessary actions or contact support for clarification.
+                <b style="color: #0f2a5e;">Action Required:</b> We regret to inform you that your request could not be approved at this time. Please review the remarks above and take necessary actions or contact support for clarification.
                 {% endif %}
             </p>
             
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="http://{{ domain }}/accounts/login/" style="display:inline-block; padding:12px 24px; background-color:#1a56db; color:#ffffff; text-decoration:none; border-radius:8px; font-weight:700;">Login to Portal</a>
+            <div style="text-align: center; margin-top: 35px;">
+                <a href="http://{{ domain }}/accounts/login/" class="btn">Login to Your Dashboard</a>
             </div>
             
-            <p style="margin-top: 35px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 13px;">Regards,<br><b>eBharat Administration</b><br>Government of India</p>
+            <p style="margin-top: 40px; font-size: 14px; color: #475569;">Best regards,<br><b style="color: #0f2a5e; font-size: 15px;">eBharat Administration Team</b><br>Government of India</p>
         </div>
         <div class="footer">
-            <p>© 2026 Government of India · Electronic Procurement Portal</p>
-            <p>This System is developed by Darshit Sapariya</p>
+            <p style="margin: 3px 0;">© 2026 Government of India · Electronic Procurement Portal</p>
+            <p style="margin: 3px 0;">This System is developed by Darshit Sapariya</p>
+            <p style="margin: 3px 0; color: #94a3b8; font-weight: bold;">Contact: [+91 8347402205]</p>
         </div>
     </div>
 </body>

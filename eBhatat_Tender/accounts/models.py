@@ -99,7 +99,9 @@ class AdminRequest(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.get_or_create(user=instance)
+        # Auto-approve superusers and staff
+        status = 'approved' if (instance.is_superuser or instance.is_staff) else 'pending'
+        UserProfile.objects.get_or_create(user=instance, defaults={'status': status})
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist')

@@ -219,7 +219,7 @@
               <!-- Evaluation Area -->
               <td>
                 {% if bid.status == "pending" %}
-                  <form method="POST" action="{% url 'tenders:update_bid_status' bid.id %}" class="flex flex-col gap-3">
+                  <form method="POST" action="{% url 'tenders:update_bid_status' bid.id %}" class="mail-loader-form flex flex-col gap-3">
                     {% csrf_token %}
                     <div class="flex gap-2 items-start">
                         <textarea name="remark" rows="2" required placeholder="Evaluation remark..."
@@ -305,7 +305,7 @@
           form.appendChild(actionInput);
         }
         actionInput.value = actionValue;
-        form.submit();
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
     });
   }

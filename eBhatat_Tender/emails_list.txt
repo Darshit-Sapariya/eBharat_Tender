@@ -1,0 +1,27 @@
+
+[tenders/views.py]:
+- line 481: Action 'def update_bid_status(request, bid_id):' uses template 'bid_awarded.html'
+
+[funding/views.py]:
+- line 42: Action 'def apply_funding(request, funding_id, tender_id):' uses template 'funding_application_confirmation.html'
+
+[coreadmin/views.py]:
+- line 215: Action 'def approve_user(request, profile_id):' uses template 'status_update_notification.html'
+- line 253: Action 'def reject_user(request, profile_id):' uses template 'status_update_notification.html'
+- line 285: Action 'def approve_application(request, app_id):' uses template 'status_update_notification.html'
+- line 329: Action 'def reject_application(request, app_id):' uses template 'status_update_notification.html'
+- line 386: Action 'def approve_funding_app(request, app_id):' uses template 'funding_awarded.html'
+- line 425: Action 'def reject_funding_app(request, app_id):' uses template 'status_update_notification.html'
+- line 490: Action 'def create_staff(request):' uses template 'welcome_email.html'
+- line 630: Action 'def approve_admin_request(request, request_id):' uses template 'status_update_notification.html'
+- line 669: Action 'def reject_admin_request(request, request_id):' uses template 'status_update_notification.html'
+- line 916: Action 'def allocate_user_role(request, profile_id):' uses template 'status_update_notification.html'
+
+[bids/views.py]:
+- line 266: Action 'def applybid(request, tender_id):' uses template 'bid_confirmation.html'
+
+[accounts/views.py]:
+- line 252: Action 'def register(request):' uses template 'welcome_email.html'
+
+[accounts/signals.py]:
+- line 23: Action 'def send_welcome_email_on_signup(request, user, **kwargs):' uses template 'welcome_email.html'

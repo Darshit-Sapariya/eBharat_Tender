@@ -18,6 +18,14 @@ def login_view(request):
         username = request.POST.get("user_name")
         password = request.POST.get("password")
 
+        # Allow login with email as well
+        if username and '@' in username:
+            try:
+                user_obj = User.objects.get(email=username)
+                username = user_obj.username
+            except User.DoesNotExist:
+                pass
+
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
@@ -26,6 +34,7 @@ def login_view(request):
                 return redirect("coreadmin:deshbord")
             return redirect("public:home")
         else:
+            messages.error(request, "Invalid username or password.")
             return redirect("accounts:login")
     return render(request, "login.html")
 

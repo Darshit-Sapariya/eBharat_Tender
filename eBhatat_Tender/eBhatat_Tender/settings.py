@@ -101,6 +101,20 @@ DATABASES = {
 }
 
 
+
+#postgresql 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'tender_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'D@rshit23',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -181,10 +195,10 @@ RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'YOUR_RAZORPAY_SECRE
 # Email Configuration
 # ------------------------------------------------------------------------------
 # In development, print emails to the console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# For Production (Uncomment and configure when ready)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# For Production/Real Email:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

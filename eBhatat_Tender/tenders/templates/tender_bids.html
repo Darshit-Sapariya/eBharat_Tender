@@ -278,7 +278,7 @@
                     </span>
                 </div>
 
-                <form method="POST" action="{% url 'tenders:update_bid_status' bid.id %}" class="show-loader space-y-4">
+                <form method="POST" action="{% url 'tenders:update_bid_status' bid.id %}" class="mail-loader-form space-y-4">
                     {% csrf_token %}
                     <div class="relative">
                         <textarea name="remark" rows="3" required
@@ -375,9 +375,7 @@
           form.appendChild(actionInput);
         }
         actionInput.value = actionValue;
-        const loader = document.getElementById('global-loader');
-        if (loader) loader.classList.remove('hidden');
-        form.submit();
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
     });
   }
