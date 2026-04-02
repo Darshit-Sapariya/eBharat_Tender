@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth import update_session_auth_hash
 import razorpay
 
 from bids.models import TenderApplication
@@ -230,6 +231,33 @@ def updateProfile(request):
                 profile.role = role
 
         profile.save()
+
+        # 🔐 Password Change Logic
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            if not old_password or not new_password or not confirm_password:
+                messages.error(request, "To change password, please fill in all password fields.")
+                return redirect("tenders:updateProfile")
+            
+            if not request.user.check_password(old_password):
+                messages.error(request, "Incorrect current password.")
+                return redirect("tenders:updateProfile")
+            
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return redirect("tenders:updateProfile")
+            
+            if len(new_password) < 8:
+                messages.error(request, "New password must be at least 8 characters long.")
+                return redirect("tenders:updateProfile")
+
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Password changed successfully!")
 
         # Update first_name on User model for consistency
         full_name = request.POST.get("full_name")

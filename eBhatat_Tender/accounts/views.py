@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from accounts.models import UserProfile, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.http import HttpResponse, JsonResponse
 from .utils import send_ebharat_email
 from django.contrib.sites.shortcuts import get_current_site
@@ -87,6 +87,34 @@ def updateProfile(request):
                 profile.role = role
 
         profile.save()
+
+        # 🔐 Password Change Logic
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            if not old_password or not new_password or not confirm_password:
+                messages.error(request, "To change password, please fill in all password fields.")
+                return redirect("accounts:updateProfile")
+            
+            if not request.user.check_password(old_password):
+                messages.error(request, "Incorrect current password.")
+                return redirect("accounts:updateProfile")
+            
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return redirect("accounts:updateProfile")
+            
+            if len(new_password) < 8:
+                messages.error(request, "New password must be at least 8 characters long.")
+                return redirect("accounts:updateProfile")
+
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Password changed successfully!")
+
         messages.success(request, "Profile Updated Successfully.")
         return redirect("accounts:updateProfile")
 
@@ -135,6 +163,33 @@ def my_profile(request):
 
         profile.status = "pending"
         profile.save()
+
+        # 🔐 Password Change Logic
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            if not old_password or not new_password or not confirm_password:
+                messages.error(request, "To change password, please fill in all password fields.")
+                return redirect("accounts:myprofile")
+            
+            if not request.user.check_password(old_password):
+                messages.error(request, "Incorrect current password.")
+                return redirect("accounts:myprofile")
+            
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return redirect("accounts:myprofile")
+            
+            if len(new_password) < 8:
+                messages.error(request, "New password must be at least 8 characters long.")
+                return redirect("accounts:myprofile")
+
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Password changed successfully!")
 
         return redirect('accounts:myprofile')   # stay on profile until approved
 
